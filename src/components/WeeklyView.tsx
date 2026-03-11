@@ -65,6 +65,28 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ forecasts }) => {
     return 'red';
   };
 
+  // Rank all site/day combos for thermal flying, pick top 3
+  const bestThermalKeys = new Set<string>();
+  (() => {
+    const thermalRanked: { key: string; score: number }[] = [];
+    for (const sf of forecasts) {
+      for (let d = 0; d < 7; d++) {
+        const fc = sf.forecast[d];
+        if (!fc) continue;
+        // Only consider flyable thermal days
+        if (fc.thermalFlyability !== 'good' && fc.thermalFlyability !== 'marginal') continue;
+        // Composite score: flyability tier (good=10, marginal=0) + thermalStrength (0-10)
+        const tierBonus = fc.thermalFlyability === 'good' ? 10 : 0;
+        const score = tierBonus + fc.thermalStrength;
+        thermalRanked.push({ key: `${sf.site.id}-${d}`, score });
+      }
+    }
+    thermalRanked.sort((a, b) => b.score - a.score);
+    for (const entry of thermalRanked.slice(0, 3)) {
+      bestThermalKeys.add(entry.key);
+    }
+  })();
+
   // Sort forecasts by flyability score (green=2, yellow=1, red=0)
   const sortedForecasts = [...forecasts].sort((a, b) => {
     let scoreA = 0;
@@ -162,13 +184,15 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ forecasts }) => {
                   return 'bg-red-100 border-red-400';
                 };
 
+                const isBestThermal = bestThermalKeys.has(`${siteForecast.site.id}-${dayIndex}`);
+
                 return (
                   <td
                     key={dayIndex}
                     className="p-4 cursor-pointer hover:bg-neutral-100 transition-colors"
                     onClick={() => setSelectedSite({ siteForecast, dayIndex })}
                   >
-                    <div className={`border-l-2 pl-3 ${getCellColor()}`}>
+                    <div className={`relative border-l-2 pl-3 ${getCellColor()}`}>
                       <div className="font-mono text-xs">
                         <div className="flex gap-2 mb-1">
                           <span className="text-neutral-500">S:</span>
@@ -190,6 +214,11 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ forecasts }) => {
                           {forecast.launchTime}
                         </div>
                       </div>
+                      {isBestThermal && (
+                        <span className="absolute bottom-0 right-0 font-mono text-[9px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-300 rounded-full px-1.5 py-0.5 leading-none">
+                          Best
+                        </span>
+                      )}
                     </div>
                   </td>
                 );
