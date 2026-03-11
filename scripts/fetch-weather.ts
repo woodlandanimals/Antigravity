@@ -106,6 +106,22 @@ const parseApiTime = (time: string): { dateStr: string; hour: number } => {
   return { dateStr, hour: parseInt(timePart.split(':')[0], 10) };
 };
 
+// Estimate Lifted Index from CAPE and surface conditions (for ECMWF which lacks LI)
+const estimateLiftedIndex = (cape: number, tempF: number, dewPointF: number): number => {
+  const spread = tempF - dewPointF;
+  if (cape > 1500) return -5;
+  if (cape > 1000) return -4;
+  if (cape > 600) return -3;
+  if (cape > 300) return -2;
+  if (cape > 100) return -1;
+  if (cape > 0) return 0;
+  if (tempF > 75 && spread > 25) return -1;
+  if (tempF > 70 && spread > 20) return 0;
+  if (spread < 10) return 3;
+  if (spread < 15) return 2;
+  return 1;
+};
+
 // Weather calculation functions
 const calculateLCL = (tempF: number, dewPointF: number, elevationFt: number): { lclMSL: number, tcon: number } => {
   const tempC = (tempF - 32) * 5/9;
@@ -495,6 +511,7 @@ async function fetchECMWFData(site: LaunchSite): Promise<any> {
       'wind_speed_10m',
       'wind_direction_10m',
       'wind_gusts_10m',
+      'cape',
       'precipitation',
       'precipitation_probability'
     ].join(','),
@@ -555,8 +572,10 @@ function processDataForDay(
     const relativeHumidity = hourly.relative_humidity_2m[noonIndex];
     let cloudCover = hourly.cloud_cover[noonIndex];
 
-    const cape = isHRRR ? (hourly.cape?.[noonIndex] || 0) : 0;
-    const liftedIndex = isHRRR ? (hourly.lifted_index?.[noonIndex] || 0) : 0;
+    const cape = hourly.cape?.[noonIndex] || 0;
+    const liftedIndex = isHRRR
+      ? (hourly.lifted_index?.[noonIndex] || 0)
+      : estimateLiftedIndex(cape, temperature, dewPoint);
     const boundaryLayerHeight = isHRRR ? (hourly.boundary_layer_height?.[noonIndex] || undefined) : undefined;
 
     const { lclMSL, tcon } = calculateLCL(temperature, dewPoint, site.elevation);

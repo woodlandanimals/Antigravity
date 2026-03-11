@@ -249,7 +249,7 @@ const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose
                   <div className="data-label">LI</div>
                   <div className="data-value">{day.liftedIndex}</div>
                   <div className="font-mono text-[10px] text-neutral-500">
-                    {day.liftedIndex && day.liftedIndex < -2 ? 'Unstable' : day.liftedIndex && day.liftedIndex > 2 ? 'Stable' : 'Neutral'}
+                    {day.liftedIndex < -2 ? 'Unstable' : day.liftedIndex > 2 ? 'Stable' : 'Neutral'}
                   </div>
                 </div>
 

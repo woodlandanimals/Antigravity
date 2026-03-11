@@ -115,6 +115,7 @@ const fetchECMWFData = async (site: LaunchSite) => {
         'wind_speed_10m',
         'wind_direction_10m',
         'wind_gusts_10m',
+        'cape',
         'precipitation',
         'precipitation_probability'
       ].join(','),
@@ -201,10 +202,10 @@ const processECMWFDataForDay = (site: LaunchSite, data: any, targetDate: string)
       cloudCover = bestHour.data.cloudCover;
     }
 
-    // ECMWF doesn't provide CAPE, lifted index, or boundary layer height
-    // So we use defaults that will trigger the stability-based fallback
-    const cape = 0;
-    const liftedIndex = 0;
+    // ECMWF provides CAPE but not lifted index or boundary layer height
+    // We estimate LI from CAPE and temp-dew spread
+    const cape = hourly.cape?.[noonIndex] || 0;
+    const liftedIndex = estimateLiftedIndex(cape, temperature, dewPoint);
     const boundaryLayerHeight = undefined;
 
     const { lclMSL, tcon } = calculateLCL(temperature, dewPoint, site.elevation);
@@ -461,6 +462,32 @@ const processHRRRDataForDay = (site: LaunchSite, data: any, targetDate: string):
     console.error(`Failed to process HRRR data for ${site.name} on ${targetDate}:`, error);
     return null;
   }
+};
+
+// Estimate Lifted Index from CAPE and surface conditions when not available from API
+// LI approximates atmospheric stability: negative = unstable, positive = stable
+const estimateLiftedIndex = (cape: number, tempF: number, dewPointF: number): number => {
+  const spread = tempF - dewPointF;
+
+  // High CAPE strongly indicates instability (negative LI)
+  if (cape > 1500) return -5;
+  if (cape > 1000) return -4;
+  if (cape > 600) return -3;
+  if (cape > 300) return -2;
+  if (cape > 100) return -1;
+
+  // No CAPE: estimate from surface conditions
+  // Large spread + warm temps suggest some instability
+  if (cape > 0) return 0;
+
+  // Zero CAPE: use temp-dew spread as a rough proxy
+  // Wide spread in warm air = drier boundary layer, potentially unstable above
+  if (tempF > 75 && spread > 25) return -1;
+  if (tempF > 70 && spread > 20) return 0;
+  if (spread < 10) return 3;  // Very moist = likely stable/overcast
+  if (spread < 15) return 2;
+
+  return 1;  // Default slightly stable
 };
 
 const calculateLCL = (tempF: number, dewPointF: number, elevationFt: number): { lclMSL: number, tcon: number } => {
