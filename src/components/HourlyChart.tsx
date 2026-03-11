@@ -4,423 +4,178 @@ import { getWindDirection } from '../services/weatherService';
 
 interface HourlyChartProps {
   hourlyData: HourlyDataPoint[];
-  siteElevation: number;
   maxWind: number;
 }
 
-const HourlyChart: React.FC<HourlyChartProps> = ({ hourlyData, siteElevation, maxWind }) => {
+const HourlyChart: React.FC<HourlyChartProps> = ({ hourlyData, maxWind }) => {
   if (!hourlyData || hourlyData.length === 0) {
     return null;
   }
 
-  // Chart dimensions
-  const width = 100; // percentage-based for responsiveness
-  const tempChartHeight = 100;
-  const windChartHeight = 70;
-  const padding = { top: 15, right: 10, bottom: 35, left: 35 };
-
-  // Calculate scales
-  const temps = hourlyData.map(d => d.temperature);
-  const tcons = hourlyData.map(d => d.tcon);
-  const allTemps = [...temps, ...tcons];
-  const minTemp = Math.min(...allTemps) - 5;
-  const maxTemp = Math.max(...allTemps) + 5;
-  const tempRange = maxTemp - minTemp;
-
-  const maxWindSpeed = Math.max(...hourlyData.map(d => Math.max(d.windSpeed, d.windGust)), maxWind);
-
-  // Helper functions
-  const getX = (index: number) => {
-    const usableWidth = 100 - padding.left - padding.right;
-    return padding.left + (index / (hourlyData.length - 1)) * usableWidth;
-  };
-
-  const getTempY = (temp: number) => {
-    return padding.top + ((maxTemp - temp) / tempRange) * tempChartHeight;
-  };
-
-  const windTop = padding.top + tempChartHeight + 30;
-
-  const getWindY = (speed: number) => {
-    return windTop + windChartHeight - (speed / maxWindSpeed) * windChartHeight;
-  };
-
-  const getWindColor = (speed: number) => {
-    const ratio = speed / maxWind;
-    if (ratio > 0.9) return '#ef4444'; // red
-    if (ratio > 0.6) return '#f59e0b'; // amber
-    return '#22c55e'; // green
-  };
+  const maxWindSpeed = Math.max(...hourlyData.map(d => Math.max(d.windSpeed, d.windGust)), 5);
 
   const formatHour = (hour: number) => {
+    if (hour === 0) return '12a';
     if (hour === 12) return '12p';
     if (hour > 12) return `${hour - 12}p`;
     return `${hour}a`;
   };
 
-  // Wind grid lines
-  const getWindGridLines = (maxSpeed: number): number[] => {
-    const step = maxSpeed <= 15 ? 5 : maxSpeed <= 30 ? 10 : 15;
-    const lines: number[] = [];
-    for (let v = step; v < maxSpeed; v += step) {
-      lines.push(v);
-    }
-    return lines;
+  const getWindBarColor = (speed: number) => {
+    const ratio = speed / maxWind;
+    if (ratio > 0.9) return '#ef4444';
+    if (ratio > 0.7) return '#f59e0b';
+    if (ratio > 0.5) return '#84cc16';
+    return '#22c55e';
   };
 
-  const windGridLines = getWindGridLines(maxWindSpeed);
+  const getGustBg = (gust: number) => {
+    const ratio = gust / maxWind;
+    if (ratio > 1.0) return 'bg-red-500 text-white';
+    if (ratio > 0.8) return 'bg-orange-400 text-white';
+    if (ratio > 0.6) return 'bg-amber-400 text-neutral-900';
+    if (ratio > 0.4) return 'bg-lime-400 text-neutral-900';
+    return 'bg-green-400 text-neutral-900';
+  };
 
-  // Generate path for temperature line
-  const tempPath = hourlyData
-    .map((d, i) => `${i === 0 ? 'M' : 'L'} ${getX(i)} ${getTempY(d.temperature)}`)
-    .join(' ');
+  const getDirBg = (speed: number) => {
+    const ratio = speed / maxWind;
+    if (ratio > 0.9) return 'bg-red-400 text-white';
+    if (ratio > 0.7) return 'bg-amber-400 text-neutral-900';
+    if (ratio > 0.5) return 'bg-lime-400 text-neutral-900';
+    return 'bg-green-400 text-neutral-900';
+  };
 
-  // Generate path for TCON line
-  const tconPath = hourlyData
-    .map((d, i) => `${i === 0 ? 'M' : 'L'} ${getX(i)} ${getTempY(d.tcon)}`)
-    .join(' ');
+  const getTempBg = (temp: number) => {
+    if (temp >= 90) return 'bg-red-400 text-white';
+    if (temp >= 80) return 'bg-orange-400 text-white';
+    if (temp >= 65) return 'bg-amber-400 text-neutral-900';
+    if (temp >= 50) return 'bg-yellow-300 text-neutral-900';
+    return 'bg-blue-300 text-neutral-900';
+  };
 
-  // Find thermal trigger point (where temp crosses tcon)
-  const thermalTriggerIndex = hourlyData.findIndex((d, i) => {
-    if (i === 0) return false;
-    const prevD = hourlyData[i - 1];
-    return prevD.temperature < prevD.tcon && d.temperature >= d.tcon;
-  });
+  const getCloudIcon = (cloudCover: number) => {
+    if (cloudCover <= 10) return '☀️';
+    if (cloudCover <= 30) return '🌤';
+    if (cloudCover <= 60) return '⛅';
+    if (cloudCover <= 85) return '🌥';
+    return '☁️';
+  };
 
-  const totalHeight = windTop + windChartHeight + padding.bottom;
-  const barWidth = (100 - padding.left - padding.right) / hourlyData.length * 0.7;
+  // Dense column: ~26px each to fit 24 cols in ~624px + label col
+  const col = 'min-w-[26px] w-[26px]';
+  const lbl = 'min-w-[36px] w-[36px] pr-1 text-right text-neutral-400 font-bold text-[8px] uppercase tracking-wider shrink-0';
 
   return (
-    <div className="w-full">
-      <svg
-        viewBox={`0 0 100 ${totalHeight}`}
-        className="w-full h-auto"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {/* Temperature Section Background */}
-        <rect
-          x={padding.left}
-          y={padding.top}
-          width={100 - padding.left - padding.right}
-          height={tempChartHeight}
-          fill="#fafafa"
-          stroke="#e5e5e5"
-          strokeWidth="0.3"
-        />
+    <div className="w-full overflow-x-auto">
+      <div className="inline-flex flex-col font-mono text-[9px] leading-tight" style={{ minWidth: 'max-content' }}>
 
-        {/* Cloud cover background */}
-        {hourlyData.map((d, i) => (
-          <rect
-            key={`cloud-${i}`}
-            x={getX(i) - barWidth / 2}
-            y={padding.top}
-            width={barWidth}
-            height={tempChartHeight}
-            fill={`rgba(150, 150, 150, ${d.cloudCover / 100 * 0.25})`}
-          />
-        ))}
-
-        {/* Thermal active zone - green fill where temp >= tcon */}
-        {hourlyData.map((d, i) => {
-          if (d.temperature >= d.tcon && i > 0) {
-            const prevD = hourlyData[i - 1];
-            const x1 = getX(i - 1);
-            const x2 = getX(i);
-            const y1 = Math.min(getTempY(prevD.temperature), getTempY(prevD.tcon));
-            const y2 = padding.top + tempChartHeight;
-            return (
-              <rect
-                key={`thermal-${i}`}
-                x={x1}
-                y={y1}
-                width={x2 - x1}
-                height={y2 - y1}
-                fill="rgba(34, 197, 94, 0.1)"
-              />
-            );
-          }
-          return null;
-        })}
-
-        {/* Temperature grid lines */}
-        {[0, 0.5, 1].map((ratio, i) => {
-          const temp = minTemp + ratio * tempRange;
-          const y = getTempY(temp);
-          return (
-            <g key={`grid-${i}`}>
-              <line
-                x1={padding.left}
-                y1={y}
-                x2={100 - padding.right}
-                y2={y}
-                stroke="#e5e5e5"
-                strokeWidth="0.2"
-              />
-              <text
-                x={padding.left - 2}
-                y={y}
-                textAnchor="end"
-                dominantBaseline="middle"
-                className="fill-neutral-400"
-                style={{ fontSize: '2.5px', fontFamily: 'monospace' }}
-              >
-                {Math.round(temp)}°
-              </text>
-            </g>
-          );
-        })}
-
-        {/* TCON line (dashed green) */}
-        <path
-          d={tconPath}
-          fill="none"
-          stroke="#22c55e"
-          strokeWidth="0.6"
-          strokeDasharray="1.5,1"
-        />
-
-        {/* Temperature line (solid black) */}
-        <path
-          d={tempPath}
-          fill="none"
-          stroke="#171717"
-          strokeWidth="0.8"
-        />
-
-        {/* Temperature data points */}
-        {hourlyData.map((d, i) => (
-          <circle
-            key={`temp-point-${i}`}
-            cx={getX(i)}
-            cy={getTempY(d.temperature)}
-            r="1"
-            fill={d.temperature >= d.tcon ? '#22c55e' : '#171717'}
-          />
-        ))}
-
-        {/* Thermal trigger indicator */}
-        {thermalTriggerIndex > 0 && (
-          <g>
-            <line
-              x1={getX(thermalTriggerIndex)}
-              y1={padding.top}
-              x2={getX(thermalTriggerIndex)}
-              y2={padding.top + tempChartHeight}
-              stroke="#22c55e"
-              strokeWidth="0.4"
-              strokeDasharray="1,1"
-            />
-            <text
-              x={getX(thermalTriggerIndex)}
-              y={padding.top - 2}
-              textAnchor="middle"
-              className="fill-green-600"
-              style={{ fontSize: '2.2px', fontFamily: 'monospace' }}
-            >
-              Thermals
-            </text>
-          </g>
-        )}
-
-        {/* Section labels */}
-        <text
-          x={padding.left}
-          y={padding.top - 4}
-          className="fill-neutral-500"
-          style={{ fontSize: '2.5px', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-        >
-          TEMP / TCON
-        </text>
-
-        {/* Legend */}
-        <g transform={`translate(${100 - padding.right - 20}, ${padding.top - 5})`}>
-          <line x1="0" y1="1" x2="4" y2="1" stroke="#171717" strokeWidth="0.6" />
-          <text x="5" y="2" className="fill-neutral-600" style={{ fontSize: '2px', fontFamily: 'monospace' }}>Temp</text>
-          <line x1="0" y1="4" x2="4" y2="4" stroke="#22c55e" strokeWidth="0.6" strokeDasharray="1,0.5" />
-          <text x="5" y="5" className="fill-neutral-600" style={{ fontSize: '2px', fontFamily: 'monospace' }}>TCON</text>
-        </g>
-
-        {/* Wind Section */}
-        <text
-          x={padding.left}
-          y={windTop - 4}
-          className="fill-neutral-500"
-          style={{ fontSize: '2.5px', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-        >
-          WIND (MPH)
-        </text>
-
-        {/* Wind section background */}
-        <rect
-          x={padding.left}
-          y={windTop}
-          width={100 - padding.left - padding.right}
-          height={windChartHeight}
-          fill="#fafafa"
-          stroke="#e5e5e5"
-          strokeWidth="0.3"
-        />
-
-        {/* Wind grid lines */}
-        {windGridLines.map(speed => {
-          const y = getWindY(speed);
-          return (
-            <g key={`wind-grid-${speed}`}>
-              <line
-                x1={padding.left}
-                y1={y}
-                x2={100 - padding.right}
-                y2={y}
-                stroke="#e5e5e5"
-                strokeWidth="0.15"
-                strokeDasharray="0.5,0.5"
-              />
-              <text
-                x={padding.left - 2}
-                y={y}
-                textAnchor="end"
-                dominantBaseline="middle"
-                className="fill-neutral-400"
-                style={{ fontSize: '2px', fontFamily: 'monospace' }}
-              >
-                {speed}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Max wind threshold line */}
-        <line
-          x1={padding.left}
-          y1={getWindY(maxWind)}
-          x2={100 - padding.right}
-          y2={getWindY(maxWind)}
-          stroke="#ef4444"
-          strokeWidth="0.3"
-          strokeDasharray="1,1"
-        />
-        <text
-          x={100 - padding.right + 1}
-          y={getWindY(maxWind)}
-          dominantBaseline="middle"
-          className="fill-red-500"
-          style={{ fontSize: '2px', fontFamily: 'monospace' }}
-        >
-          {maxWind}
-        </text>
-
-        {/* Wind bars */}
-        {hourlyData.map((d, i) => {
-          const x = getX(i);
-          const barHeight = (d.windSpeed / maxWindSpeed) * windChartHeight;
-          const gustHeight = (d.windGust / maxWindSpeed) * windChartHeight;
-
-          return (
-            <g key={`wind-${i}`}>
-              {/* Gust extension (lighter) */}
-              {d.windGust > d.windSpeed && (
-                <rect
-                  x={x - barWidth / 2}
-                  y={windTop + windChartHeight - gustHeight}
-                  width={barWidth}
-                  height={gustHeight - barHeight}
-                  fill={getWindColor(d.windGust)}
-                  opacity={0.3}
-                />
-              )}
-              {/* Main wind bar */}
-              <rect
-                x={x - barWidth / 2}
-                y={windTop + windChartHeight - barHeight}
-                width={barWidth}
-                height={barHeight}
-                fill={getWindColor(d.windSpeed)}
-              />
-              {/* Wind speed label on top of bar */}
-              <text
-                x={x}
-                y={windTop + windChartHeight - Math.max(barHeight, gustHeight) - 1.5}
-                textAnchor="middle"
-                dominantBaseline="baseline"
-                className="fill-neutral-700"
-                style={{ fontSize: '2.2px', fontFamily: 'monospace', fontWeight: 'bold' }}
-              >
-                {d.windSpeed}
-              </text>
-              {/* Gust label */}
-              {d.windGust > d.windSpeed + 3 && (
-                <text
-                  x={x}
-                  y={windTop + windChartHeight - Math.max(barHeight, gustHeight) - 4}
-                  textAnchor="middle"
-                  dominantBaseline="baseline"
-                  className="fill-neutral-400"
-                  style={{ fontSize: '1.8px', fontFamily: 'monospace' }}
-                >
-                  G{d.windGust}
-                </text>
-              )}
-              {/* Wind direction arrow */}
-              <g transform={`translate(${x}, ${windTop + windChartHeight + 5})`}>
-                <g transform={`rotate(${d.windDirection + 180})`}>
-                  <line x1="0" y1="2" x2="0" y2="-2" stroke="#525252" strokeWidth="0.4" />
-                  <polygon points="0,-3 -1,-1.5 1,-1.5" fill="#525252" />
-                </g>
-              </g>
-              {/* Wind direction text label */}
-              <text
-                x={x}
-                y={windTop + windChartHeight + 10}
-                textAnchor="middle"
-                className="fill-neutral-400"
-                style={{ fontSize: '1.8px', fontFamily: 'monospace' }}
-              >
-                {getWindDirection(d.windDirection)}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Time labels */}
-        {hourlyData.map((d, i) => {
-          // Only show every other label if many hours
-          if (hourlyData.length > 8 && i % 2 !== 0) return null;
-          return (
-            <text
-              key={`time-${i}`}
-              x={getX(i)}
-              y={windTop + windChartHeight + 15}
-              textAnchor="middle"
-              className="fill-neutral-600"
-              style={{ fontSize: '2.5px', fontFamily: 'monospace' }}
-            >
+        {/* Hour row */}
+        <div className="flex items-center">
+          <div className={lbl}>Hr</div>
+          {hourlyData.map((d, i) => (
+            <div key={i} className={`${col} text-center text-neutral-500 font-bold py-0.5 border-b border-neutral-100 text-[8px]`}>
               {formatHour(d.hour)}
-            </text>
-          );
-        })}
+            </div>
+          ))}
+        </div>
 
-        {/* Wind scale labels */}
-        <text
-          x={padding.left - 2}
-          y={windTop}
-          textAnchor="end"
-          dominantBaseline="hanging"
-          className="fill-neutral-400"
-          style={{ fontSize: '2px', fontFamily: 'monospace' }}
-        >
-          {Math.round(maxWindSpeed)}
-        </text>
-        <text
-          x={padding.left - 2}
-          y={windTop + windChartHeight}
-          textAnchor="end"
-          dominantBaseline="baseline"
-          className="fill-neutral-400"
-          style={{ fontSize: '2px', fontFamily: 'monospace' }}
-        >
-          0
-        </text>
-      </svg>
+        {/* Wind speed bars + values */}
+        <div className="flex items-end">
+          <div className={`${lbl} self-center`}>
+            Wind
+          </div>
+          {hourlyData.map((d, i) => {
+            const barH = Math.max(2, (d.windSpeed / maxWindSpeed) * 36);
+            return (
+              <div key={i} className={`${col} flex flex-col items-center justify-end`} style={{ height: 52 }}>
+                <div className="text-[8px] font-bold text-neutral-700 leading-none mb-px">{d.windSpeed}</div>
+                <div
+                  className="w-[14px] rounded-t-sm"
+                  style={{
+                    height: barH,
+                    backgroundColor: getWindBarColor(d.windSpeed),
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Wind direction arrows */}
+        <div className="flex items-center">
+          <div className={lbl} />
+          {hourlyData.map((d, i) => (
+            <div key={i} className={`${col} flex justify-center py-px`}>
+              <svg width="12" height="12" viewBox="0 0 16 16">
+                <g transform={`rotate(${d.windDirection + 180}, 8, 8)`}>
+                  <line x1="8" y1="13" x2="8" y2="3" stroke="#404040" strokeWidth="1.8" />
+                  <polygon points="8,1 5,5 11,5" fill="#404040" />
+                </g>
+              </svg>
+            </div>
+          ))}
+        </div>
+
+        {/* Wind direction compass label */}
+        <div className="flex items-center">
+          <div className={lbl} />
+          {hourlyData.map((d, i) => (
+            <div key={i} className={`${col} text-center py-px`}>
+              <span className={`inline-block px-0.5 py-px rounded-sm text-[7px] font-bold ${getDirBg(d.windSpeed)}`}>
+                {getWindDirection(d.windDirection)}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Gust row */}
+        <div className="flex items-center mt-0.5">
+          <div className={lbl}>Gust</div>
+          {hourlyData.map((d, i) => (
+            <div key={i} className={`${col} text-center py-px`}>
+              <span className={`inline-block min-w-[18px] px-0.5 py-px rounded-sm text-[8px] font-bold ${getGustBg(d.windGust)}`}>
+                {d.windGust}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Sky row */}
+        <div className="flex items-center mt-0.5">
+          <div className={lbl}>Sky</div>
+          {hourlyData.map((d, i) => (
+            <div key={i} className={`${col} text-center py-px text-[10px] leading-none`}>
+              {getCloudIcon(d.cloudCover)}
+            </div>
+          ))}
+        </div>
+
+        {/* Temperature row */}
+        <div className="flex items-center mt-0.5">
+          <div className={lbl}>°F</div>
+          {hourlyData.map((d, i) => (
+            <div key={i} className={`${col} text-center py-px`}>
+              <span className={`inline-block min-w-[18px] px-0.5 py-px rounded-sm text-[8px] font-bold ${getTempBg(d.temperature)}`}>
+                {d.temperature}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Cloud % row */}
+        <div className="flex items-center mt-0.5">
+          <div className={lbl}>Cld</div>
+          {hourlyData.map((d, i) => (
+            <div key={i} className={`${col} text-center py-px`}>
+              <span className="inline-block min-w-[18px] px-0.5 py-px rounded-sm text-[8px] text-neutral-500 bg-neutral-50">
+                {d.cloudCover}
+              </span>
+            </div>
+          ))}
+        </div>
+
+      </div>
     </div>
   );
 };

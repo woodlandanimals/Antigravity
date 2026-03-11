@@ -269,11 +269,10 @@ const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose
                   </button>
                   {expandedDay === day.date && (
                     <div className="mt-3 space-y-4">
-                      {/* Hourly temp/wind chart */}
-                      <div className="bg-white border border-neutral-200 p-4">
+                      {/* Hourly wind breakdown */}
+                      <div className="bg-white border border-neutral-200 py-3 px-1">
                         <HourlyChart
                           hourlyData={day.hourlyData}
-                          siteElevation={site.elevation}
                           maxWind={site.maxWind}
                         />
                       </div>

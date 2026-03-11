@@ -13,6 +13,12 @@ let dataSource: 'live' | 'cached' | 'stale' = 'live';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Parse API time string (e.g. "2026-03-10T14:00") without Date object to avoid UTC shift
+const parseApiTime = (time: string): { dateStr: string; hour: number } => {
+  const [dateStr, timePart] = time.split('T');
+  return { dateStr, hour: parseInt(timePart.split(':')[0], 10) };
+};
+
 const getCacheKey = (site: LaunchSite) => {
   return `${site.latitude.toFixed(4)},${site.longitude.toFixed(4)}`;
 };
@@ -156,9 +162,7 @@ const processECMWFDataForDay = (site: LaunchSite, data: any, targetDate: string)
 
     const targetIndices: number[] = [];
     hourly.time.forEach((time: string, index: number) => {
-      const dt = new Date(time);
-      const dateStr = dt.toISOString().split('T')[0];
-      const hour = dt.getHours();
+      const { dateStr, hour } = parseApiTime(time);
 
       if (dateStr === targetDate && hour >= 10 && hour <= 14) {
         targetIndices.push(index);
@@ -170,8 +174,8 @@ const processECMWFDataForDay = (site: LaunchSite, data: any, targetDate: string)
     }
 
     const noonIndex = targetIndices.reduce((closest, current) => {
-      const closestHour = new Date(hourly.time[closest]).getHours();
-      const currentHour = new Date(hourly.time[current]).getHours();
+      const closestHour = parseApiTime(hourly.time[closest]).hour;
+      const currentHour = parseApiTime(hourly.time[current]).hour;
       return Math.abs(currentHour - 12) < Math.abs(closestHour - 12) ? current : closest;
     });
 
@@ -312,9 +316,7 @@ const processHRRRDataForDay = (site: LaunchSite, data: any, targetDate: string):
 
     const targetIndices: number[] = [];
     hourly.time.forEach((time: string, index: number) => {
-      const dt = new Date(time);
-      const dateStr = dt.toISOString().split('T')[0];
-      const hour = dt.getHours();
+      const { dateStr, hour } = parseApiTime(time);
 
       if (dateStr === targetDate && hour >= 10 && hour <= 14) {
         targetIndices.push(index);
@@ -326,8 +328,8 @@ const processHRRRDataForDay = (site: LaunchSite, data: any, targetDate: string):
     }
 
     const noonIndex = targetIndices.reduce((closest, current) => {
-      const closestHour = new Date(hourly.time[closest]).getHours();
-      const currentHour = new Date(hourly.time[current]).getHours();
+      const closestHour = parseApiTime(hourly.time[closest]).hour;
+      const currentHour = parseApiTime(hourly.time[current]).hour;
       return Math.abs(currentHour - 12) < Math.abs(closestHour - 12) ? current : closest;
     });
 
@@ -512,12 +514,10 @@ const extractHourlyData = (
   const result: HourlyDataPoint[] = [];
 
   hourly.time.forEach((time: string, index: number) => {
-    const dt = new Date(time);
-    const dateStr = dt.toISOString().split('T')[0];
-    const hour = dt.getHours();
+    const { dateStr, hour } = parseApiTime(time);
 
-    // Only include 6am to 6pm (hours 6-18)
-    if (dateStr === targetDate && hour >= 6 && hour <= 18) {
+    // Include all 24 hours for full daily breakdown
+    if (dateStr === targetDate) {
       const temp = hourly.temperature_2m[index];
       const dewPoint = hourly.dew_point_2m[index];
       const { tcon } = calculateLCL(temp, dewPoint, site.elevation);
@@ -674,9 +674,7 @@ const analyzeRain = (hourly: any, targetDate: string): string | undefined => {
   const rainHours: Array<{ hour: number, precip: number, prob: number }> = [];
 
   hourly.time.forEach((time: string, index: number) => {
-    const dt = new Date(time);
-    const dateStr = dt.toISOString().split('T')[0];
-    const hour = dt.getHours();
+    const { dateStr, hour } = parseApiTime(time);
 
     if (dateStr === targetDate) {
       const precip = hourly.precipitation?.[index] || 0;
@@ -1287,9 +1285,8 @@ const extractSoundingData = (
 
   const hourly = data.hourly;
   const targetIndex = hourly.time.findIndex((time: string) => {
-    const dt = new Date(time);
-    const dateStr = dt.toISOString().split('T')[0];
-    return dateStr === targetDate && dt.getHours() === targetHour;
+    const { dateStr, hour } = parseApiTime(time);
+    return dateStr === targetDate && hour === targetHour;
   });
 
   if (targetIndex === -1) return null;
