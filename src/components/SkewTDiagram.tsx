@@ -1,5 +1,6 @@
 import React from 'react';
 import { SoundingData } from '../types/weather';
+import { getWindDirection } from '../services/weatherService';
 
 interface SkewTDiagramProps {
   soundingData: SoundingData;
@@ -31,13 +32,11 @@ const WindBarb: React.FC<{
   const halfBarbs = Math.floor((remainingAfterPennants - fullBarbs * 10) / 5);
 
   // Build barb path elements
-  // Staff goes from bottom (0,0) upward (0, -size)
-  // Barbs extend to the right from the top of the staff downward
   const barbLength = size * 0.4;
   const barbSpacing = size * 0.15;
   const pennantWidth = size * 0.12;
   let pathParts: string[] = [];
-  let currentPos = 0; // distance from top of staff
+  let currentPos = 0;
 
   // Staff line
   pathParts.push(`M 0 0 L 0 ${-size}`);
@@ -79,13 +78,25 @@ const WindBarb: React.FC<{
   );
 };
 
+// Moist adiabatic lapse rate varies with temperature
+const calculateMALR = (tempF: number): number => {
+  const tempC = (tempF - 32) * 5 / 9;
+  if (tempC > 25) return 3.3;
+  if (tempC > 15) return 3.0;
+  if (tempC > 5) return 2.7;
+  if (tempC > -5) return 2.2;
+  return 1.8;
+};
+
 const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation }) => {
   // SVG dimensions
   const svgWidth = 400;
-  const svgHeight = 400;
+  const svgHeight = 420;
 
-  // Plot area
-  const plotLeft = 55;
+  // Plot area (shifted right for cloud column)
+  const cloudColLeft = 55;
+  const cloudColWidth = 12;
+  const plotLeft = 70;
   const plotRight = 310;
   const plotTop = 15;
   const plotBottom = 340;
@@ -103,24 +114,23 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
   const T_MIN_F = -30;
   const T_MAX_F = 100;
 
-  // Skew factor: how many pixels to shift right per foot of altitude
-  const SKEW_FACTOR = plotWidth * 0.6 / ALT_MAX;
+  // Skew factor (reduced from 0.6 to 0.45 to keep data visible at altitude)
+  const SKEW_FACTOR = plotWidth * 0.45 / ALT_MAX;
 
-  // Convert geopotential height (meters) to feet
+  // Unique clip ID to avoid collision
+  const clipId = `skewt-clip-${soundingData.hour}`;
+
   const metersToFeet = (m: number): number => m * 3.28084;
 
-  // Get altitude in feet for a pressure level
   const getAltitude = (level: typeof soundingData.levels[0]): number => {
     return metersToFeet(level.geopotentialHeight);
   };
 
-  // Y coordinate from altitude (feet)
   const altToY = (altFt: number): number => {
     const fraction = (altFt - ALT_MIN) / (ALT_MAX - ALT_MIN);
     return plotBottom - fraction * plotHeight;
   };
 
-  // X coordinate from temperature (°F) and altitude (feet)
   const tempToX = (tempF: number, altFt: number): number => {
     const baseFraction = (tempF - T_MIN_F) / (T_MAX_F - T_MIN_F);
     const baseX = plotLeft + baseFraction * plotWidth;
@@ -128,10 +138,10 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
     return baseX + skewOffset;
   };
 
-  // Convert F to C for display
-  const fToC = (f: number): number => Math.round((f - 32) * 5 / 9);
+  // DALR = 5.4°F per 1000 ft
+  const DALR = 5.4;
 
-  // Filter levels within our altitude range
+  // Filter levels within altitude range
   const visibleLevels = soundingData.levels
     .filter(l => {
       const alt = getAltitude(l);
@@ -139,29 +149,51 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
     })
     .sort((a, b) => getAltitude(a) - getAltitude(b));
 
+  // Interpolate environmental temperature at arbitrary altitude
+  const interpolateEnvTemp = (targetAlt: number): number | null => {
+    if (visibleLevels.length < 2) return null;
+    for (let i = 0; i < visibleLevels.length - 1; i++) {
+      const altLow = getAltitude(visibleLevels[i]);
+      const altHigh = getAltitude(visibleLevels[i + 1]);
+      if (targetAlt >= altLow && targetAlt <= altHigh) {
+        const fraction = (targetAlt - altLow) / (altHigh - altLow);
+        return visibleLevels[i].temperature +
+          fraction * (visibleLevels[i + 1].temperature - visibleLevels[i].temperature);
+      }
+    }
+    return null;
+  };
+
+  // Interpolate dewpoint at arbitrary altitude (for cloud column)
+  const interpolateDewpoint = (targetAlt: number): number | null => {
+    if (visibleLevels.length < 2) return null;
+    for (let i = 0; i < visibleLevels.length - 1; i++) {
+      const altLow = getAltitude(visibleLevels[i]);
+      const altHigh = getAltitude(visibleLevels[i + 1]);
+      if (targetAlt >= altLow && targetAlt <= altHigh) {
+        const fraction = (targetAlt - altLow) / (altHigh - altLow);
+        return visibleLevels[i].dewPoint +
+          fraction * (visibleLevels[i + 1].dewPoint - visibleLevels[i].dewPoint);
+      }
+    }
+    return null;
+  };
+
   // Generate temperature profile path
   const tempPoints = visibleLevels.map(l => {
     const alt = getAltitude(l);
-    const x = tempToX(l.temperature, alt);
-    const y = altToY(alt);
-    return `${x},${y}`;
+    return `${tempToX(l.temperature, alt)},${altToY(alt)}`;
   });
-  const tempPath = tempPoints.length > 0
-    ? `M ${tempPoints.join(' L ')}`
-    : '';
+  const tempPath = tempPoints.length > 0 ? `M ${tempPoints.join(' L ')}` : '';
 
   // Generate dew point profile path
   const dewPoints = visibleLevels.map(l => {
     const alt = getAltitude(l);
-    const x = tempToX(l.dewPoint, alt);
-    const y = altToY(alt);
-    return `${x},${y}`;
+    return `${tempToX(l.dewPoint, alt)},${altToY(alt)}`;
   });
-  const dewPath = dewPoints.length > 0
-    ? `M ${dewPoints.join(' L ')}`
-    : '';
+  const dewPath = dewPoints.length > 0 ? `M ${dewPoints.join(' L ')}` : '';
 
-  // Detect inversions (temperature increases with altitude)
+  // Detect inversions
   const inversions: Array<{ altBottom: number; altTop: number }> = [];
   for (let i = 0; i < visibleLevels.length - 1; i++) {
     const lower = visibleLevels[i];
@@ -174,22 +206,14 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
     }
   }
 
-  // Dry adiabat calculation: temperature of a parcel starting at startTempF at surface
-  // rising to a given altitude, using Poisson's equation approximation
-  // DALR = 5.4°F per 1000 ft
-  const DALR = 5.4; // °F per 1000 ft
-
-  // Dry adiabat starting temperatures (at ALT_MIN)
+  // Dry adiabat reference lines
   const adiabatStarts = [-20, 0, 20, 40, 60, 80, 100, 120];
-
-  // Generate adiabat paths
   const adiabatPaths = adiabatStarts.map(startTemp => {
     const points: string[] = [];
     for (let alt = ALT_MIN; alt <= ALT_MAX; alt += 500) {
       const temp = startTemp - (alt - ALT_MIN) / 1000 * DALR;
       const x = tempToX(temp, alt);
       const y = altToY(alt);
-      // Only include points within the plot area
       if (x >= plotLeft - 20 && x <= plotRight + 20) {
         points.push(`${x},${y}`);
       }
@@ -197,10 +221,8 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
     return points.length > 1 ? `M ${points.join(' L ')}` : '';
   });
 
-  // Altitude grid levels (feet)
+  // Grid levels
   const altGridLevels = [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000];
-
-  // Temperature grid (°F) for bottom axis labels
   const tempGridValues = [-20, 0, 20, 40, 60, 80];
 
   // Calculate TCON and LCL from surface data
@@ -216,6 +238,67 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
     tconF = Math.round(surfaceLevel.dewPoint + (lclAGL_ft / 1000) * DALR);
   }
 
+  // === PARCEL TRAJECTORY (green line) ===
+  let parcelPath = '';
+  let thermalTopAlt: number | null = null;
+  let thermalTopTemp: number | null = null;
+
+  if (surfaceLevel) {
+    const surfaceAlt = getAltitude(surfaceLevel);
+    const surfaceTemp = surfaceLevel.temperature;
+    const points: string[] = [];
+    let parcelTemp = surfaceTemp;
+    let foundTop = false;
+
+    for (let alt = surfaceAlt; alt <= ALT_MAX; alt += 250) {
+      // Determine lapse rate
+      if (alt > surfaceAlt) {
+        const lapseRate = alt <= lclFt ? DALR : calculateMALR(parcelTemp);
+        parcelTemp = parcelTemp - lapseRate * (250 / 1000);
+      }
+
+      const x = tempToX(parcelTemp, alt);
+      const y = altToY(alt);
+      points.push(`${x},${y}`);
+
+      // Detect thermal top: parcel cooler than environment
+      if (!foundTop && alt > surfaceAlt + 500) {
+        const envTemp = interpolateEnvTemp(alt);
+        if (envTemp !== null && parcelTemp < envTemp) {
+          thermalTopAlt = alt;
+          thermalTopTemp = envTemp;
+          foundTop = true;
+        }
+      }
+    }
+
+    parcelPath = points.length > 1 ? `M ${points.join(' L ')}` : '';
+  }
+
+  // === CLOUD COVER COLUMN data ===
+  // Sample at 500ft intervals, check temp-dewpoint spread
+  const cloudBars: Array<{ yTop: number; yBottom: number; opacity: number }> = [];
+  if (visibleLevels.length >= 2) {
+    const minAlt = getAltitude(visibleLevels[0]);
+    const maxAlt = getAltitude(visibleLevels[visibleLevels.length - 1]);
+    const step = 500;
+    for (let alt = minAlt; alt < maxAlt; alt += step) {
+      const temp = interpolateEnvTemp(alt);
+      const dew = interpolateDewpoint(alt);
+      if (temp !== null && dew !== null) {
+        const spread = temp - dew;
+        if (spread < 8) {
+          const opacity = Math.max(0.15, Math.min(0.8, 1 - spread / 8));
+          cloudBars.push({
+            yTop: altToY(alt + step),
+            yBottom: altToY(alt),
+            opacity
+          });
+        }
+      }
+    }
+  }
+
   return (
     <div className="w-full">
       <svg
@@ -225,7 +308,7 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
         style={{ backgroundColor: '#2d2d2d' }}
       >
         <defs>
-          <clipPath id="skewt-clip">
+          <clipPath id={clipId}>
             <rect x={plotLeft} y={plotTop} width={plotWidth} height={plotHeight} />
           </clipPath>
         </defs>
@@ -241,13 +324,47 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
           strokeWidth="0.5"
         />
 
+        {/* Cloud cover column header */}
+        <text
+          x={cloudColLeft + cloudColWidth / 2}
+          y={plotTop - 2}
+          textAnchor="middle"
+          fill="rgba(255,255,255,0.4)"
+          style={{ fontSize: '7px', fontFamily: 'monospace' }}
+        >
+          CLD
+        </text>
+
+        {/* Cloud cover column background */}
+        <rect
+          x={cloudColLeft}
+          y={plotTop}
+          width={cloudColWidth}
+          height={plotHeight}
+          fill="#303030"
+          stroke="#555"
+          strokeWidth="0.5"
+        />
+
+        {/* Cloud bars */}
+        {cloudBars.map((bar, i) => (
+          <rect
+            key={`cloud-${i}`}
+            x={cloudColLeft}
+            y={bar.yTop}
+            width={cloudColWidth}
+            height={bar.yBottom - bar.yTop}
+            fill={`rgba(200, 220, 255, ${bar.opacity})`}
+          />
+        ))}
+
         {/* Altitude grid lines and labels */}
         {altGridLevels.map(alt => {
           const y = altToY(alt);
           return (
             <g key={`alt-grid-${alt}`}>
               <line
-                x1={plotLeft}
+                x1={cloudColLeft}
                 y1={y}
                 x2={plotRight}
                 y2={y}
@@ -255,7 +372,7 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
                 strokeWidth="0.5"
               />
               <text
-                x={plotLeft - 5}
+                x={cloudColLeft - 5}
                 y={y}
                 textAnchor="end"
                 dominantBaseline="middle"
@@ -282,7 +399,7 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
         </text>
 
         {/* Clipped content */}
-        <g clipPath="url(#skewt-clip)">
+        <g clipPath={`url(#${clipId})`}>
           {/* Isotherms (skewed vertical temperature reference lines) */}
           {tempGridValues.map(tempF => {
             const x1 = tempToX(tempF, ALT_MIN);
@@ -366,7 +483,7 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
                 fill="rgba(100,180,255,0.6)"
                 style={{ fontSize: '8px', fontFamily: 'monospace' }}
               >
-                LCL {(lclFt / 1000).toFixed(1)}k'
+                LCL {(lclFt / 1000).toFixed(1)}k&apos;
               </text>
             </g>
           )}
@@ -406,6 +523,50 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
               strokeLinejoin="round"
               strokeLinecap="round"
             />
+          )}
+
+          {/* Parcel trajectory (green dashed line) */}
+          {parcelPath && (
+            <path
+              d={parcelPath}
+              fill="none"
+              stroke="#22c55e"
+              strokeWidth="2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              strokeDasharray="6,3"
+            />
+          )}
+
+          {/* Thermal top indicator */}
+          {thermalTopAlt && thermalTopTemp !== null && thermalTopAlt < ALT_MAX && (
+            <g>
+              <line
+                x1={plotLeft}
+                y1={altToY(thermalTopAlt)}
+                x2={plotRight}
+                y2={altToY(thermalTopAlt)}
+                stroke="rgba(34, 197, 94, 0.5)"
+                strokeWidth="1"
+                strokeDasharray="4,2"
+              />
+              <circle
+                cx={tempToX(thermalTopTemp, thermalTopAlt)}
+                cy={altToY(thermalTopAlt)}
+                r="4"
+                fill="#22c55e"
+                stroke="#fff"
+                strokeWidth="1"
+              />
+              <text
+                x={plotLeft + 4}
+                y={altToY(thermalTopAlt) - 6}
+                fill="#22c55e"
+                style={{ fontSize: '9px', fontFamily: 'monospace', fontWeight: 'bold' }}
+              >
+                TOP {(thermalTopAlt / 1000).toFixed(1)}k&apos;
+              </text>
+            </g>
           )}
 
           {/* Data points on temperature line */}
@@ -504,27 +665,55 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
 
         {/* Legend */}
         <g transform={`translate(${plotLeft + 5}, ${plotTop + 8})`}>
-          <line x1="0" y1="0" x2="14" y2="0" stroke="#ef4444" strokeWidth="2" />
-          <text x="17" y="1" dominantBaseline="middle" fill="rgba(255,255,255,0.6)" style={{ fontSize: '8px', fontFamily: 'monospace' }}>
+          <line x1="0" y1="0" x2="12" y2="0" stroke="#ef4444" strokeWidth="2" />
+          <text x="15" y="1" dominantBaseline="middle" fill="rgba(255,255,255,0.6)" style={{ fontSize: '7px', fontFamily: 'monospace' }}>
             Temp
           </text>
-          <line x1="50" y1="0" x2="64" y2="0" stroke="#60a5fa" strokeWidth="2" />
-          <text x="67" y="1" dominantBaseline="middle" fill="rgba(255,255,255,0.6)" style={{ fontSize: '8px', fontFamily: 'monospace' }}>
-            Dew Pt
+          <line x1="44" y1="0" x2="56" y2="0" stroke="#60a5fa" strokeWidth="2" />
+          <text x="59" y="1" dominantBaseline="middle" fill="rgba(255,255,255,0.6)" style={{ fontSize: '7px', fontFamily: 'monospace' }}>
+            Dew
+          </text>
+          <line x1="82" y1="0" x2="94" y2="0" stroke="#22c55e" strokeWidth="2" strokeDasharray="4,2" />
+          <text x="97" y="1" dominantBaseline="middle" fill="rgba(255,255,255,0.6)" style={{ fontSize: '7px', fontFamily: 'monospace' }}>
+            Parcel
           </text>
         </g>
 
+        {/* Surface wind arrow */}
+        {surfaceLevel && (
+          <g transform={`translate(${plotRight - 20}, ${plotBottom + 30})`}>
+            <circle cx="0" cy="0" r="12" fill="#444" stroke="#666" strokeWidth="0.5" />
+            <g transform={`rotate(${surfaceLevel.windDirection + 180})`}>
+              <path d="M0,-8 L-3,3 L0,0.5 L3,3 Z" fill="#22c55e" />
+            </g>
+            <text
+              x="18" y="-2"
+              dominantBaseline="middle"
+              fill="rgba(255,255,255,0.8)"
+              style={{ fontSize: '10px', fontFamily: 'monospace', fontWeight: 'bold' }}
+            >
+              {surfaceLevel.windSpeed}mph
+            </text>
+            <text
+              x="18" y="9"
+              fill="rgba(255,255,255,0.5)"
+              style={{ fontSize: '8px', fontFamily: 'monospace' }}
+            >
+              {getWindDirection(surfaceLevel.windDirection)}
+            </text>
+          </g>
+        )}
+
         {/* Bottom info bar */}
-        <g>
-          <text
-            x={plotLeft}
-            y={plotBottom + 32}
-            fill="rgba(255,255,255,0.5)"
-            style={{ fontSize: '9px', fontFamily: 'monospace' }}
-          >
-            tcon: {tconF}°F   lcl: {lclFt.toLocaleString()}ft   elev: {siteElevation.toLocaleString()}ft
-          </text>
-        </g>
+        <text
+          x={plotLeft}
+          y={plotBottom + 32}
+          fill="rgba(255,255,255,0.5)"
+          style={{ fontSize: '9px', fontFamily: 'monospace' }}
+        >
+          tcon: {tconF}°F   lcl: {lclFt.toLocaleString()}ft
+          {thermalTopAlt ? `   top: ${(thermalTopAlt / 1000).toFixed(1)}k` : ''}   elev: {siteElevation.toLocaleString()}ft
+        </text>
       </svg>
     </div>
   );
