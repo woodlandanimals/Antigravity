@@ -466,28 +466,35 @@ const processHRRRDataForDay = (site: LaunchSite, data: any, targetDate: string):
 
 // Estimate Lifted Index from CAPE and surface conditions when not available from API
 // LI approximates atmospheric stability: negative = unstable, positive = stable
+// Scale matches HRRR range: roughly -8 to +8 (°C)
 const estimateLiftedIndex = (cape: number, tempF: number, dewPointF: number): number => {
   const spread = tempF - dewPointF;
 
   // High CAPE strongly indicates instability (negative LI)
+  if (cape > 2500) return -7;
   if (cape > 1500) return -5;
   if (cape > 1000) return -4;
   if (cape > 600) return -3;
   if (cape > 300) return -2;
   if (cape > 100) return -1;
-
-  // No CAPE: estimate from surface conditions
-  // Large spread + warm temps suggest some instability
   if (cape > 0) return 0;
 
-  // Zero CAPE: use temp-dew spread as a rough proxy
-  // Wide spread in warm air = drier boundary layer, potentially unstable above
-  if (tempF > 75 && spread > 25) return -1;
-  if (tempF > 70 && spread > 20) return 0;
-  if (spread < 10) return 3;  // Very moist = likely stable/overcast
-  if (spread < 15) return 2;
+  // Zero CAPE: estimate from surface conditions
+  // Cold temps + narrow spread = very stable (marine layer, inversions)
+  if (tempF < 50 && spread < 15) return 7;
+  if (tempF < 55 && spread < 10) return 6;
+  if (tempF < 60 && spread < 15) return 5;
 
-  return 1;  // Default slightly stable
+  // Cool temps + moderate spread = stable
+  if (tempF < 65 && spread < 20) return 4;
+  if (spread < 10) return 5;   // Very moist = likely stable/overcast
+  if (spread < 15) return 3;
+
+  // Warm temps + wide spread hint at possible instability even without CAPE
+  if (tempF > 80 && spread > 30) return -1;
+  if (tempF > 75 && spread > 25) return 0;
+
+  return 2;  // Default moderately stable (typical zero-CAPE day)
 };
 
 const calculateLCL = (tempF: number, dewPointF: number, elevationFt: number): { lclMSL: number, tcon: number } => {
@@ -600,8 +607,8 @@ const calculateThermalStrength = (
 
   if (liftedIndex < -4) strength += 1;
   else if (liftedIndex < -2) strength += 0.5;
-  else if (liftedIndex > 2) strength -= 1;
   else if (liftedIndex > 4) strength -= 1.5;
+  else if (liftedIndex > 2) strength -= 1;
 
   if (blDepth && blDepth > 8000) strength += 0.5;
   else if (blDepth && blDepth < 3000) strength -= 0.5;
