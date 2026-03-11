@@ -9,9 +9,10 @@ import WindArrow from './WindArrow';
 interface SiteDetailModalProps {
   siteForecast: SiteForecast;
   onClose: () => void;
+  startDayIndex?: number;
 }
 
-const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose }) => {
+const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose, startDayIndex = 0 }) => {
   const { site, forecast } = siteForecast;
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
   const [soundingCache, setSoundingCache] = useState<Record<string, SoundingData | null>>({});
@@ -72,9 +73,18 @@ const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose
   };
 
   const getDayLabel = (index: number) => {
-    if (index === 0) return 'Today';
-    if (index === 1) return 'Tomorrow';
-    return `Day ${index + 1}`;
+    const actualDay = startDayIndex + index;
+    if (actualDay === 0) return 'Today';
+    if (actualDay === 1) return 'Tomorrow';
+    // Use the forecast date to get the day of week
+    const day = forecast[index];
+    if (day) {
+      const [year, month, dayNum] = day.date.split('-');
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(dayNum));
+      const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+      return dayOfWeek;
+    }
+    return `Day ${actualDay + 1}`;
   };
 
   const formatDate = (dateString: string) => {

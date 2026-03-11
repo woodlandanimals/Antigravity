@@ -205,6 +205,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({ forecasts }) => {
             site: selectedSite.siteForecast.site,
             forecast: [selectedSite.siteForecast.forecast[selectedSite.dayIndex]]
           }}
+          startDayIndex={selectedSite.dayIndex}
           onClose={() => setSelectedSite(null)}
         />
       )}
