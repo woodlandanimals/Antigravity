@@ -6,8 +6,8 @@ interface HeaderProps {
   dataSource: 'live' | 'cached' | 'stale';
   onRefresh: () => void;
   isLoading: boolean;
-  view: 'today' | 'weekly';
-  onViewChange: (view: 'today' | 'weekly') => void;
+  view: 'today' | 'weekly' | 'map';
+  onViewChange: (view: 'today' | 'weekly' | 'map') => void;
 }
 
 const formatAge = (date: Date): string => {
@@ -63,6 +63,16 @@ const Header: React.FC<HeaderProps> = ({ lastUpdated, dataSource, onRefresh, isL
                 }`}
               >
                 Weekly
+              </button>
+              <button
+                onClick={() => onViewChange('map')}
+                className={`px-6 py-2 font-mono text-xs uppercase tracking-wider transition-all border-l border-neutral-300 ${
+                  view === 'map'
+                    ? 'bg-neutral-900 text-white'
+                    : 'bg-white text-neutral-600 hover:bg-neutral-50'
+                }`}
+              >
+                Map
               </button>
             </div>
           </div>
@@ -151,6 +161,16 @@ const Header: React.FC<HeaderProps> = ({ lastUpdated, dataSource, onRefresh, isL
                 }`}
               >
                 Weekly
+              </button>
+              <button
+                onClick={() => onViewChange('map')}
+                className={`px-4 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-all border-l border-neutral-300 ${
+                  view === 'map'
+                    ? 'bg-neutral-900 text-white'
+                    : 'bg-white text-neutral-600'
+                }`}
+              >
+                Map
               </button>
             </div>
           </div>
