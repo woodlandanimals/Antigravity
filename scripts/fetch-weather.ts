@@ -96,6 +96,8 @@ const launchSites: LaunchSite[] = [
   { id: 'paiute', name: 'Paiute', elevation: 8000, latitude: 37.4100, longitude: -118.2700, orientation: 'SW-NW', maxWind: 15, siteType: 'thermal' },
   { id: 'flynns', name: 'Flynns', elevation: 5600, latitude: 37.3884, longitude: -118.2950, orientation: 'W-NW', maxWind: 15, siteType: 'thermal' },
   { id: 'vollmer-peak', name: 'Vollmer Peak', elevation: 1905, latitude: 37.8838, longitude: -122.2204, orientation: 'NE-SE', maxWind: 18, siteType: 'mixed' },
+  { id: 'mt-st-helena', name: 'Mt St Helena', elevation: 3800, latitude: 38.6744, longitude: -122.6294, orientation: 'SW-NW', maxWind: 14, siteType: 'mixed' },
+  { id: 'windy-hill', name: 'Windy Hill', elevation: 1910, latitude: 37.3933, longitude: -122.2228, orientation: 'NE', maxWind: 20, siteType: 'mixed' },
 ];
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

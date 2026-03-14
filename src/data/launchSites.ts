@@ -210,5 +210,25 @@ export const launchSites: LaunchSite[] = [
     orientation: 'NE-SE',
     maxWind: 18,
     siteType: 'mixed'  // Berkeley Hills ridge + thermal
+  },
+  {
+    id: 'mt-st-helena',
+    name: 'Mt St Helena',
+    elevation: 3800,
+    latitude: 38.6744,
+    longitude: -122.6294,
+    orientation: 'SW-NW',
+    maxWind: 14,
+    siteType: 'mixed'  // Mayacamas Mtns - thermal + ridge, spring best
+  },
+  {
+    id: 'windy-hill',
+    name: 'Windy Hill',
+    elevation: 1910,
+    latitude: 37.3933,
+    longitude: -122.2228,
+    orientation: 'NE',
+    maxWind: 20,
+    siteType: 'mixed'  // NE-facing ridge soaring + late season thermals
   }
 ];
