@@ -35,24 +35,41 @@ const __dirname = path.dirname(__filename);
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function fetchHRRRData(site: LaunchSite): Promise<any> {
+// --- Batched site data fetching (all sites in 1 API call) ---
+
+const HRRR_HOURLY_VARS = [
+  'temperature_2m',
+  'dew_point_2m',
+  'relative_humidity_2m',
+  'cloud_cover',
+  'wind_speed_10m',
+  'wind_direction_10m',
+  'wind_gusts_10m',
+  'cape',
+  'lifted_index',
+  'boundary_layer_height',
+  'precipitation',
+  'precipitation_probability'
+];
+
+const ECMWF_HOURLY_VARS = [
+  'temperature_2m',
+  'dew_point_2m',
+  'relative_humidity_2m',
+  'cloud_cover',
+  'wind_speed_10m',
+  'wind_direction_10m',
+  'wind_gusts_10m',
+  'cape',
+  'precipitation',
+  'precipitation_probability'
+];
+
+async function fetchBatchHRRR(sites: LaunchSite[]): Promise<any[]> {
   const params = new URLSearchParams({
-    latitude: site.latitude.toFixed(4),
-    longitude: site.longitude.toFixed(4),
-    hourly: [
-      'temperature_2m',
-      'dew_point_2m',
-      'relative_humidity_2m',
-      'cloud_cover',
-      'wind_speed_10m',
-      'wind_direction_10m',
-      'wind_gusts_10m',
-      'cape',
-      'lifted_index',
-      'boundary_layer_height',
-      'precipitation',
-      'precipitation_probability'
-    ].join(','),
+    latitude: sites.map(s => s.latitude.toFixed(4)).join(','),
+    longitude: sites.map(s => s.longitude.toFixed(4)).join(','),
+    hourly: HRRR_HOURLY_VARS.join(','),
     temperature_unit: 'fahrenheit',
     wind_speed_unit: 'mph',
     timezone: 'America/Los_Angeles',
@@ -61,30 +78,16 @@ async function fetchHRRRData(site: LaunchSite): Promise<any> {
 
   const url = `https://api.open-meteo.com/v1/forecast?${params}`;
   const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`HRRR API error: ${response.status}`);
-  }
-
-  return response.json();
+  if (!response.ok) throw new Error(`HRRR batch API error: ${response.status}`);
+  const data = await response.json();
+  return Array.isArray(data) ? data : [data];
 }
 
-async function fetchECMWFData(site: LaunchSite): Promise<any> {
+async function fetchBatchECMWF(sites: LaunchSite[]): Promise<any[]> {
   const params = new URLSearchParams({
-    latitude: site.latitude.toFixed(4),
-    longitude: site.longitude.toFixed(4),
-    hourly: [
-      'temperature_2m',
-      'dew_point_2m',
-      'relative_humidity_2m',
-      'cloud_cover',
-      'wind_speed_10m',
-      'wind_direction_10m',
-      'wind_gusts_10m',
-      'cape',
-      'precipitation',
-      'precipitation_probability'
-    ].join(','),
+    latitude: sites.map(s => s.latitude.toFixed(4)).join(','),
+    longitude: sites.map(s => s.longitude.toFixed(4)).join(','),
+    hourly: ECMWF_HOURLY_VARS.join(','),
     temperature_unit: 'fahrenheit',
     wind_speed_unit: 'mph',
     timezone: 'America/Los_Angeles',
@@ -93,12 +96,9 @@ async function fetchECMWFData(site: LaunchSite): Promise<any> {
 
   const url = `https://api.open-meteo.com/v1/ecmwf?${params}`;
   const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`ECMWF API error: ${response.status}`);
-  }
-
-  return response.json();
+  if (!response.ok) throw new Error(`ECMWF batch API error: ${response.status}`);
+  const data = await response.json();
+  return Array.isArray(data) ? data : [data];
 }
 
 function processDataForDay(
@@ -208,95 +208,67 @@ function processDataForDay(
   }
 }
 
-async function fetchWeatherForSite(site: LaunchSite): Promise<SiteForecast> {
-  const now = new Date();
+function processSiteForecasts(
+  sites: LaunchSite[],
+  hrrrResults: any[],
+  ecmwfResults: any[],
+  targetDates: string[]
+): SiteForecast[] {
+  return sites.map((site, siteIdx) => {
+    const hrrrData = hrrrResults[siteIdx] || null;
+    const ecmwfData = ecmwfResults[siteIdx] || null;
+    const forecastData: WeatherCondition[] = [];
 
-  const getPacificDateString = (daysOffset: number = 0): string => {
-    const date = new Date(now);
-    date.setDate(date.getDate() + daysOffset);
-    const pacificDateStr = date.toLocaleDateString('en-US', {
-      timeZone: 'America/Los_Angeles',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-    const [month, day, year] = pacificDateStr.split('/');
-    return `${year}-${month}-${day}`;
-  };
+    for (let i = 0; i < targetDates.length; i++) {
+      const targetDate = targetDates[i];
+      let dayForecast: WeatherCondition | null = null;
 
-  const targetDates = Array.from({ length: 7 }, (_, i) => getPacificDateString(i));
+      if (i <= 1 && hrrrData) {
+        dayForecast = processDataForDay(site, hrrrData, targetDate, true);
+      } else if (ecmwfData) {
+        dayForecast = processDataForDay(site, ecmwfData, targetDate, false);
+      }
 
-  let hrrrData = null;
-  let ecmwfData = null;
-
-  try {
-    hrrrData = await fetchHRRRData(site);
-    await delay(150);
-  } catch (error) {
-    console.error(`Failed to fetch HRRR data for ${site.name}:`, error);
-  }
-
-  try {
-    ecmwfData = await fetchECMWFData(site);
-    await delay(150);
-  } catch (error) {
-    console.error(`Failed to fetch ECMWF data for ${site.name}:`, error);
-  }
-
-  const forecastData: WeatherCondition[] = [];
-
-  for (let i = 0; i < targetDates.length; i++) {
-    const targetDate = targetDates[i];
-    let dayForecast: WeatherCondition | null = null;
-
-    if (i <= 1 && hrrrData) {
-      dayForecast = processDataForDay(site, hrrrData, targetDate, true);
-    } else if (ecmwfData) {
-      dayForecast = processDataForDay(site, ecmwfData, targetDate, false);
+      if (dayForecast) {
+        forecastData.push(dayForecast);
+      } else {
+        forecastData.push({
+          date: targetDate,
+          windSpeed: 0,
+          windDirection: 0,
+          windGust: 0,
+          temperature: 0,
+          dewPoint: 0,
+          tcon: 0,
+          thermalStrength: 0,
+          topOfLift: site.elevation,
+          flyability: 'poor',
+          conditions: 'Forecast not available',
+          soaringFlyability: 'poor',
+          thermalFlyability: 'poor',
+          launchTime: '12:00 PM',
+          xcPotential: 'low',
+          xcReason: 'No data',
+          cape: 0,
+          liftedIndex: 0,
+          convergence: 0,
+          relativeHumidity: 0,
+          cloudCover: 0,
+          windDirectionMatch: false
+        });
+      }
     }
 
-    if (dayForecast) {
-      forecastData.push(dayForecast);
-    } else {
-      forecastData.push({
-        date: targetDate,
-        windSpeed: 0,
-        windDirection: 0,
-        windGust: 0,
-        temperature: 0,
-        dewPoint: 0,
-        tcon: 0,
-        thermalStrength: 0,
-        topOfLift: site.elevation,
-        flyability: 'poor',
-        conditions: 'Forecast not available',
-        soaringFlyability: 'poor',
-        thermalFlyability: 'poor',
-        launchTime: '12:00 PM',
-        xcPotential: 'low',
-        xcReason: 'No data',
-        cape: 0,
-        liftedIndex: 0,
-        convergence: 0,
-        relativeHumidity: 0,
-        cloudCover: 0,
-        windDirectionMatch: false
-      });
-    }
-  }
-
-  return {
-    site,
-    forecast: forecastData
-  };
+    return { site, forecast: forecastData };
+  });
 }
 
 // --- Grid data fetching for continuous map overlays ---
 
 const GRID: GridMeta = {
-  latMin: 33.5, latMax: 40.0, latStep: 0.25,
-  lonMin: -124.0, lonMax: -117.0, lonStep: 0.25,
-  rows: 27, cols: 29
+  latMin: 33.5, latMax: 40.0, latStep: 0.4,
+  lonMin: -124.0, lonMax: -117.0, lonStep: 0.4,
+  rows: 17, cols: 18
 };
 
 function generateGridPoints(): { lats: number[]; lons: number[] } {
@@ -458,14 +430,8 @@ async function fetchGridForecast(targetDates: string[]): Promise<GridForecast> {
       console.error(`  Grid batch ${batchNum} failed:`, error);
     }
 
-    // Open-Meteo counts each location as a request (600/min free tier).
-    // Each batch = 50 locations. Pause longer every 10 batches (500 locations).
-    if (batchNum % 10 === 0) {
-      console.log('  Rate limit pause (65s)...');
-      await delay(65000);
-    } else {
-      await delay(500);
-    }
+    // 306 grid + 46 site locations = 352 total per run, well under 600/min limit
+    await delay(300);
   }
 
   // Only process today + tomorrow for grid (HRRR data)
@@ -481,23 +447,48 @@ async function fetchGridForecast(targetDates: string[]): Promise<GridForecast> {
 
 async function main() {
   console.log('Starting weather data fetch...');
-  console.log(`Fetching data for ${launchSites.length} sites`);
+  console.log(`Fetching data for ${launchSites.length} sites (batched)`);
 
-  const forecasts: SiteForecast[] = [];
+  const now = new Date();
+  const getPacificDateString = (daysOffset: number = 0): string => {
+    const date = new Date(now);
+    date.setDate(date.getDate() + daysOffset);
+    const pacificDateStr = date.toLocaleDateString('en-US', {
+      timeZone: 'America/Los_Angeles',
+      year: 'numeric', month: '2-digit', day: '2-digit'
+    });
+    const [month, day, year] = pacificDateStr.split('/');
+    return `${year}-${month}-${day}`;
+  };
+  const targetDates = Array.from({ length: 7 }, (_, i) => getPacificDateString(i));
 
-  for (const site of launchSites) {
-    console.log(`Fetching ${site.name}...`);
-    try {
-      const forecast = await fetchWeatherForSite(site);
-      forecasts.push(forecast);
-    } catch (error) {
-      console.error(`Failed to fetch ${site.name}:`, error);
-      forecasts.push({
-        site,
-        forecast: []
-      });
-    }
+  // Fetch all sites in 2 batch calls (HRRR + ECMWF) instead of 46 individual calls
+  let hrrrResults: any[] = [];
+  let ecmwfResults: any[] = [];
+
+  try {
+    console.log('Fetching HRRR batch (all sites)...');
+    hrrrResults = await fetchBatchHRRR(launchSites);
+    console.log(`  Got ${hrrrResults.length} HRRR results`);
+  } catch (error) {
+    console.error('HRRR batch failed:', error);
+    hrrrResults = new Array(launchSites.length).fill(null);
   }
+
+  await delay(500);
+
+  try {
+    console.log('Fetching ECMWF batch (all sites)...');
+    ecmwfResults = await fetchBatchECMWF(launchSites);
+    console.log(`  Got ${ecmwfResults.length} ECMWF results`);
+  } catch (error) {
+    console.error('ECMWF batch failed:', error);
+    ecmwfResults = new Array(launchSites.length).fill(null);
+  }
+
+  await delay(500);
+
+  const forecasts = processSiteForecasts(launchSites, hrrrResults, ecmwfResults, targetDates);
 
   const outputDir = path.join(__dirname, '../public/data');
   if (!fs.existsSync(outputDir)) {
@@ -515,19 +506,6 @@ async function main() {
 
   // Fetch and write grid data for map overlays
   try {
-    const now = new Date();
-    const getPacificDateString = (daysOffset: number = 0): string => {
-      const date = new Date(now);
-      date.setDate(date.getDate() + daysOffset);
-      const pacificDateStr = date.toLocaleDateString('en-US', {
-        timeZone: 'America/Los_Angeles',
-        year: 'numeric', month: '2-digit', day: '2-digit'
-      });
-      const [month, day, year] = pacificDateStr.split('/');
-      return `${year}-${month}-${day}`;
-    };
-    const targetDates = Array.from({ length: 7 }, (_, i) => getPacificDateString(i));
-
     const gridForecast = await fetchGridForecast(targetDates);
     const gridPath = path.join(outputDir, 'gridForecast.json');
     fs.writeFileSync(gridPath, JSON.stringify(gridForecast));
