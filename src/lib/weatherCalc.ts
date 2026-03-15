@@ -397,3 +397,115 @@ export const extractHourlyData = (
 
   return result;
 };
+
+// Score an hour for thermal flying potential
+const scoreThermalHour = (
+  temp: number,
+  tcon: number,
+  windSpeed: number,
+  windGust: number,
+  cloudCover: number,
+  maxWind: number
+): number => {
+  let score = 0;
+
+  // Temperature vs TCON (thermals triggered when temp >= tcon)
+  const tempDeficit = tcon - temp;
+  if (tempDeficit <= 0) score += 40;  // Thermals are triggering
+  else if (tempDeficit <= 3) score += 30;
+  else if (tempDeficit <= 5) score += 20;
+  else if (tempDeficit <= 8) score += 10;
+
+  // Wind - moderate is best for thermals
+  if (windSpeed >= 5 && windSpeed <= 12) score += 25;
+  else if (windSpeed >= 3 && windSpeed <= 15) score += 15;
+  else if (windSpeed > maxWind) score -= 20;
+
+  // Gusts penalty
+  if (windGust > maxWind) score -= 15;
+  else if (windGust > windSpeed * 1.5) score -= 10;
+
+  // Cloud cover - some clouds indicate thermal activity, too much blocks sun
+  if (cloudCover >= 20 && cloudCover <= 50) score += 15;  // Cu development
+  else if (cloudCover < 20) score += 10;  // Clear but maybe blue thermals
+  else if (cloudCover > 70) score -= 10;  // Too overcast
+
+  return score;
+};
+
+// Score an hour for soaring (ridge lift) potential
+const scoreSoaringHour = (
+  windSpeed: number,
+  windGust: number,
+  windDirection: number,
+  siteOrientation: string,
+  maxWind: number
+): number => {
+  let score = 0;
+
+  // Wind direction match is critical for ridge soaring
+  const dirMatch = checkWindDirectionMatch(windDirection, siteOrientation);
+  if (!dirMatch) return -50;  // Wrong direction = no ridge lift
+
+  // Ideal soaring wind: 10-18 mph
+  if (windSpeed >= 10 && windSpeed <= 16) score += 40;
+  else if (windSpeed >= 8 && windSpeed <= 20) score += 25;
+  else if (windSpeed >= 6 && windSpeed <= 22) score += 10;
+  else if (windSpeed < 6) score -= 10;  // Too light
+  else if (windSpeed > maxWind) score -= 30;  // Too strong
+
+  // Gusts penalty
+  if (windGust > maxWind) score -= 20;
+  else if (windGust > 25) score -= 10;
+
+  return score;
+};
+
+export const calculateLaunchTimeFromHourly = (
+  hourlyData: { hour: number; temperature: number; tcon: number; windSpeed: number; windDirection: number; windGust: number; cloudCover: number }[],
+  site: LaunchSite,
+  siteOrientation: string
+): string => {
+  if (!hourlyData || hourlyData.length === 0) {
+    return '12:00 PM';  // Fallback
+  }
+
+  // Filter to flyable hours (10am - 6pm for launch consideration)
+  const flyableHours = hourlyData.filter(h => h.hour >= 10 && h.hour <= 18);
+
+  if (flyableHours.length === 0) {
+    return '12:00 PM';
+  }
+
+  // Score each hour based on site type
+  const scoredHours = flyableHours.map(h => {
+    let score = 0;
+
+    if (site.siteType === 'soaring') {
+      score = scoreSoaringHour(h.windSpeed, h.windGust, h.windDirection, siteOrientation, site.maxWind);
+    } else if (site.siteType === 'thermal') {
+      score = scoreThermalHour(h.temperature, h.tcon, h.windSpeed, h.windGust, h.cloudCover, site.maxWind);
+    } else {
+      // Mixed site - consider both, weight toward better option
+      const thermalScore = scoreThermalHour(h.temperature, h.tcon, h.windSpeed, h.windGust, h.cloudCover, site.maxWind);
+      const soaringScore = scoreSoaringHour(h.windSpeed, h.windGust, h.windDirection, siteOrientation, site.maxWind);
+      score = Math.max(thermalScore, soaringScore);
+    }
+
+    return { hour: h.hour, score };
+  });
+
+  // Find the best hour
+  const bestHour = scoredHours.reduce((best, current) =>
+    current.score > best.score ? current : best
+  );
+
+  // Format the hour
+  const formatHour = (hour: number): string => {
+    if (hour === 12) return '12:00 PM';
+    if (hour > 12) return `${hour - 12}:00 PM`;
+    return `${hour}:00 AM`;
+  };
+
+  return formatHour(bestHour.hour);
+};
