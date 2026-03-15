@@ -27,7 +27,8 @@ import {
   determineFlyability,
   calculateXCPotential,
   analyzeRain,
-  extractHourlyData
+  extractHourlyData,
+  calculateLaunchTimeFromHourly
 } from '../src/lib/weatherCalc';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -172,7 +173,12 @@ function processDataForDay(
     );
 
     const rainInfo = analyzeRain(hourly, targetDate);
-    const launchTime = '12:00 PM';
+
+    // Calculate suggested launch time from hourly data
+    const launchTime = hourlyData.length > 0
+      ? calculateLaunchTimeFromHourly(hourlyData, site, site.orientation)
+      : '12:00 PM';
+
     const { xcPotential, xcReason } = calculateXCPotential(topOfLift, thermalStrength, windSpeed, site);
 
     return {
