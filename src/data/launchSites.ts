@@ -44,12 +44,12 @@ export const launchSites: LaunchSite[] = [
   {
     id: 'whaleback',
     name: 'Whaleback',
-    elevation: 2400,
-    latitude: 36.7500,
-    longitude: -121.8000,
-    orientation: 'W-NW',
-    maxWind: 20,
-    siteType: 'mixed'  // Coastal influence + thermals
+    elevation: 7437,
+    latitude: 41.5340,
+    longitude: -122.1530,
+    orientation: 'NW-SW',
+    maxWind: 14,
+    siteType: 'thermal'  // High altitude thermal near Mt Shasta
   },
   {
     id: 'blue-rock',
