@@ -1,12 +1,14 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip, useMap, Circle } from 'react-leaflet';
-import { SiteForecast, WeatherCondition, HourlyDataPoint } from '../types/weather';
+import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import { SiteForecast, WeatherCondition, HourlyDataPoint, GridForecast, GridHour } from '../types/weather';
 import { getWindDirection } from '../services/weatherService';
 import WindArrow from './WindArrow';
 import 'leaflet/dist/leaflet.css';
 
 interface MapViewProps {
   forecasts: SiteForecast[];
+  gridForecast: GridForecast | null;
   onSiteClick: (forecast: SiteForecast) => void;
 }
 
@@ -26,7 +28,6 @@ const flyabilityColor = (f: string) => {
   }
 };
 
-// Interpolate hourly data for a given hour
 const getHourlySnapshot = (fc: WeatherCondition, hour: number): Partial<HourlyDataPoint> | null => {
   if (!fc.hourlyData || fc.hourlyData.length === 0) return null;
   const match = fc.hourlyData.find(h => h.hour === hour);
@@ -35,111 +36,270 @@ const getHourlySnapshot = (fc: WeatherCondition, hour: number): Partial<HourlyDa
   return sorted[0] || null;
 };
 
-// --- Overlay color ramps ---
+// --- Overlay types & color ramps ---
 
-type OverlayKey = 'topOfLift' | 'liftAGL' | 'liftedIndex' | 'cape' | 'thermalIndex';
+type OverlayKey = 'topOfLift' | 'thermalIndex' | 'cape' | 'liftedIndex' | 'cloudCover' | 'windSpeed';
 
-// Top of Lift MSL - altitude color ramp
-const tolMSLColor = (topOfLift: number) => {
-  if (topOfLift >= 12000) return 'rgba(239,68,68,0.45)';
-  if (topOfLift >= 10000) return 'rgba(249,115,22,0.4)';
-  if (topOfLift >= 8000)  return 'rgba(245,158,11,0.35)';
-  if (topOfLift >= 6000)  return 'rgba(234,179,8,0.3)';
-  if (topOfLift >= 4000)  return 'rgba(132,204,22,0.25)';
-  if (topOfLift >= 2000)  return 'rgba(96,165,250,0.2)';
-  return 'rgba(147,197,253,0.12)';
+// Color ramps returning [r, g, b, a] for canvas pixel painting
+type RGBA = [number, number, number, number];
+
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const lerpRGBA = (a: RGBA, b: RGBA, t: number): RGBA => [
+  Math.round(lerp(a[0], b[0], t)),
+  Math.round(lerp(a[1], b[1], t)),
+  Math.round(lerp(a[2], b[2], t)),
+  Math.round(lerp(a[3], b[3], t)),
+];
+
+// Smooth gradient color ramps — each returns RGBA for a given value
+const colorRamps: Record<OverlayKey, (val: number) => RGBA> = {
+  topOfLift: (v: number) => {
+    // 0–12000+ ft MSL
+    const stops: [number, RGBA][] = [
+      [0,     [147, 197, 253, 30]],
+      [2000,  [96,  165, 250, 50]],
+      [4000,  [132, 204, 22,  60]],
+      [6000,  [234, 179, 8,   80]],
+      [8000,  [245, 158, 11,  95]],
+      [10000, [249, 115, 22,  110]],
+      [12000, [239, 68,  68,  125]],
+    ];
+    return interpolateStops(stops, v);
+  },
+  thermalIndex: (v: number) => {
+    // 0–10 thermal strength
+    const stops: [number, RGBA][] = [
+      [0, [96,  165, 250, 20]],
+      [1, [132, 204, 22,  45]],
+      [3, [234, 179, 8,   70]],
+      [5, [245, 158, 11,  95]],
+      [7, [249, 115, 22,  115]],
+      [9, [239, 68,  68,  130]],
+    ];
+    return interpolateStops(stops, v);
+  },
+  cape: (v: number) => {
+    const stops: [number, RGBA][] = [
+      [0,    [96,  165, 250, 15]],
+      [50,   [132, 204, 22,  50]],
+      [200,  [234, 179, 8,   70]],
+      [500,  [245, 158, 11,  90]],
+      [1000, [249, 115, 22,  110]],
+      [1500, [239, 68,  68,  130]],
+    ];
+    return interpolateStops(stops, v);
+  },
+  liftedIndex: (v: number) => {
+    // Inverted: negative = unstable = good (red), positive = stable = blue
+    const stops: [number, RGBA][] = [
+      [-6, [239, 68,  68,  130]],
+      [-4, [249, 115, 22,  110]],
+      [-2, [245, 158, 11,  90]],
+      [0,  [234, 179, 8,   70]],
+      [2,  [132, 204, 22,  45]],
+      [4,  [96,  165, 250, 25]],
+    ];
+    return interpolateStops(stops, v);
+  },
+  cloudCover: (v: number) => {
+    // 0–100% — clear to white/grey
+    const stops: [number, RGBA][] = [
+      [0,   [255, 255, 255, 0]],
+      [20,  [220, 230, 240, 20]],
+      [50,  [200, 210, 220, 60]],
+      [80,  [180, 190, 200, 100]],
+      [100, [160, 170, 180, 130]],
+    ];
+    return interpolateStops(stops, v);
+  },
+  windSpeed: (v: number) => {
+    // 0–30+ mph
+    const stops: [number, RGBA][] = [
+      [0,  [96,  165, 250, 20]],
+      [5,  [132, 204, 22,  45]],
+      [10, [234, 179, 8,   70]],
+      [15, [245, 158, 11,  90]],
+      [20, [249, 115, 22,  110]],
+      [30, [239, 68,  68,  130]],
+    ];
+    return interpolateStops(stops, v);
+  },
 };
 
-// Lift Above Ground - AGL ramp
-const liftAGLColor = (agl: number) => {
-  if (agl >= 5000) return 'rgba(239,68,68,0.45)';
-  if (agl >= 4000) return 'rgba(249,115,22,0.4)';
-  if (agl >= 3000) return 'rgba(245,158,11,0.35)';
-  if (agl >= 2000) return 'rgba(234,179,8,0.3)';
-  if (agl >= 1000) return 'rgba(132,204,22,0.22)';
-  return 'rgba(96,165,250,0.12)';
-};
-
-// Lifted Index - negative = unstable (good), positive = stable (bad)
-const liColor = (li: number) => {
-  if (li <= -4) return 'rgba(239,68,68,0.45)';   // very unstable
-  if (li <= -2) return 'rgba(249,115,22,0.4)';
-  if (li <= 0)  return 'rgba(245,158,11,0.35)';
-  if (li <= 2)  return 'rgba(234,179,8,0.25)';
-  if (li <= 4)  return 'rgba(132,204,22,0.18)';
-  return 'rgba(96,165,250,0.1)';                   // very stable
-};
-
-// CAPE
-const capeColor = (cape: number) => {
-  if (cape >= 1500) return 'rgba(239,68,68,0.45)';
-  if (cape >= 1000) return 'rgba(249,115,22,0.4)';
-  if (cape >= 500)  return 'rgba(245,158,11,0.35)';
-  if (cape >= 200)  return 'rgba(234,179,8,0.28)';
-  if (cape >= 50)   return 'rgba(132,204,22,0.2)';
-  return 'rgba(96,165,250,0.08)';
-};
-
-// Thermal Index (thermalStrength 0-10)
-const thermalColor = (strength: number) => {
-  if (strength >= 8)  return 'rgba(239,68,68,0.45)';
-  if (strength >= 6)  return 'rgba(249,115,22,0.4)';
-  if (strength >= 5)  return 'rgba(245,158,11,0.35)';
-  if (strength >= 3)  return 'rgba(234,179,8,0.28)';
-  if (strength >= 1)  return 'rgba(132,204,22,0.18)';
-  return 'rgba(96,165,250,0.08)';
-};
-
-// Get overlay circle color for a given layer
-const getOverlayColor = (key: OverlayKey, fc: WeatherCondition, elevation: number): string => {
-  switch (key) {
-    case 'topOfLift': return tolMSLColor(fc.topOfLift);
-    case 'liftAGL': return liftAGLColor(fc.topOfLift - elevation);
-    case 'liftedIndex': return liColor(fc.liftedIndex ?? 5);
-    case 'cape': return capeColor(fc.cape ?? 0);
-    case 'thermalIndex': return thermalColor(fc.thermalStrength);
-    default: return 'rgba(128,128,128,0.1)';
-  }
-};
-
-// Get overlay circle radius scaled to value
-const getOverlayRadius = (key: OverlayKey, fc: WeatherCondition, elevation: number): number => {
-  switch (key) {
-    case 'topOfLift': return Math.max(10000, Math.min(35000, (fc.topOfLift / 1000) * 2500));
-    case 'liftAGL': {
-      const agl = fc.topOfLift - elevation;
-      return Math.max(8000, Math.min(30000, agl * 5));
+function interpolateStops(stops: [number, RGBA][], value: number): RGBA {
+  if (value <= stops[0][0]) return stops[0][1];
+  if (value >= stops[stops.length - 1][0]) return stops[stops.length - 1][1];
+  for (let i = 0; i < stops.length - 1; i++) {
+    if (value >= stops[i][0] && value <= stops[i + 1][0]) {
+      const t = (value - stops[i][0]) / (stops[i + 1][0] - stops[i][0]);
+      return lerpRGBA(stops[i][1], stops[i + 1][1], t);
     }
-    case 'liftedIndex': {
-      const li = fc.liftedIndex ?? 5;
-      return Math.max(10000, Math.min(30000, (10 - li) * 2500));
-    }
-    case 'cape': return Math.max(8000, Math.min(35000, Math.sqrt(fc.cape ?? 0) * 700));
-    case 'thermalIndex': return Math.max(8000, Math.min(30000, fc.thermalStrength * 3000));
-    default: return 15000;
   }
+  return stops[0][1];
+}
+
+// Map overlay key to grid data field
+const GRID_FIELD: Record<OverlayKey, keyof GridHour> = {
+  topOfLift: 'topOfLift',
+  thermalIndex: 'thermalStrength',
+  cape: 'cape',
+  liftedIndex: 'liftedIndex',
+  cloudCover: 'cloudCover',
+  windSpeed: 'windSpeed',
 };
 
-// Get value text for tooltip
+// Get overlay value text for site tooltip
 const getOverlayValue = (key: OverlayKey, fc: WeatherCondition, elevation: number): string => {
   switch (key) {
     case 'topOfLift': return `${(fc.topOfLift / 1000).toFixed(1)}k'`;
-    case 'liftAGL': return `${((fc.topOfLift - elevation) / 1000).toFixed(1)}k'`;
-    case 'liftedIndex': return `LI ${fc.liftedIndex ?? '?'}`;
-    case 'cape': return `${fc.cape ?? 0}`;
     case 'thermalIndex': return `${fc.thermalStrength}/10`;
+    case 'cape': return `${fc.cape ?? 0}`;
+    case 'liftedIndex': return `LI ${fc.liftedIndex ?? '?'}`;
+    case 'cloudCover': return `${fc.cloudCover ?? 0}%`;
+    case 'windSpeed': return `${fc.windSpeed}mph`;
     default: return '';
   }
 };
 
 // --- Layer definitions ---
 const OVERLAY_LAYERS: { key: OverlayKey; label: string; color: string; unit: string }[] = [
-  { key: 'topOfLift',    label: 'Top of Lift',       color: '#f59e0b', unit: 'ft MSL' },
-  { key: 'liftAGL',      label: 'Lift Above Ground', color: '#f97316', unit: 'ft AGL' },
-  { key: 'liftedIndex',  label: 'Lifted Index',      color: '#ef4444', unit: '' },
-  { key: 'cape',         label: 'CAPE',              color: '#a855f7', unit: 'J/kg' },
-  { key: 'thermalIndex', label: 'Thermal Index',     color: '#22c55e', unit: '/10' },
+  { key: 'thermalIndex', label: 'Thermal Strength', color: '#22c55e', unit: '/10' },
+  { key: 'topOfLift',    label: 'Top of Lift',      color: '#f59e0b', unit: 'ft MSL' },
+  { key: 'cape',         label: 'CAPE',             color: '#a855f7', unit: 'J/kg' },
+  { key: 'liftedIndex',  label: 'Lifted Index',     color: '#ef4444', unit: '' },
+  { key: 'cloudCover',   label: 'Cloud Cover',      color: '#94a3b8', unit: '%' },
+  { key: 'windSpeed',    label: 'Wind Speed',       color: '#3b82f6', unit: 'mph' },
 ];
+
+// --- Bilinear interpolation from grid ---
+
+function bilinearSample(
+  grid: GridForecast,
+  data: number[],
+  lat: number,
+  lon: number
+): number | null {
+  const { latMin, latStep, lonMin, lonStep, rows, cols } = grid.grid;
+
+  // Continuous grid coordinates
+  const gRow = (lat - latMin) / latStep;
+  const gCol = (lon - lonMin) / lonStep;
+
+  // Out of bounds
+  if (gRow < 0 || gRow >= rows - 1 || gCol < 0 || gCol >= cols - 1) return null;
+
+  const r0 = Math.floor(gRow);
+  const c0 = Math.floor(gCol);
+  const r1 = r0 + 1;
+  const c1 = c0 + 1;
+
+  const tRow = gRow - r0;
+  const tCol = gCol - c0;
+
+  const v00 = data[r0 * cols + c0];
+  const v01 = data[r0 * cols + c1];
+  const v10 = data[r1 * cols + c0];
+  const v11 = data[r1 * cols + c1];
+
+  if (v00 == null || v01 == null || v10 == null || v11 == null) return null;
+
+  // Bilinear interpolation
+  const top = v00 + (v01 - v00) * tCol;
+  const bot = v10 + (v11 - v10) * tCol;
+  return top + (bot - top) * tRow;
+}
+
+// --- Canvas grid layer (Leaflet L.GridLayer) ---
+
+const WeatherGridLayer: React.FC<{
+  gridForecast: GridForecast;
+  overlayKey: OverlayKey;
+  dayIndex: number;
+  hour: number;
+}> = ({ gridForecast, overlayKey, dayIndex, hour }) => {
+  const map = useMap();
+  const layerRef = useRef<L.GridLayer | null>(null);
+
+  useEffect(() => {
+    const gridDay = gridForecast.days[dayIndex];
+    if (!gridDay) return;
+
+    // Find closest available hour
+    const availableHours = Object.keys(gridDay.hours).map(Number).sort((a, b) => a - b);
+    const closestHour = availableHours.reduce((prev, curr) =>
+      Math.abs(curr - hour) < Math.abs(prev - hour) ? curr : prev
+    , availableHours[0]);
+
+    const gridHour = gridDay.hours[String(closestHour)];
+    if (!gridHour) return;
+
+    const field = GRID_FIELD[overlayKey];
+    const data = gridHour[field] as number[];
+    if (!data || data.length === 0) return;
+
+    const colorFn = colorRamps[overlayKey];
+
+    const CanvasLayer = L.GridLayer.extend({
+      createTile(coords: L.Coords) {
+        const tile = document.createElement('canvas');
+        const tileSize = this.getTileSize();
+        tile.width = tileSize.x;
+        tile.height = tileSize.y;
+        const ctx = tile.getContext('2d');
+        if (!ctx) return tile;
+
+        const imgData = ctx.createImageData(tileSize.x, tileSize.y);
+        const pixels = imgData.data;
+
+        // Sample every 4th pixel for performance, then fill 4x4 blocks
+        const step = 4;
+
+        for (let py = 0; py < tileSize.y; py += step) {
+          for (let px = 0; px < tileSize.x; px += step) {
+            // Convert pixel to lat/lon
+            const point = L.point(
+              coords.x * tileSize.x + px,
+              coords.y * tileSize.y + py
+            );
+            const latlng = map.unproject(point, coords.z);
+
+            const value = bilinearSample(gridForecast, data, latlng.lat, latlng.lng);
+            if (value === null) continue;
+
+            const [r, g, b, a] = colorFn(value);
+
+            // Fill step x step block
+            for (let dy = 0; dy < step && py + dy < tileSize.y; dy++) {
+              for (let dx = 0; dx < step && px + dx < tileSize.x; dx++) {
+                const idx = ((py + dy) * tileSize.x + (px + dx)) * 4;
+                pixels[idx] = r;
+                pixels[idx + 1] = g;
+                pixels[idx + 2] = b;
+                pixels[idx + 3] = a;
+              }
+            }
+          }
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        return tile;
+      }
+    });
+
+    const layer = new CanvasLayer({ opacity: 1 });
+    layer.addTo(map);
+    layerRef.current = layer;
+
+    return () => {
+      if (layerRef.current) {
+        map.removeLayer(layerRef.current);
+        layerRef.current = null;
+      }
+    };
+  }, [map, gridForecast, overlayKey, dayIndex, hour]);
+
+  return null;
+};
 
 // --- Sub-components ---
 
@@ -284,19 +444,9 @@ const SitePopup: React.FC<{ sf: SiteForecast; fc: WeatherCondition; hourSnap: Pa
   );
 };
 
-// --- Overlay Panel ---
-
-interface OverlayState {
-  topOfLift: boolean;
-  liftAGL: boolean;
-  liftedIndex: boolean;
-  cape: boolean;
-  thermalIndex: boolean;
-}
+// --- Control Panel ---
 
 interface ControlPanelProps {
-  overlays: OverlayState;
-  setOverlays: React.Dispatch<React.SetStateAction<OverlayState>>;
   activeOverlay: OverlayKey | null;
   setActiveOverlay: (key: OverlayKey | null) => void;
   dayIndex: number;
@@ -304,36 +454,19 @@ interface ControlPanelProps {
   hour: number;
   setHour: (h: number) => void;
   hasHourly: boolean;
+  hasGrid: boolean;
 }
 
-const ControlPanel: React.FC<ControlPanelProps> = ({ overlays, setOverlays, activeOverlay, setActiveOverlay, dayIndex, setDayIndex, hour, setHour, hasHourly }) => {
+const ControlPanel: React.FC<ControlPanelProps> = ({ activeOverlay, setActiveOverlay, dayIndex, setDayIndex, hour, setHour, hasHourly, hasGrid }) => {
   const [collapsed, setCollapsed] = useState(false);
-
-  const allOff = !Object.values(overlays).some(Boolean);
-
-  const clearAll = () => {
-    setOverlays({ topOfLift: false, liftAGL: false, liftedIndex: false, cape: false, thermalIndex: false });
-    setActiveOverlay(null);
-  };
 
   const formatHour = (h: number) => {
     if (h === 12) return '12p';
     return h > 12 ? `${h - 12}p` : `${h}a`;
   };
 
-  // Radio-style: only one overlay at a time for clarity
   const handleToggle = (key: OverlayKey) => {
-    if (activeOverlay === key) {
-      // Turn off
-      setActiveOverlay(null);
-      setOverlays(prev => ({ ...prev, [key]: false }));
-    } else {
-      // Turn this one on, rest off
-      const newState: OverlayState = { topOfLift: false, liftAGL: false, liftedIndex: false, cape: false, thermalIndex: false };
-      newState[key] = true;
-      setOverlays(newState);
-      setActiveOverlay(key);
-    }
+    setActiveOverlay(activeOverlay === key ? null : key);
   };
 
   if (collapsed) {
@@ -366,7 +499,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ overlays, setOverlays, acti
         </button>
       </div>
 
-      {/* Overlay toggles - radio style */}
+      {/* Overlay toggles */}
       <div className="space-y-1 mb-3">
         {OVERLAY_LAYERS.map(({ key, label, color, unit }) => (
           <button
@@ -404,14 +537,14 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ overlays, setOverlays, acti
       {/* Clear */}
       {activeOverlay && (
         <button
-          onClick={clearAll}
+          onClick={() => setActiveOverlay(null)}
           className="w-full font-mono text-[9px] uppercase tracking-wider py-1.5 px-2 border border-neutral-700 rounded-[3px] text-neutral-500 hover:border-neutral-500 hover:text-neutral-300 transition-all mb-3"
         >
           Clear Overlay
         </button>
       )}
 
-      {/* Color ramp legend for active overlay */}
+      {/* Color ramp legend */}
       {activeOverlay && (
         <div className="mb-3">
           <div className="flex items-center gap-0.5 h-2 rounded-sm overflow-hidden">
@@ -421,12 +554,18 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ overlays, setOverlays, acti
           </div>
           <div className="flex justify-between mt-0.5">
             <span className="font-mono text-[7px] text-neutral-600">
-              {activeOverlay === 'liftedIndex' ? 'Stable' : 'Low'}
+              {activeOverlay === 'liftedIndex' ? 'Stable' : activeOverlay === 'cloudCover' ? 'Clear' : 'Low'}
             </span>
             <span className="font-mono text-[7px] text-neutral-600">
-              {activeOverlay === 'liftedIndex' ? 'Unstable' : 'High'}
+              {activeOverlay === 'liftedIndex' ? 'Unstable' : activeOverlay === 'cloudCover' ? 'Overcast' : 'High'}
             </span>
           </div>
+        </div>
+      )}
+
+      {!hasGrid && activeOverlay && (
+        <div className="font-mono text-[8px] text-amber-500/70 mb-3">
+          Grid data loading...
         </div>
       )}
 
@@ -501,14 +640,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ overlays, setOverlays, acti
 
 // --- Main MapView ---
 
-const MapView: React.FC<MapViewProps> = ({ forecasts, onSiteClick }) => {
-  const [overlays, setOverlays] = useState<OverlayState>({
-    topOfLift: false,
-    liftAGL: false,
-    liftedIndex: false,
-    cape: false,
-    thermalIndex: false,
-  });
+const MapView: React.FC<MapViewProps> = ({ forecasts, gridForecast, onSiteClick }) => {
   const [activeOverlay, setActiveOverlay] = useState<OverlayKey | null>(null);
   const [dayIndex, setDayIndex] = useState(0);
   const [hour, setHour] = useState(12);
@@ -542,26 +674,15 @@ const MapView: React.FC<MapViewProps> = ({ forecasts, onSiteClick }) => {
           maxZoom={17}
         />
 
-        {/* Active overlay circles */}
-        {activeOverlay && forecasts.map(sf => {
-          const fc = getFC(sf);
-          if (!fc) return null;
-          const color = getOverlayColor(activeOverlay, fc, sf.site.elevation);
-          const radius = getOverlayRadius(activeOverlay, fc, sf.site.elevation);
-          return (
-            <Circle
-              key={`overlay-${sf.site.id}`}
-              center={[sf.site.latitude, sf.site.longitude]}
-              radius={radius}
-              pathOptions={{
-                fillColor: color,
-                fillOpacity: 1,
-                color: 'transparent',
-                weight: 0,
-              }}
-            />
-          );
-        })}
+        {/* Grid weather overlay — renders below site markers */}
+        {activeOverlay && gridForecast && (
+          <WeatherGridLayer
+            gridForecast={gridForecast}
+            overlayKey={activeOverlay}
+            dayIndex={dayIndex}
+            hour={hour}
+          />
+        )}
 
         {/* Site markers with labels */}
         {forecasts.map(sf => {
@@ -574,7 +695,6 @@ const MapView: React.FC<MapViewProps> = ({ forecasts, onSiteClick }) => {
           const baseRadius = 8;
           const radius = baseRadius + (fc.thermalStrength / 10) * 6;
 
-          // Build tooltip text with overlay value
           const overlayVal = activeOverlay ? ` · ${getOverlayValue(activeOverlay, fc, sf.site.elevation)}` : '';
 
           return (
@@ -628,8 +748,6 @@ const MapView: React.FC<MapViewProps> = ({ forecasts, onSiteClick }) => {
 
       {/* Control panel */}
       <ControlPanel
-        overlays={overlays}
-        setOverlays={setOverlays}
         activeOverlay={activeOverlay}
         setActiveOverlay={setActiveOverlay}
         dayIndex={dayIndex}
@@ -637,6 +755,7 @@ const MapView: React.FC<MapViewProps> = ({ forecasts, onSiteClick }) => {
         hour={hour}
         setHour={setHour}
         hasHourly={hasHourly}
+        hasGrid={!!gridForecast}
       />
 
       {/* Data attribution */}

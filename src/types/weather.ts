@@ -78,3 +78,37 @@ export interface SiteForecast {
   site: LaunchSite;
   forecast: WeatherCondition[];
 }
+
+// Grid overlay types for continuous weather map
+export interface GridMeta {
+  latMin: number;
+  latMax: number;
+  latStep: number;
+  lonMin: number;
+  lonMax: number;
+  lonStep: number;
+  rows: number;
+  cols: number;
+}
+
+export interface GridHour {
+  cape: number[];
+  liftedIndex: number[];
+  cloudCover: number[];
+  windSpeed: number[];
+  windDir: number[];
+  thermalStrength: number[];
+  topOfLift: number[];
+  blHeight: number[];
+}
+
+export interface GridDay {
+  date: string;
+  hours: Record<string, GridHour>;
+}
+
+export interface GridForecast {
+  generated: string;
+  grid: GridMeta;
+  days: GridDay[];
+}
