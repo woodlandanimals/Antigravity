@@ -37,10 +37,10 @@ const getHourlySnapshot = (fc: WeatherCondition, hour: number): Partial<HourlyDa
 };
 
 // --- Overlay types & color ramps ---
+// XCSkies-style: high opacity, vivid distinct color bands
 
-type OverlayKey = 'topOfLift' | 'thermalIndex' | 'cape' | 'liftedIndex' | 'cloudCover' | 'windSpeed';
+type OverlayKey = 'topOfLift' | 'thermalIndex' | 'cape' | 'liftedIndex' | 'cloudCover';
 
-// Color ramps returning [r, g, b, a] for canvas pixel painting
 type RGBA = [number, number, number, number];
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -50,81 +50,6 @@ const lerpRGBA = (a: RGBA, b: RGBA, t: number): RGBA => [
   Math.round(lerp(a[2], b[2], t)),
   Math.round(lerp(a[3], b[3], t)),
 ];
-
-// Smooth gradient color ramps — each returns RGBA for a given value
-const colorRamps: Record<OverlayKey, (val: number) => RGBA> = {
-  topOfLift: (v: number) => {
-    // 0–12000+ ft MSL
-    const stops: [number, RGBA][] = [
-      [0,     [147, 197, 253, 30]],
-      [2000,  [96,  165, 250, 50]],
-      [4000,  [132, 204, 22,  60]],
-      [6000,  [234, 179, 8,   80]],
-      [8000,  [245, 158, 11,  95]],
-      [10000, [249, 115, 22,  110]],
-      [12000, [239, 68,  68,  125]],
-    ];
-    return interpolateStops(stops, v);
-  },
-  thermalIndex: (v: number) => {
-    // 0–10 thermal strength
-    const stops: [number, RGBA][] = [
-      [0, [96,  165, 250, 20]],
-      [1, [132, 204, 22,  45]],
-      [3, [234, 179, 8,   70]],
-      [5, [245, 158, 11,  95]],
-      [7, [249, 115, 22,  115]],
-      [9, [239, 68,  68,  130]],
-    ];
-    return interpolateStops(stops, v);
-  },
-  cape: (v: number) => {
-    const stops: [number, RGBA][] = [
-      [0,    [96,  165, 250, 15]],
-      [50,   [132, 204, 22,  50]],
-      [200,  [234, 179, 8,   70]],
-      [500,  [245, 158, 11,  90]],
-      [1000, [249, 115, 22,  110]],
-      [1500, [239, 68,  68,  130]],
-    ];
-    return interpolateStops(stops, v);
-  },
-  liftedIndex: (v: number) => {
-    // Inverted: negative = unstable = good (red), positive = stable = blue
-    const stops: [number, RGBA][] = [
-      [-6, [239, 68,  68,  130]],
-      [-4, [249, 115, 22,  110]],
-      [-2, [245, 158, 11,  90]],
-      [0,  [234, 179, 8,   70]],
-      [2,  [132, 204, 22,  45]],
-      [4,  [96,  165, 250, 25]],
-    ];
-    return interpolateStops(stops, v);
-  },
-  cloudCover: (v: number) => {
-    // 0–100% — clear to white/grey
-    const stops: [number, RGBA][] = [
-      [0,   [255, 255, 255, 0]],
-      [20,  [220, 230, 240, 20]],
-      [50,  [200, 210, 220, 60]],
-      [80,  [180, 190, 200, 100]],
-      [100, [160, 170, 180, 130]],
-    ];
-    return interpolateStops(stops, v);
-  },
-  windSpeed: (v: number) => {
-    // 0–30+ mph
-    const stops: [number, RGBA][] = [
-      [0,  [96,  165, 250, 20]],
-      [5,  [132, 204, 22,  45]],
-      [10, [234, 179, 8,   70]],
-      [15, [245, 158, 11,  90]],
-      [20, [249, 115, 22,  110]],
-      [30, [239, 68,  68,  130]],
-    ];
-    return interpolateStops(stops, v);
-  },
-};
 
 function interpolateStops(stops: [number, RGBA][], value: number): RGBA {
   if (value <= stops[0][0]) return stops[0][1];
@@ -138,6 +63,90 @@ function interpolateStops(stops: [number, RGBA][], value: number): RGBA {
   return stops[0][1];
 }
 
+// XCSkies-matched color ramps — bold, opaque, distinct bands
+const colorRamps: Record<OverlayKey, (val: number) => RGBA> = {
+  topOfLift: (v: number) => {
+    // Matches XCSkies "Top of usable lift" — dark teal → magenta → blue → green → yellow → orange
+    const stops: [number, RGBA][] = [
+      [0,     [40,  50,  60,  200]],  // dark grey-teal (no lift)
+      [1000,  [80,  50,  90,  200]],  // dark purple
+      [2000,  [160, 60,  160, 200]],  // magenta
+      [3000,  [140, 80,  180, 200]],  // purple
+      [4000,  [100, 100, 200, 195]],  // blue-purple
+      [5000,  [60,  120, 200, 195]],  // medium blue
+      [6000,  [40,  150, 210, 190]],  // sky blue
+      [7000,  [60,  180, 120, 190]],  // teal-green
+      [8000,  [80,  200, 80,  185]],  // green
+      [9000,  [160, 210, 60,  185]],  // yellow-green
+      [10000, [220, 200, 40,  185]],  // yellow
+      [12000, [240, 160, 40,  180]],  // orange
+      [14000, [230, 100, 30,  180]],  // deep orange
+      [18000, [200, 50,  30,  180]],  // red
+    ];
+    return interpolateStops(stops, v);
+  },
+  thermalIndex: (v: number) => {
+    // 0–10 scale — blue (none) → green (moderate) → red (epic)
+    const stops: [number, RGBA][] = [
+      [0,   [60,  100, 180, 180]],  // blue (no thermals)
+      [1,   [60,  140, 180, 185]],  // light blue
+      [2,   [60,  180, 140, 185]],  // teal
+      [3,   [80,  190, 80,  185]],  // green
+      [4,   [140, 200, 60,  185]],  // yellow-green
+      [5,   [200, 200, 40,  185]],  // yellow
+      [6,   [230, 170, 40,  185]],  // amber
+      [7,   [240, 130, 30,  185]],  // orange
+      [8,   [230, 80,  30,  185]],  // deep orange
+      [9,   [210, 40,  40,  185]],  // red
+      [10,  [180, 20,  20,  190]],  // dark red
+    ];
+    return interpolateStops(stops, v);
+  },
+  cape: (v: number) => {
+    const stops: [number, RGBA][] = [
+      [0,    [60,  100, 180, 170]],  // blue
+      [50,   [80,  170, 140, 180]],  // teal
+      [100,  [80,  190, 80,  185]],  // green
+      [250,  [180, 200, 50,  185]],  // yellow-green
+      [500,  [230, 180, 40,  185]],  // yellow
+      [750,  [240, 140, 30,  185]],  // orange
+      [1000, [230, 80,  30,  185]],  // deep orange
+      [1500, [200, 40,  40,  190]],  // red
+      [2000, [160, 20,  60,  195]],  // dark red
+    ];
+    return interpolateStops(stops, v);
+  },
+  liftedIndex: (v: number) => {
+    // Negative = unstable (good for thermals, warm colors)
+    // Positive = stable (poor, cool colors)
+    const stops: [number, RGBA][] = [
+      [-6, [200, 40,  40,  190]],  // dark red (very unstable)
+      [-4, [230, 80,  30,  185]],  // deep orange
+      [-2, [240, 150, 30,  185]],  // orange
+      [-1, [220, 200, 50,  185]],  // yellow
+      [0,  [120, 190, 80,  180]],  // green (neutral)
+      [1,  [60,  170, 160, 180]],  // teal
+      [2,  [60,  140, 200, 180]],  // blue
+      [4,  [60,  100, 180, 185]],  // deep blue
+      [6,  [50,  60,  140, 190]],  // navy (very stable)
+    ];
+    return interpolateStops(stops, v);
+  },
+  cloudCover: (v: number) => {
+    // 0–100% — transparent to opaque white/grey
+    const stops: [number, RGBA][] = [
+      [0,   [255, 255, 255, 0]],    // clear
+      [10,  [240, 245, 250, 30]],
+      [30,  [220, 230, 240, 90]],
+      [50,  [200, 210, 225, 140]],
+      [70,  [180, 190, 210, 170]],
+      [85,  [160, 170, 190, 190]],
+      [100, [140, 150, 170, 210]],  // heavy overcast
+    ];
+    return interpolateStops(stops, v);
+  },
+};
+
 // Map overlay key to grid data field
 const GRID_FIELD: Record<OverlayKey, keyof GridHour> = {
   topOfLift: 'topOfLift',
@@ -145,7 +154,6 @@ const GRID_FIELD: Record<OverlayKey, keyof GridHour> = {
   cape: 'cape',
   liftedIndex: 'liftedIndex',
   cloudCover: 'cloudCover',
-  windSpeed: 'windSpeed',
 };
 
 // Get overlay value text for site tooltip
@@ -156,7 +164,6 @@ const getOverlayValue = (key: OverlayKey, fc: WeatherCondition, elevation: numbe
     case 'cape': return `${fc.cape ?? 0}`;
     case 'liftedIndex': return `LI ${fc.liftedIndex ?? '?'}`;
     case 'cloudCover': return `${fc.cloudCover ?? 0}%`;
-    case 'windSpeed': return `${fc.windSpeed}mph`;
     default: return '';
   }
 };
@@ -168,7 +175,6 @@ const OVERLAY_LAYERS: { key: OverlayKey; label: string; color: string; unit: str
   { key: 'cape',         label: 'CAPE',             color: '#a855f7', unit: 'J/kg' },
   { key: 'liftedIndex',  label: 'Lifted Index',     color: '#ef4444', unit: '' },
   { key: 'cloudCover',   label: 'Cloud Cover',      color: '#94a3b8', unit: '%' },
-  { key: 'windSpeed',    label: 'Wind Speed',       color: '#3b82f6', unit: 'mph' },
 ];
 
 // --- Bilinear interpolation from grid ---
@@ -180,19 +186,14 @@ function bilinearSample(
   lon: number
 ): number | null {
   const { latMin, latStep, lonMin, lonStep, rows, cols } = grid.grid;
-
-  // Continuous grid coordinates
   const gRow = (lat - latMin) / latStep;
   const gCol = (lon - lonMin) / lonStep;
-
-  // Out of bounds
   if (gRow < 0 || gRow >= rows - 1 || gCol < 0 || gCol >= cols - 1) return null;
 
   const r0 = Math.floor(gRow);
   const c0 = Math.floor(gCol);
   const r1 = r0 + 1;
   const c1 = c0 + 1;
-
   const tRow = gRow - r0;
   const tCol = gCol - c0;
 
@@ -200,16 +201,14 @@ function bilinearSample(
   const v01 = data[r0 * cols + c1];
   const v10 = data[r1 * cols + c0];
   const v11 = data[r1 * cols + c1];
-
   if (v00 == null || v01 == null || v10 == null || v11 == null) return null;
 
-  // Bilinear interpolation
   const top = v00 + (v01 - v00) * tCol;
   const bot = v10 + (v11 - v10) * tCol;
   return top + (bot - top) * tRow;
 }
 
-// --- Canvas grid layer (Leaflet L.GridLayer) ---
+// --- Canvas heatmap layer ---
 
 const WeatherGridLayer: React.FC<{
   gridForecast: GridForecast;
@@ -224,7 +223,6 @@ const WeatherGridLayer: React.FC<{
     const gridDay = gridForecast.days[dayIndex];
     if (!gridDay) return;
 
-    // Find closest available hour
     const availableHours = Object.keys(gridDay.hours).map(Number).sort((a, b) => a - b);
     const closestHour = availableHours.reduce((prev, curr) =>
       Math.abs(curr - hour) < Math.abs(prev - hour) ? curr : prev
@@ -251,12 +249,11 @@ const WeatherGridLayer: React.FC<{
         const imgData = ctx.createImageData(tileSize.x, tileSize.y);
         const pixels = imgData.data;
 
-        // Sample every 4th pixel for performance, then fill 4x4 blocks
-        const step = 4;
+        // Sample every 2nd pixel for quality (was 4), fill 2x2 blocks
+        const step = 2;
 
         for (let py = 0; py < tileSize.y; py += step) {
           for (let px = 0; px < tileSize.x; px += step) {
-            // Convert pixel to lat/lon
             const point = L.point(
               coords.x * tileSize.x + px,
               coords.y * tileSize.y + py
@@ -268,7 +265,6 @@ const WeatherGridLayer: React.FC<{
 
             const [r, g, b, a] = colorFn(value);
 
-            // Fill step x step block
             for (let dy = 0; dy < step && py + dy < tileSize.y; dy++) {
               for (let dx = 0; dx < step && px + dx < tileSize.x; dx++) {
                 const idx = ((py + dy) * tileSize.x + (px + dx)) * 4;
@@ -297,6 +293,133 @@ const WeatherGridLayer: React.FC<{
       }
     };
   }, [map, gridForecast, overlayKey, dayIndex, hour]);
+
+  return null;
+};
+
+// --- Wind barbs canvas layer ---
+
+const WindBarbLayer: React.FC<{
+  gridForecast: GridForecast;
+  dayIndex: number;
+  hour: number;
+}> = ({ gridForecast, dayIndex, hour }) => {
+  const map = useMap();
+  const layerRef = useRef<L.GridLayer | null>(null);
+
+  useEffect(() => {
+    const gridDay = gridForecast.days[dayIndex];
+    if (!gridDay) return;
+
+    const availableHours = Object.keys(gridDay.hours).map(Number).sort((a, b) => a - b);
+    const closestHour = availableHours.reduce((prev, curr) =>
+      Math.abs(curr - hour) < Math.abs(prev - hour) ? curr : prev
+    , availableHours[0]);
+
+    const gridHour = gridDay.hours[String(closestHour)];
+    if (!gridHour) return;
+
+    const { windSpeed, windDir } = gridHour;
+    if (!windSpeed || !windDir) return;
+
+    const grid = gridForecast.grid;
+
+    const WindLayer = L.GridLayer.extend({
+      createTile(coords: L.Coords) {
+        const tile = document.createElement('canvas');
+        const tileSize = this.getTileSize();
+        tile.width = tileSize.x;
+        tile.height = tileSize.y;
+        const ctx = tile.getContext('2d');
+        if (!ctx) return tile;
+
+        // Draw wind barbs at grid points that fall within this tile
+        for (let r = 0; r < grid.rows; r++) {
+          for (let c = 0; c < grid.cols; c++) {
+            const lat = grid.latMin + r * grid.latStep;
+            const lon = grid.lonMin + c * grid.lonStep;
+
+            // Convert grid point to pixel position within this tile
+            const worldPt = map.project(L.latLng(lat, lon), coords.z);
+            const px = worldPt.x - coords.x * tileSize.x;
+            const py = worldPt.y - coords.y * tileSize.y;
+
+            // Only draw if within tile bounds (with margin)
+            if (px < -30 || px > tileSize.x + 30 || py < -30 || py > tileSize.y + 30) continue;
+
+            const idx = r * grid.cols + c;
+            const speed = windSpeed[idx];
+            const dir = windDir[idx];
+            if (speed === 0 && dir === 0) continue;
+
+            // Draw wind barb
+            const len = 22;
+            // Wind direction: meteorological convention — arrow points FROM the direction
+            const rad = (dir + 180) * Math.PI / 180;
+
+            const endX = px + Math.sin(rad) * len;
+            const endY = py - Math.cos(rad) * len;
+
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(endX, endY);
+            ctx.strokeStyle = 'rgba(30, 30, 30, 0.8)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Barb ticks — each full barb = 10 mph, half barb = 5 mph
+            const numFull = Math.floor(speed / 10);
+            const hasHalf = (speed % 10) >= 5;
+            const barbLen = 8;
+            const perpRad = rad + Math.PI / 2;
+
+            for (let b = 0; b < numFull; b++) {
+              const t = 0.7 - b * 0.15;
+              const bx = px + (endX - px) * t;
+              const by = py + (endY - py) * t;
+              ctx.beginPath();
+              ctx.moveTo(bx, by);
+              ctx.lineTo(bx + Math.sin(perpRad) * barbLen, by - Math.cos(perpRad) * barbLen);
+              ctx.strokeStyle = 'rgba(30, 30, 30, 0.8)';
+              ctx.lineWidth = 1.5;
+              ctx.stroke();
+            }
+
+            if (hasHalf) {
+              const t = 0.7 - numFull * 0.15;
+              const bx = px + (endX - px) * t;
+              const by = py + (endY - py) * t;
+              ctx.beginPath();
+              ctx.moveTo(bx, by);
+              ctx.lineTo(bx + Math.sin(perpRad) * barbLen * 0.5, by - Math.cos(perpRad) * barbLen * 0.5);
+              ctx.strokeStyle = 'rgba(30, 30, 30, 0.7)';
+              ctx.lineWidth = 1.2;
+              ctx.stroke();
+            }
+
+            // Speed number
+            ctx.font = 'bold 9px monospace';
+            ctx.fillStyle = 'rgba(30, 30, 30, 0.85)';
+            ctx.textAlign = 'center';
+            ctx.fillText(String(Math.round(speed)), px, py + len + 12);
+          }
+        }
+
+        return tile;
+      }
+    });
+
+    const layer = new WindLayer({ opacity: 1 });
+    layer.addTo(map);
+    layerRef.current = layer;
+
+    return () => {
+      if (layerRef.current) {
+        map.removeLayer(layerRef.current);
+        layerRef.current = null;
+      }
+    };
+  }, [map, gridForecast, dayIndex, hour]);
 
   return null;
 };
@@ -336,14 +459,13 @@ const SitePopup: React.FC<{ sf: SiteForecast; fc: WeatherCondition; hourSnap: Pa
 
   return (
     <div className="map-popup-content" onClick={(e) => e.stopPropagation()}>
-      {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-2.5">
         <div>
           <div className="font-mono text-[13px] font-bold text-neutral-100 tracking-tight leading-none">
             {sf.site.name.toUpperCase()}
           </div>
           <div className="font-mono text-[9px] text-neutral-500 mt-1">
-            {sf.site.elevation.toLocaleString()}′ · {sf.site.orientation}
+            {sf.site.elevation.toLocaleString()}' · {sf.site.orientation}
           </div>
         </div>
         <div className="flex gap-2.5">
@@ -351,11 +473,7 @@ const SitePopup: React.FC<{ sf: SiteForecast; fc: WeatherCondition; hourSnap: Pa
           <StatusDot status={fc.thermalFlyability} label="Therm" />
         </div>
       </div>
-
-      {/* Accent bar */}
       <div className="h-[2px] rounded-full mb-2.5" style={{ background: flyabilityColor(fly) }} />
-
-      {/* Data grid - row 1 */}
       <div className="grid grid-cols-4 gap-2 mb-1.5">
         <div>
           <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-neutral-500">Wind</div>
@@ -374,18 +492,16 @@ const SitePopup: React.FC<{ sf: SiteForecast; fc: WeatherCondition; hourSnap: Pa
         <div>
           <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-neutral-500">Top</div>
           <div className="font-mono text-sm font-semibold text-neutral-100 tabular-nums">
-            {(fc.topOfLift / 1000).toFixed(1)}<span className="text-[10px] text-neutral-500">k′</span>
+            {(fc.topOfLift / 1000).toFixed(1)}<span className="text-[10px] text-neutral-500">k'</span>
           </div>
         </div>
         <div>
           <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-neutral-500">AGL</div>
           <div className="font-mono text-sm font-semibold text-neutral-100 tabular-nums">
-            {(agl / 1000).toFixed(1)}<span className="text-[10px] text-neutral-500">k′</span>
+            {(agl / 1000).toFixed(1)}<span className="text-[10px] text-neutral-500">k'</span>
           </div>
         </div>
       </div>
-
-      {/* Data grid - row 2 */}
       <div className="grid grid-cols-4 gap-2 mb-2.5">
         <div>
           <div className="font-mono text-[8px] uppercase tracking-[0.15em] text-neutral-500">Temp</div>
@@ -412,13 +528,9 @@ const SitePopup: React.FC<{ sf: SiteForecast; fc: WeatherCondition; hourSnap: Pa
           </div>
         </div>
       </div>
-
-      {/* Conditions */}
       <div className="font-mono text-[10px] text-neutral-400 leading-relaxed mb-2 line-clamp-2">
         {fc.conditions}
       </div>
-
-      {/* XC + Detail */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {fc.xcPotential !== 'low' && (
@@ -436,7 +548,6 @@ const SitePopup: React.FC<{ sf: SiteForecast; fc: WeatherCondition; hourSnap: Pa
           Details →
         </button>
       </div>
-
       {fc.rainInfo && (
         <div className="font-mono text-[9px] text-blue-400 mt-1.5">↓ {fc.rainInfo}</div>
       )}
@@ -449,6 +560,8 @@ const SitePopup: React.FC<{ sf: SiteForecast; fc: WeatherCondition; hourSnap: Pa
 interface ControlPanelProps {
   activeOverlay: OverlayKey | null;
   setActiveOverlay: (key: OverlayKey | null) => void;
+  showWindBarbs: boolean;
+  setShowWindBarbs: (show: boolean) => void;
   dayIndex: number;
   setDayIndex: (d: number) => void;
   hour: number;
@@ -457,7 +570,10 @@ interface ControlPanelProps {
   hasGrid: boolean;
 }
 
-const ControlPanel: React.FC<ControlPanelProps> = ({ activeOverlay, setActiveOverlay, dayIndex, setDayIndex, hour, setHour, hasHourly, hasGrid }) => {
+const ControlPanel: React.FC<ControlPanelProps> = ({
+  activeOverlay, setActiveOverlay, showWindBarbs, setShowWindBarbs,
+  dayIndex, setDayIndex, hour, setHour, hasHourly, hasGrid
+}) => {
   const [collapsed, setCollapsed] = useState(false);
 
   const formatHour = (h: number) => {
@@ -506,9 +622,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ activeOverlay, setActiveOve
             key={key}
             onClick={() => handleToggle(key)}
             className={`w-full flex items-center gap-2.5 px-2 py-1.5 rounded-[4px] transition-all text-left ${
-              activeOverlay === key
-                ? 'bg-neutral-700/80'
-                : 'hover:bg-neutral-800/50'
+              activeOverlay === key ? 'bg-neutral-700/80' : 'hover:bg-neutral-800/50'
             }`}
           >
             <div
@@ -548,7 +662,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ activeOverlay, setActiveOve
       {activeOverlay && (
         <div className="mb-3">
           <div className="flex items-center gap-0.5 h-2 rounded-sm overflow-hidden">
-            {['rgba(96,165,250,0.5)', 'rgba(132,204,22,0.6)', 'rgba(234,179,8,0.7)', 'rgba(245,158,11,0.8)', 'rgba(249,115,22,0.85)', 'rgba(239,68,68,0.9)'].map((c, i) => (
+            {['rgba(60,100,180,0.8)', 'rgba(60,180,140,0.8)', 'rgba(80,190,80,0.8)', 'rgba(200,200,40,0.8)', 'rgba(240,140,30,0.85)', 'rgba(210,40,40,0.9)'].map((c, i) => (
               <div key={i} className="flex-1 h-full" style={{ background: c }} />
             ))}
           </div>
@@ -568,6 +682,26 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ activeOverlay, setActiveOve
           Grid data loading...
         </div>
       )}
+
+      {/* Divider + Wind toggle */}
+      <div className="h-px bg-neutral-700/50 mb-3" />
+
+      <div className="font-mono text-[9px] uppercase tracking-[0.15em] text-neutral-500 mb-1.5">Wind</div>
+      <div className="flex gap-1 mb-3">
+        {['None', 'Surface'].map((label) => (
+          <button
+            key={label}
+            onClick={() => setShowWindBarbs(label === 'Surface')}
+            className={`flex-1 font-mono text-[10px] py-1.5 rounded-[3px] transition-all ${
+              (label === 'Surface' ? showWindBarbs : !showWindBarbs)
+                ? 'bg-neutral-700 text-neutral-100'
+                : 'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
       {/* Divider */}
       <div className="h-px bg-neutral-700/50 mb-3" />
@@ -642,6 +776,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ activeOverlay, setActiveOve
 
 const MapView: React.FC<MapViewProps> = ({ forecasts, gridForecast, onSiteClick }) => {
   const [activeOverlay, setActiveOverlay] = useState<OverlayKey | null>(null);
+  const [showWindBarbs, setShowWindBarbs] = useState(true);
   const [dayIndex, setDayIndex] = useState(0);
   const [hour, setHour] = useState(12);
   const mapRef = useRef<any>(null);
@@ -674,11 +809,20 @@ const MapView: React.FC<MapViewProps> = ({ forecasts, gridForecast, onSiteClick 
           maxZoom={17}
         />
 
-        {/* Grid weather overlay — renders below site markers */}
+        {/* Grid weather heatmap overlay */}
         {activeOverlay && gridForecast && (
           <WeatherGridLayer
             gridForecast={gridForecast}
             overlayKey={activeOverlay}
+            dayIndex={dayIndex}
+            hour={hour}
+          />
+        )}
+
+        {/* Wind barbs overlay — always on top of heatmap */}
+        {showWindBarbs && gridForecast && (
+          <WindBarbLayer
+            gridForecast={gridForecast}
             dayIndex={dayIndex}
             hour={hour}
           />
@@ -750,6 +894,8 @@ const MapView: React.FC<MapViewProps> = ({ forecasts, gridForecast, onSiteClick 
       <ControlPanel
         activeOverlay={activeOverlay}
         setActiveOverlay={setActiveOverlay}
+        showWindBarbs={showWindBarbs}
+        setShowWindBarbs={setShowWindBarbs}
         dayIndex={dayIndex}
         setDayIndex={setDayIndex}
         hour={hour}
