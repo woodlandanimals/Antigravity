@@ -4,6 +4,7 @@ import SiteCard from './components/SiteCard';
 import Legend from './components/Legend';
 import SiteDetailModal from './components/SiteDetailModal';
 import WeeklyView from './components/WeeklyView';
+import MapView from './components/MapView';
 import { SiteForecast } from './types/weather';
 import { getWeatherForecast } from './services/weatherService';
 
@@ -13,7 +14,7 @@ function App() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [dataSource, setDataSource] = useState<'cached' | 'stale'>('cached');
   const [selectedSite, setSelectedSite] = useState<SiteForecast | null>(null);
-  const [view, setView] = useState<'today' | 'weekly'>('today');
+  const [view, setView] = useState<'today' | 'weekly' | 'map'>('today');
 
   const fetchForecasts = async () => {
     try {
@@ -85,7 +86,7 @@ function App() {
         onViewChange={setView}
       />
 
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className={view === 'map' ? '' : 'max-w-6xl mx-auto px-4 py-6'}>
         {loading && forecasts.length === 0 && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
@@ -94,7 +95,9 @@ function App() {
             </div>
           </div>
         )}
-        {forecasts.length > 0 && view === 'weekly' ? (
+        {forecasts.length > 0 && view === 'map' ? (
+          <MapView forecasts={sortedForecasts} onSiteClick={(sf) => setSelectedSite(sf)} />
+        ) : forecasts.length > 0 && view === 'weekly' ? (
           <WeeklyView forecasts={sortedForecasts} />
         ) : forecasts.length > 0 ? (
           <div className="space-y-8">
