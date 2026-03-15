@@ -34,10 +34,12 @@
 - Wants to get Junali snowboarding
 
 ### Work Style
-- Email: Leaves unread until ready to act — needs priority surfacing
+- Email: Leaves unread until ready to act — needs priority surfacing for billing anomalies, school, deadlines
+- Email filtering: Wants spam/low-value email cleared proactively; improve focused inbox filters
 - Calendar: Google Calendar
 - Output preference: Bullets in chat, Google Sheets for research
-- Check-ins: Monday morning + spontaneous
+- Check-ins: Monday morning + spontaneous ("what's on my mind" brain dumps)
+- Weekly rhythm: Random list of things to research/act on — Andy jots them down, I research and return best options
 
 ---
 
@@ -129,6 +131,12 @@
 ### Connection Goals
 - Travel coordination with friends/family
 - Surface opportunities for visits when planning trips
+
+### Recurring Life Admin (often forgotten)
+- Vet appointments
+- Personal doctor appointments
+- Vacation planning
+- Random weekly tasks — Andy brain dumps, I research and return options
 
 ---
 

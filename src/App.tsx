@@ -11,7 +11,7 @@ function App() {
   const [forecasts, setForecasts] = useState<SiteForecast[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
-  const [dataSource, setDataSource] = useState<'live' | 'cached' | 'stale'>('live');
+  const [dataSource, setDataSource] = useState<'cached' | 'stale'>('cached');
   const [selectedSite, setSelectedSite] = useState<SiteForecast | null>(null);
   const [view, setView] = useState<'today' | 'weekly'>('today');
 

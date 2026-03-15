@@ -210,5 +210,25 @@ export const launchSites: LaunchSite[] = [
     orientation: 'NE-SE',
     maxWind: 18,
     siteType: 'mixed'  // Berkeley Hills ridge + thermal
+  },
+  {
+    id: 'mt-st-helena',
+    name: 'Mt St Helena',
+    elevation: 3800,
+    latitude: 38.6694,
+    longitude: -122.6361,
+    orientation: 'NW-SW',
+    maxWind: 14,
+    siteType: 'thermal'  // Mayacamas Mountains thermal, Napa Valley
+  },
+  {
+    id: 'windy-hill',
+    name: 'Windy Hill',
+    elevation: 1910,
+    latitude: 37.3709,
+    longitude: -122.2228,
+    orientation: 'NNE-ENE',
+    maxWind: 20,
+    siteType: 'soaring'  // NE-facing ridge soaring, Portola Valley
   }
 ];
