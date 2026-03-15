@@ -294,9 +294,9 @@ async function fetchWeatherForSite(site: LaunchSite): Promise<SiteForecast> {
 // --- Grid data fetching for continuous map overlays ---
 
 const GRID: GridMeta = {
-  latMin: 34.0, latMax: 39.5, latStep: 0.5,
-  lonMin: -123.5, lonMax: -118.0, lonStep: 0.5,
-  rows: 12, cols: 12
+  latMin: 33.5, latMax: 40.0, latStep: 0.25,
+  lonMin: -124.0, lonMax: -117.0, lonStep: 0.25,
+  rows: 27, cols: 29
 };
 
 function generateGridPoints(): { lats: number[]; lons: number[] } {
@@ -458,7 +458,14 @@ async function fetchGridForecast(targetDates: string[]): Promise<GridForecast> {
       console.error(`  Grid batch ${batchNum} failed:`, error);
     }
 
-    await delay(200);
+    // Open-Meteo counts each location as a request (600/min free tier).
+    // Each batch = 50 locations. Pause longer every 10 batches (500 locations).
+    if (batchNum % 10 === 0) {
+      console.log('  Rate limit pause (65s)...');
+      await delay(65000);
+    } else {
+      await delay(500);
+    }
   }
 
   // Only process today + tomorrow for grid (HRRR data)
