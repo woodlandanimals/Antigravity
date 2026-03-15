@@ -6,7 +6,7 @@
  * calls except for on-demand sounding data in the site detail modal.
  */
 
-import { LaunchSite, SiteForecast, PressureLevelData, SoundingData } from '../types/weather';
+import { LaunchSite, SiteForecast, PressureLevelData, SoundingData, GridForecast } from '../types/weather';
 import { parseApiTime } from '../lib/weatherCalc';
 
 // Sounding data cache (only API calls this service makes)
@@ -61,6 +61,33 @@ export const getDataStatus = () => ({
   timestamp: null as Date | null,
   source: 'cached' as const
 });
+
+// --- Grid forecast data for map overlays ---
+
+let gridCache: { data: GridForecast; timestamp: number } | null = null;
+const GRID_CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+
+export const getGridForecast = async (): Promise<GridForecast | null> => {
+  if (gridCache && Date.now() - gridCache.timestamp < GRID_CACHE_DURATION) {
+    return gridCache.data;
+  }
+
+  try {
+    const response = await fetch('/data/gridForecast.json');
+    if (!response.ok) {
+      console.warn('Grid forecast not available:', response.status);
+      return null;
+    }
+
+    const data: GridForecast = await response.json();
+    gridCache = { data, timestamp: Date.now() };
+    console.log('Loaded grid forecast data from', data.generated);
+    return data;
+  } catch (e) {
+    console.warn('Failed to load grid forecast:', e);
+    return null;
+  }
+};
 
 // --- Sounding data (on-demand API calls for site detail modal) ---
 

@@ -14,7 +14,7 @@ import { fileURLToPath } from 'url';
 
 // Import shared modules — single source of truth for sites, types, and calculations
 import { launchSites } from '../src/data/launchSites';
-import { LaunchSite, WeatherCondition, SiteForecast, HourlyDataPoint } from '../src/types/weather';
+import { LaunchSite, WeatherCondition, SiteForecast, HourlyDataPoint, GridForecast, GridMeta, GridDay, GridHour } from '../src/types/weather';
 import {
   parseApiTime,
   estimateLiftedIndex,
@@ -291,6 +291,187 @@ async function fetchWeatherForSite(site: LaunchSite): Promise<SiteForecast> {
   };
 }
 
+// --- Grid data fetching for continuous map overlays ---
+
+const GRID: GridMeta = {
+  latMin: 34.0, latMax: 39.5, latStep: 0.5,
+  lonMin: -123.5, lonMax: -118.0, lonStep: 0.5,
+  rows: 12, cols: 12
+};
+
+function generateGridPoints(): { lats: number[]; lons: number[] } {
+  const lats: number[] = [];
+  const lons: number[] = [];
+  for (let r = 0; r < GRID.rows; r++) {
+    for (let c = 0; c < GRID.cols; c++) {
+      lats.push(GRID.latMin + r * GRID.latStep);
+      lons.push(GRID.lonMin + c * GRID.lonStep);
+    }
+  }
+  return { lats, lons };
+}
+
+async function fetchGridBatch(lats: number[], lons: number[]): Promise<any> {
+  const params = new URLSearchParams({
+    latitude: lats.map(l => l.toFixed(2)).join(','),
+    longitude: lons.map(l => l.toFixed(2)).join(','),
+    hourly: [
+      'temperature_2m',
+      'dew_point_2m',
+      'cloud_cover',
+      'wind_speed_10m',
+      'wind_direction_10m',
+      'wind_gusts_10m',
+      'cape',
+      'lifted_index',
+      'boundary_layer_height'
+    ].join(','),
+    temperature_unit: 'fahrenheit',
+    wind_speed_unit: 'mph',
+    timezone: 'America/Los_Angeles',
+    forecast_days: '2'
+  });
+
+  const url = `https://api.open-meteo.com/v1/forecast?${params}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Grid HRRR API error: ${response.status} ${await response.text()}`);
+  }
+  return response.json();
+}
+
+function processGridData(allResponses: any[], targetDates: string[]): GridDay[] {
+  const days: GridDay[] = [];
+
+  for (const targetDate of targetDates) {
+    const hours: Record<string, GridHour> = {};
+
+    for (let h = 6; h <= 18; h++) {
+      const cape: number[] = [];
+      const liftedIndex: number[] = [];
+      const cloudCover: number[] = [];
+      const windSpeed: number[] = [];
+      const windDir: number[] = [];
+      const thermalStr: number[] = [];
+      const topOfLiftArr: number[] = [];
+      const blHeight: number[] = [];
+
+      for (let ptIdx = 0; ptIdx < GRID.rows * GRID.cols; ptIdx++) {
+        const data = allResponses[ptIdx];
+        if (!data || !data.hourly) {
+          // Push zeros for missing data
+          cape.push(0); liftedIndex.push(0); cloudCover.push(0);
+          windSpeed.push(0); windDir.push(0); thermalStr.push(0);
+          topOfLiftArr.push(0); blHeight.push(0);
+          continue;
+        }
+
+        const hourly = data.hourly;
+        const elevation = (data.elevation || 0) * 3.28084; // meters to feet
+
+        // Find the index for this date+hour
+        let idx = -1;
+        for (let i = 0; i < hourly.time.length; i++) {
+          const { dateStr, hour: apiHour } = parseApiTime(hourly.time[i]);
+          if (dateStr === targetDate && apiHour === h) {
+            idx = i;
+            break;
+          }
+        }
+
+        if (idx === -1) {
+          cape.push(0); liftedIndex.push(0); cloudCover.push(0);
+          windSpeed.push(0); windDir.push(0); thermalStr.push(0);
+          topOfLiftArr.push(0); blHeight.push(0);
+          continue;
+        }
+
+        const temp = hourly.temperature_2m[idx] ?? 0;
+        const dew = hourly.dew_point_2m[idx] ?? 0;
+        const ws = Math.round(hourly.wind_speed_10m[idx] ?? 0);
+        const wd = Math.round(hourly.wind_direction_10m[idx] ?? 0);
+        const cc = Math.round(hourly.cloud_cover[idx] ?? 0);
+        const cp = Math.round(hourly.cape?.[idx] ?? 0);
+        const li = Math.round((hourly.lifted_index?.[idx] ?? 0) * 10) / 10;
+        const bl = Math.round(hourly.boundary_layer_height?.[idx] ?? 0);
+
+        const { lclMSL } = calculateLCL(temp, dew, elevation);
+        const ts = calculateThermalStrength(temp, dew, ws, elevation, cp, li, bl || undefined);
+        const tol = Math.round(calculateTopOfUsableLift(
+          lclMSL, ts, ws, elevation, cp, li, bl || undefined, temp, dew
+        ));
+
+        cape.push(cp);
+        liftedIndex.push(li);
+        cloudCover.push(cc);
+        windSpeed.push(ws);
+        windDir.push(wd);
+        thermalStr.push(ts);
+        topOfLiftArr.push(tol);
+        blHeight.push(bl);
+      }
+
+      hours[String(h)] = {
+        cape, liftedIndex, cloudCover, windSpeed,
+        windDir: windDir, thermalStrength: thermalStr,
+        topOfLift: topOfLiftArr, blHeight
+      };
+    }
+
+    days.push({ date: targetDate, hours });
+  }
+
+  return days;
+}
+
+async function fetchGridForecast(targetDates: string[]): Promise<GridForecast> {
+  console.log('\nFetching grid data for map overlays...');
+  const { lats, lons } = generateGridPoints();
+  const totalPoints = lats.length;
+  console.log(`Grid: ${GRID.rows}x${GRID.cols} = ${totalPoints} points`);
+
+  // Batch into groups of 50 for the API
+  const BATCH_SIZE = 50;
+  const allResponses: any[] = new Array(totalPoints).fill(null);
+
+  for (let start = 0; start < totalPoints; start += BATCH_SIZE) {
+    const end = Math.min(start + BATCH_SIZE, totalPoints);
+    const batchLats = lats.slice(start, end);
+    const batchLons = lons.slice(start, end);
+    const batchNum = Math.floor(start / BATCH_SIZE) + 1;
+    const totalBatches = Math.ceil(totalPoints / BATCH_SIZE);
+
+    console.log(`  Grid batch ${batchNum}/${totalBatches} (${end - start} points)...`);
+
+    try {
+      const result = await fetchGridBatch(batchLats, batchLons);
+
+      // Single point returns object, multi returns array
+      if (Array.isArray(result)) {
+        for (let i = 0; i < result.length; i++) {
+          allResponses[start + i] = result[i];
+        }
+      } else {
+        allResponses[start] = result;
+      }
+    } catch (error) {
+      console.error(`  Grid batch ${batchNum} failed:`, error);
+    }
+
+    await delay(200);
+  }
+
+  // Only process today + tomorrow for grid (HRRR data)
+  const gridDates = targetDates.slice(0, 2);
+  const days = processGridData(allResponses, gridDates);
+
+  return {
+    generated: new Date().toISOString(),
+    grid: GRID,
+    days
+  };
+}
+
 async function main() {
   console.log('Starting weather data fetch...');
   console.log(`Fetching data for ${launchSites.length} sites`);
@@ -311,21 +492,45 @@ async function main() {
     }
   }
 
-  const outputPath = path.join(__dirname, '../public/data/forecast.json');
-  const outputDir = path.dirname(outputPath);
-
+  const outputDir = path.join(__dirname, '../public/data');
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
+  // Write site forecasts
+  const outputPath = path.join(outputDir, 'forecast.json');
   const output = {
     generated: new Date().toISOString(),
     forecasts
   };
-
   fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
+  console.log(`\nSuccess! Written ${forecasts.length} site forecasts to ${outputPath}`);
 
-  console.log(`\nSuccess! Written ${forecasts.length} forecasts to ${outputPath}`);
+  // Fetch and write grid data for map overlays
+  try {
+    const now = new Date();
+    const getPacificDateString = (daysOffset: number = 0): string => {
+      const date = new Date(now);
+      date.setDate(date.getDate() + daysOffset);
+      const pacificDateStr = date.toLocaleDateString('en-US', {
+        timeZone: 'America/Los_Angeles',
+        year: 'numeric', month: '2-digit', day: '2-digit'
+      });
+      const [month, day, year] = pacificDateStr.split('/');
+      return `${year}-${month}-${day}`;
+    };
+    const targetDates = Array.from({ length: 7 }, (_, i) => getPacificDateString(i));
+
+    const gridForecast = await fetchGridForecast(targetDates);
+    const gridPath = path.join(outputDir, 'gridForecast.json');
+    fs.writeFileSync(gridPath, JSON.stringify(gridForecast));
+    const gridSizeKB = Math.round(fs.statSync(gridPath).size / 1024);
+    console.log(`Written grid data to ${gridPath} (${gridSizeKB} KB)`);
+  } catch (error) {
+    console.error('Failed to fetch grid data:', error);
+    // Non-fatal — site forecasts still written
+  }
+
   console.log(`Generated at: ${output.generated}`);
 }
 

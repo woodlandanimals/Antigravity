@@ -5,8 +5,8 @@ import Legend from './components/Legend';
 import SiteDetailModal from './components/SiteDetailModal';
 import WeeklyView from './components/WeeklyView';
 import MapView from './components/MapView';
-import { SiteForecast } from './types/weather';
-import { getWeatherForecast } from './services/weatherService';
+import { SiteForecast, GridForecast } from './types/weather';
+import { getWeatherForecast, getGridForecast } from './services/weatherService';
 
 function App() {
   const [forecasts, setForecasts] = useState<SiteForecast[]>([]);
@@ -15,6 +15,7 @@ function App() {
   const [dataSource, setDataSource] = useState<'cached' | 'stale'>('cached');
   const [selectedSite, setSelectedSite] = useState<SiteForecast | null>(null);
   const [view, setView] = useState<'today' | 'weekly' | 'map'>('today');
+  const [gridForecast, setGridForecast] = useState<GridForecast | null>(null);
 
   const fetchForecasts = async () => {
     try {
@@ -29,6 +30,13 @@ function App() {
       setLoading(false);
     }
   };
+
+  // Load grid data for map overlays (separate from site forecasts, non-blocking)
+  useEffect(() => {
+    getGridForecast().then(grid => {
+      if (grid) setGridForecast(grid);
+    });
+  }, []);
 
   useEffect(() => {
     fetchForecasts();
@@ -96,7 +104,7 @@ function App() {
           </div>
         )}
         {forecasts.length > 0 && view === 'map' ? (
-          <MapView forecasts={sortedForecasts} onSiteClick={(sf) => setSelectedSite(sf)} />
+          <MapView forecasts={sortedForecasts} gridForecast={gridForecast} onSiteClick={(sf) => setSelectedSite(sf)} />
         ) : forecasts.length > 0 && view === 'weekly' ? (
           <WeeklyView forecasts={sortedForecasts} />
         ) : forecasts.length > 0 ? (
