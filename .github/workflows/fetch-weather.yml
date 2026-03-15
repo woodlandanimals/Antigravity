@@ -36,3 +36,11 @@ jobs:
           # Only commit if there are changes
           git diff --staged --quiet || git commit -m "Update weather data [skip ci]"
           git push
+
+      - name: Build and deploy to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          npm run build
+          npx netlify-cli deploy --prod --dir=dist
