@@ -9,9 +9,10 @@ import WindArrow from './WindArrow';
 interface SiteDetailModalProps {
   siteForecast: SiteForecast;
   onClose: () => void;
+  startDayIndex?: number;
 }
 
-const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose }) => {
+const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose, startDayIndex = 0 }) => {
   const { site, forecast } = siteForecast;
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
   const [soundingCache, setSoundingCache] = useState<Record<string, SoundingData | null>>({});
@@ -72,9 +73,18 @@ const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose
   };
 
   const getDayLabel = (index: number) => {
-    if (index === 0) return 'Today';
-    if (index === 1) return 'Tomorrow';
-    return `Day ${index + 1}`;
+    const actualDay = startDayIndex + index;
+    if (actualDay === 0) return 'Today';
+    if (actualDay === 1) return 'Tomorrow';
+    // Use the forecast date to get the day of week
+    const day = forecast[index];
+    if (day) {
+      const [year, month, dayNum] = day.date.split('-');
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(dayNum));
+      const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+      return dayOfWeek;
+    }
+    return `Day ${actualDay + 1}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -239,7 +249,7 @@ const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose
                   <div className="data-label">LI</div>
                   <div className="data-value">{day.liftedIndex}</div>
                   <div className="font-mono text-[10px] text-neutral-500">
-                    {day.liftedIndex && day.liftedIndex < -2 ? 'Unstable' : day.liftedIndex && day.liftedIndex > 2 ? 'Stable' : 'Neutral'}
+                    {day.liftedIndex < -2 ? 'Unstable' : day.liftedIndex > 2 ? 'Stable' : 'Neutral'}
                   </div>
                 </div>
 
@@ -269,11 +279,10 @@ const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose
                   </button>
                   {expandedDay === day.date && (
                     <div className="mt-3 space-y-4">
-                      {/* Hourly temp/wind chart */}
-                      <div className="bg-white border border-neutral-200 p-4">
+                      {/* Hourly wind breakdown */}
+                      <div className="bg-white border border-neutral-200 py-3 px-1">
                         <HourlyChart
                           hourlyData={day.hourlyData}
-                          siteElevation={site.elevation}
                           maxWind={site.maxWind}
                         />
                       </div>

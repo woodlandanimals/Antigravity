@@ -215,20 +215,20 @@ export const launchSites: LaunchSite[] = [
     id: 'mt-st-helena',
     name: 'Mt St Helena',
     elevation: 3800,
-    latitude: 38.6744,
-    longitude: -122.6294,
-    orientation: 'SW-NW',
+    latitude: 38.6694,
+    longitude: -122.6361,
+    orientation: 'NW-SW',
     maxWind: 14,
-    siteType: 'mixed'  // Mayacamas Mtns - thermal + ridge, spring best
+    siteType: 'thermal'  // Mayacamas Mountains thermal, Napa Valley
   },
   {
     id: 'windy-hill',
     name: 'Windy Hill',
     elevation: 1910,
-    latitude: 37.3933,
+    latitude: 37.3709,
     longitude: -122.2228,
-    orientation: 'NE',
+    orientation: 'NNE-ENE',
     maxWind: 20,
-    siteType: 'mixed'  // NE-facing ridge soaring + late season thermals
+    siteType: 'soaring'  // NE-facing ridge soaring, Portola Valley
   }
 ];

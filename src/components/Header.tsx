@@ -3,7 +3,7 @@ import { RefreshCw } from 'lucide-react';
 
 interface HeaderProps {
   lastUpdated: Date;
-  dataSource: 'live' | 'cached' | 'stale';
+  dataSource: 'cached' | 'stale';
   onRefresh: () => void;
   isLoading: boolean;
   view: 'today' | 'weekly' | 'map';
