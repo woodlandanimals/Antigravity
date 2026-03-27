@@ -1,5 +1,5 @@
 {
-  "generated": "2026-03-27T14:29:51.333Z",
+  "generated": "2026-03-27T15:25:26.876Z",
   "forecasts": [
     {
       "site": {
@@ -19,14 +19,14 @@
           "windDirection": 167,
           "windGust": 5,
           "temperature": 70,
-          "dewPoint": 54,
+          "dewPoint": 57,
           "tcon": 73,
-          "thermalStrength": 5,
+          "thermalStrength": 4.5,
           "topOfLift": 4700,
-          "flyability": "good",
-          "conditions": "Good: 5/10 thermals, top 4.7k",
+          "flyability": "marginal",
+          "conditions": "Moderate: 4.5/10 thermals, top 4.7k",
           "soaringFlyability": "poor",
-          "thermalFlyability": "good",
+          "thermalFlyability": "marginal",
           "launchTime": "2:00 PM",
           "xcPotential": "low",
           "xcReason": "Low ceiling",
@@ -92,7 +92,7 @@
               "windSpeed": 1,
               "windDirection": 90,
               "windGust": 2,
-              "cloudCover": 72
+              "cloudCover": 17
             },
             {
               "hour": 7,
@@ -101,21 +101,21 @@
               "windSpeed": 1,
               "windDirection": 360,
               "windGust": 1,
-              "cloudCover": 30
+              "cloudCover": 1
             },
             {
               "hour": 8,
               "temperature": 58,
-              "tcon": 64,
+              "tcon": 63,
               "windSpeed": 2,
               "windDirection": 270,
               "windGust": 2,
-              "cloudCover": 65
+              "cloudCover": 26
             },
             {
               "hour": 9,
               "temperature": 63,
-              "tcon": 71,
+              "tcon": 68,
               "windSpeed": 3,
               "windDirection": 103,
               "windGust": 4,
@@ -124,20 +124,20 @@
             {
               "hour": 10,
               "temperature": 67,
-              "tcon": 72,
+              "tcon": 70,
               "windSpeed": 2,
               "windDirection": 139,
               "windGust": 5,
-              "cloudCover": 100
+              "cloudCover": 95
             },
             {
               "hour": 11,
               "temperature": 69,
-              "tcon": 72,
+              "tcon": 71,
               "windSpeed": 3,
               "windDirection": 196,
               "windGust": 6,
-              "cloudCover": 100
+              "cloudCover": 92
             },
             {
               "hour": 12,
@@ -160,7 +160,7 @@
             {
               "hour": 14,
               "temperature": 73,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 5,
               "windDirection": 250,
               "windGust": 5,
@@ -187,7 +187,7 @@
             {
               "hour": 17,
               "temperature": 72,
-              "tcon": 79,
+              "tcon": 78,
               "windSpeed": 7,
               "windDirection": 302,
               "windGust": 9,
@@ -196,7 +196,7 @@
             {
               "hour": 18,
               "temperature": 70,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 6,
               "windDirection": 342,
               "windGust": 9,
@@ -205,16 +205,16 @@
             {
               "hour": 19,
               "temperature": 66,
-              "tcon": 72,
+              "tcon": 71,
               "windSpeed": 8,
               "windDirection": 17,
               "windGust": 9,
-              "cloudCover": 100
+              "cloudCover": 84
             },
             {
               "hour": 20,
               "temperature": 66,
-              "tcon": 72,
+              "tcon": 73,
               "windSpeed": 2,
               "windDirection": 22,
               "windGust": 3,
@@ -223,36 +223,36 @@
             {
               "hour": 21,
               "temperature": 64,
-              "tcon": 68,
+              "tcon": 69,
               "windSpeed": 2,
               "windDirection": 60,
               "windGust": 2,
-              "cloudCover": 100
+              "cloudCover": 10
             },
             {
               "hour": 22,
               "temperature": 64,
-              "tcon": 69,
+              "tcon": 70,
               "windSpeed": 2,
-              "windDirection": 32,
+              "windDirection": 23,
               "windGust": 2,
               "cloudCover": 0
             },
             {
               "hour": 23,
               "temperature": 63,
-              "tcon": 67,
-              "windSpeed": 2,
-              "windDirection": 77,
+              "tcon": 69,
+              "windSpeed": 1,
+              "windDirection": 90,
               "windGust": 2,
               "cloudCover": 0
             }
           ],
-          "blDepth": 325,
-          "cape": 980,
-          "liftedIndex": -4.6,
+          "blDepth": 270,
+          "cape": 1190,
+          "liftedIndex": -5.2,
           "convergence": 0,
-          "relativeHumidity": 58,
+          "relativeHumidity": 64,
           "cloudCover": 100,
           "windDirectionMatch": true
         },
@@ -276,10 +276,10 @@
           "hourlyData": [
             {
               "hour": 0,
-              "temperature": 63,
-              "tcon": 68,
+              "temperature": 64,
+              "tcon": 69,
               "windSpeed": 3,
-              "windDirection": 75,
+              "windDirection": 61,
               "windGust": 3,
               "cloudCover": 0
             },
@@ -1224,7 +1224,7 @@
           "relativeHumidity": 43,
           "cloudCover": 26,
           "windDirectionMatch": true,
-          "rainInfo": "Rain expected in afternoon and evening"
+          "rainInfo": "Rain expected in afternoon"
         },
         {
           "date": "2026-04-01",
@@ -1731,15 +1731,15 @@
           "windDirection": 253,
           "windGust": 5,
           "temperature": 70,
-          "dewPoint": 39,
-          "tcon": 77,
+          "dewPoint": 43,
+          "tcon": 76,
           "thermalStrength": 1.8,
-          "topOfLift": 2407,
+          "topOfLift": 2393,
           "flyability": "marginal",
           "conditions": "Overcast may limit thermals: 100% cloud cover",
           "soaringFlyability": "poor",
           "thermalFlyability": "poor",
-          "launchTime": "3:00 PM",
+          "launchTime": "4:00 PM",
           "xcPotential": "low",
           "xcReason": "Low ceiling",
           "hourlyData": [
@@ -1800,16 +1800,16 @@
             {
               "hour": 6,
               "temperature": 56,
-              "tcon": 63,
+              "tcon": 62,
               "windSpeed": 19,
               "windDirection": 30,
               "windGust": 26,
-              "cloudCover": 100
+              "cloudCover": 97
             },
             {
               "hour": 7,
               "temperature": 57,
-              "tcon": 64,
+              "tcon": 63,
               "windSpeed": 14,
               "windDirection": 22,
               "windGust": 17,
@@ -1818,7 +1818,7 @@
             {
               "hour": 8,
               "temperature": 58,
-              "tcon": 66,
+              "tcon": 65,
               "windSpeed": 19,
               "windDirection": 23,
               "windGust": 25,
@@ -1827,7 +1827,7 @@
             {
               "hour": 9,
               "temperature": 64,
-              "tcon": 73,
+              "tcon": 72,
               "windSpeed": 15,
               "windDirection": 23,
               "windGust": 17,
@@ -1836,7 +1836,7 @@
             {
               "hour": 10,
               "temperature": 67,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 4,
               "windDirection": 360,
               "windGust": 7,
@@ -1845,7 +1845,7 @@
             {
               "hour": 11,
               "temperature": 68,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 2,
               "windDirection": 264,
               "windGust": 4,
@@ -1854,7 +1854,7 @@
             {
               "hour": 12,
               "temperature": 70,
-              "tcon": 77,
+              "tcon": 76,
               "windSpeed": 2,
               "windDirection": 253,
               "windGust": 5,
@@ -1863,7 +1863,7 @@
             {
               "hour": 13,
               "temperature": 72,
-              "tcon": 79,
+              "tcon": 78,
               "windSpeed": 3,
               "windDirection": 253,
               "windGust": 5,
@@ -1872,7 +1872,7 @@
             {
               "hour": 14,
               "temperature": 74,
-              "tcon": 82,
+              "tcon": 81,
               "windSpeed": 3,
               "windDirection": 293,
               "windGust": 4,
@@ -1881,11 +1881,11 @@
             {
               "hour": 15,
               "temperature": 75,
-              "tcon": 82,
+              "tcon": 81,
               "windSpeed": 5,
               "windDirection": 300,
               "windGust": 5,
-              "cloudCover": 18
+              "cloudCover": 83
             },
             {
               "hour": 16,
@@ -1903,7 +1903,7 @@
               "windSpeed": 7,
               "windDirection": 302,
               "windGust": 7,
-              "cloudCover": 0
+              "cloudCover": 1
             },
             {
               "hour": 18,
@@ -1921,7 +1921,7 @@
               "windSpeed": 7,
               "windDirection": 338,
               "windGust": 8,
-              "cloudCover": 89
+              "cloudCover": 0
             },
             {
               "hour": 20,
@@ -1930,7 +1930,7 @@
               "windSpeed": 9,
               "windDirection": 337,
               "windGust": 10,
-              "cloudCover": 13
+              "cloudCover": 0
             },
             {
               "hour": 21,
@@ -1939,32 +1939,32 @@
               "windSpeed": 7,
               "windDirection": 339,
               "windGust": 7,
-              "cloudCover": 9
+              "cloudCover": 3
             },
             {
               "hour": 22,
               "temperature": 61,
               "tcon": 70,
-              "windSpeed": 4,
-              "windDirection": 321,
-              "windGust": 4,
-              "cloudCover": 12
+              "windSpeed": 3,
+              "windDirection": 318,
+              "windGust": 3,
+              "cloudCover": 29
             },
             {
               "hour": 23,
-              "temperature": 61,
-              "tcon": 69,
-              "windSpeed": 5,
-              "windDirection": 337,
-              "windGust": 5,
-              "cloudCover": 27
+              "temperature": 60,
+              "tcon": 68,
+              "windSpeed": 6,
+              "windDirection": 333,
+              "windGust": 6,
+              "cloudCover": 13
             }
           ],
-          "blDepth": 415,
+          "blDepth": 410,
           "cape": 0,
-          "liftedIndex": 5.9,
+          "liftedIndex": 4.6,
           "convergence": 0,
-          "relativeHumidity": 32,
+          "relativeHumidity": 37,
           "cloudCover": 100,
           "windDirectionMatch": true
         },
@@ -1989,11 +1989,11 @@
             {
               "hour": 0,
               "temperature": 61,
-              "tcon": 69,
-              "windSpeed": 2,
-              "windDirection": 354,
-              "windGust": 2,
-              "cloudCover": 69
+              "tcon": 68,
+              "windSpeed": 3,
+              "windDirection": 9,
+              "windGust": 3,
+              "cloudCover": 100
             },
             {
               "hour": 1,
@@ -3444,15 +3444,15 @@
           "windDirection": 32,
           "windGust": 18,
           "temperature": 74,
-          "dewPoint": 37,
+          "dewPoint": 38,
           "tcon": 82,
           "thermalStrength": 3.5,
-          "topOfLift": 3597,
+          "topOfLift": 3611,
           "flyability": "poor",
           "conditions": "Wind direction unfavorable for SW-W site",
           "soaringFlyability": "poor",
           "thermalFlyability": "poor",
-          "launchTime": "6:00 PM",
+          "launchTime": "3:00 PM",
           "xcPotential": "low",
           "xcReason": "Low ceiling",
           "hourlyData": [
@@ -3513,16 +3513,16 @@
             {
               "hour": 6,
               "temperature": 54,
-              "tcon": 61,
+              "tcon": 59,
               "windSpeed": 4,
               "windDirection": 171,
               "windGust": 4,
-              "cloudCover": 97
+              "cloudCover": 99
             },
             {
               "hour": 7,
               "temperature": 56,
-              "tcon": 64,
+              "tcon": 63,
               "windSpeed": 6,
               "windDirection": 342,
               "windGust": 7,
@@ -3531,7 +3531,7 @@
             {
               "hour": 8,
               "temperature": 56,
-              "tcon": 66,
+              "tcon": 65,
               "windSpeed": 2,
               "windDirection": 34,
               "windGust": 2,
@@ -3540,7 +3540,7 @@
             {
               "hour": 9,
               "temperature": 62,
-              "tcon": 71,
+              "tcon": 70,
               "windSpeed": 4,
               "windDirection": 347,
               "windGust": 11,
@@ -3558,7 +3558,7 @@
             {
               "hour": 11,
               "temperature": 71,
-              "tcon": 79,
+              "tcon": 78,
               "windSpeed": 11,
               "windDirection": 27,
               "windGust": 22,
@@ -3616,16 +3616,16 @@
               "windSpeed": 3,
               "windDirection": 63,
               "windGust": 5,
-              "cloudCover": 47
+              "cloudCover": 100
             },
             {
               "hour": 18,
               "temperature": 79,
-              "tcon": 86,
+              "tcon": 87,
               "windSpeed": 3,
               "windDirection": 190,
               "windGust": 4,
-              "cloudCover": 29
+              "cloudCover": 100
             },
             {
               "hour": 19,
@@ -3634,7 +3634,7 @@
               "windSpeed": 7,
               "windDirection": 259,
               "windGust": 11,
-              "cloudCover": 42
+              "cloudCover": 100
             },
             {
               "hour": 20,
@@ -3648,7 +3648,7 @@
             {
               "hour": 21,
               "temperature": 70,
-              "tcon": 78,
+              "tcon": 77,
               "windSpeed": 10,
               "windDirection": 288,
               "windGust": 13,
@@ -3661,23 +3661,23 @@
               "windSpeed": 10,
               "windDirection": 290,
               "windGust": 12,
-              "cloudCover": 93
+              "cloudCover": 70
             },
             {
               "hour": 23,
               "temperature": 69,
               "tcon": 77,
               "windSpeed": 9,
-              "windDirection": 292,
-              "windGust": 10,
-              "cloudCover": 2
+              "windDirection": 291,
+              "windGust": 11,
+              "cloudCover": 24
             }
           ],
-          "blDepth": 465,
+          "blDepth": 470,
           "cape": 0,
-          "liftedIndex": 7.7,
+          "liftedIndex": 8.2,
           "convergence": 0,
-          "relativeHumidity": 27,
+          "relativeHumidity": 28,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -3702,11 +3702,11 @@
             {
               "hour": 0,
               "temperature": 69,
-              "tcon": 77,
-              "windSpeed": 8,
-              "windDirection": 284,
-              "windGust": 8,
-              "cloudCover": 3
+              "tcon": 76,
+              "windSpeed": 9,
+              "windDirection": 283,
+              "windGust": 9,
+              "cloudCover": 95
             },
             {
               "hour": 1,
@@ -5156,10 +5156,10 @@
           "windDirection": 202,
           "windGust": 21,
           "temperature": 50,
-          "dewPoint": 22,
-          "tcon": 56,
+          "dewPoint": 17,
+          "tcon": 57,
           "thermalStrength": 2.5,
-          "topOfLift": 10327,
+          "topOfLift": 10285,
           "flyability": "poor",
           "conditions": "Wind direction unfavorable for W-NW site",
           "soaringFlyability": "poor",
@@ -5225,11 +5225,11 @@
             {
               "hour": 6,
               "temperature": 33,
-              "tcon": 39,
+              "tcon": 38,
               "windSpeed": 11,
               "windDirection": 110,
               "windGust": 12,
-              "cloudCover": 85
+              "cloudCover": 84
             },
             {
               "hour": 7,
@@ -5238,12 +5238,12 @@
               "windSpeed": 10,
               "windDirection": 119,
               "windGust": 12,
-              "cloudCover": 100
+              "cloudCover": 85
             },
             {
               "hour": 8,
               "temperature": 36,
-              "tcon": 43,
+              "tcon": 44,
               "windSpeed": 8,
               "windDirection": 127,
               "windGust": 10,
@@ -5261,7 +5261,7 @@
             {
               "hour": 10,
               "temperature": 46,
-              "tcon": 53,
+              "tcon": 54,
               "windSpeed": 8,
               "windDirection": 180,
               "windGust": 19,
@@ -5270,7 +5270,7 @@
             {
               "hour": 11,
               "temperature": 48,
-              "tcon": 56,
+              "tcon": 57,
               "windSpeed": 9,
               "windDirection": 189,
               "windGust": 19,
@@ -5279,7 +5279,7 @@
             {
               "hour": 12,
               "temperature": 50,
-              "tcon": 56,
+              "tcon": 57,
               "windSpeed": 9,
               "windDirection": 202,
               "windGust": 21,
@@ -5315,7 +5315,7 @@
             {
               "hour": 16,
               "temperature": 53,
-              "tcon": 59,
+              "tcon": 58,
               "windSpeed": 11,
               "windDirection": 236,
               "windGust": 17,
@@ -5351,11 +5351,11 @@
             {
               "hour": 20,
               "temperature": 42,
-              "tcon": 44,
+              "tcon": 45,
               "windSpeed": 5,
               "windDirection": 211,
               "windGust": 14,
-              "cloudCover": 27
+              "cloudCover": 100
             },
             {
               "hour": 21,
@@ -5364,7 +5364,7 @@
               "windSpeed": 7,
               "windDirection": 217,
               "windGust": 14,
-              "cloudCover": 100
+              "cloudCover": 37
             },
             {
               "hour": 22,
@@ -5373,23 +5373,23 @@
               "windSpeed": 8,
               "windDirection": 219,
               "windGust": 16,
-              "cloudCover": 90
+              "cloudCover": 7
             },
             {
               "hour": 23,
-              "temperature": 41,
+              "temperature": 40,
               "tcon": 45,
               "windSpeed": 7,
-              "windDirection": 208,
+              "windDirection": 210,
               "windGust": 13,
-              "cloudCover": 63
+              "cloudCover": 67
             }
           ],
-          "blDepth": 440,
+          "blDepth": 425,
           "cape": 0,
-          "liftedIndex": 2.8,
+          "liftedIndex": 3.9,
           "convergence": 0,
-          "relativeHumidity": 33,
+          "relativeHumidity": 27,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -5413,12 +5413,12 @@
           "hourlyData": [
             {
               "hour": 0,
-              "temperature": 41,
-              "tcon": 46,
+              "temperature": 40,
+              "tcon": 45,
               "windSpeed": 7,
-              "windDirection": 209,
-              "windGust": 14,
-              "cloudCover": 8
+              "windDirection": 207,
+              "windGust": 13,
+              "cloudCover": 7
             },
             {
               "hour": 1,
@@ -6870,8 +6870,8 @@
           "windDirection": 152,
           "windGust": 13,
           "temperature": 49,
-          "dewPoint": 19,
-          "tcon": 56,
+          "dewPoint": 20,
+          "tcon": 55,
           "thermalStrength": 2,
           "topOfLift": 7937,
           "flyability": "poor",
@@ -6939,25 +6939,25 @@
             {
               "hour": 6,
               "temperature": 31,
-              "tcon": 40,
+              "tcon": 39,
               "windSpeed": 4,
               "windDirection": 137,
               "windGust": 9,
-              "cloudCover": 41
+              "cloudCover": 8
             },
             {
               "hour": 7,
               "temperature": 32,
-              "tcon": 40,
+              "tcon": 41,
               "windSpeed": 5,
               "windDirection": 128,
               "windGust": 11,
-              "cloudCover": 3
+              "cloudCover": 2
             },
             {
               "hour": 8,
               "temperature": 31,
-              "tcon": 39,
+              "tcon": 40,
               "windSpeed": 7,
               "windDirection": 131,
               "windGust": 12,
@@ -6966,7 +6966,7 @@
             {
               "hour": 9,
               "temperature": 36,
-              "tcon": 43,
+              "tcon": 44,
               "windSpeed": 6,
               "windDirection": 151,
               "windGust": 15,
@@ -6993,7 +6993,7 @@
             {
               "hour": 12,
               "temperature": 49,
-              "tcon": 56,
+              "tcon": 55,
               "windSpeed": 10,
               "windDirection": 152,
               "windGust": 13,
@@ -7011,11 +7011,11 @@
             {
               "hour": 14,
               "temperature": 54,
-              "tcon": 62,
+              "tcon": 63,
               "windSpeed": 6,
               "windDirection": 164,
               "windGust": 6,
-              "cloudCover": 0
+              "cloudCover": 100
             },
             {
               "hour": 15,
@@ -7024,7 +7024,7 @@
               "windSpeed": 3,
               "windDirection": 191,
               "windGust": 7,
-              "cloudCover": 79
+              "cloudCover": 100
             },
             {
               "hour": 16,
@@ -7038,7 +7038,7 @@
             {
               "hour": 17,
               "temperature": 54,
-              "tcon": 63,
+              "tcon": 62,
               "windSpeed": 7,
               "windDirection": 286,
               "windGust": 10,
@@ -7065,7 +7065,7 @@
             {
               "hour": 20,
               "temperature": 46,
-              "tcon": 52,
+              "tcon": 53,
               "windSpeed": 9,
               "windDirection": 290,
               "windGust": 14,
@@ -7074,36 +7074,36 @@
             {
               "hour": 21,
               "temperature": 45,
-              "tcon": 51,
+              "tcon": 53,
               "windSpeed": 8,
               "windDirection": 279,
               "windGust": 12,
-              "cloudCover": 97
+              "cloudCover": 98
             },
             {
               "hour": 22,
               "temperature": 44,
-              "tcon": 50,
+              "tcon": 51,
               "windSpeed": 7,
-              "windDirection": 280,
+              "windDirection": 279,
               "windGust": 11,
-              "cloudCover": 75
+              "cloudCover": 64
             },
             {
               "hour": 23,
               "temperature": 44,
-              "tcon": 50,
-              "windSpeed": 9,
+              "tcon": 51,
+              "windSpeed": 8,
               "windDirection": 278,
-              "windGust": 13,
-              "cloudCover": 13
+              "windGust": 12,
+              "cloudCover": 21
             }
           ],
-          "blDepth": 355,
+          "blDepth": 350,
           "cape": 0,
-          "liftedIndex": 6.3,
+          "liftedIndex": 6.4,
           "convergence": 0,
-          "relativeHumidity": 30,
+          "relativeHumidity": 32,
           "cloudCover": 0,
           "windDirectionMatch": false
         },
@@ -7128,11 +7128,11 @@
             {
               "hour": 0,
               "temperature": 43,
-              "tcon": 50,
+              "tcon": 51,
               "windSpeed": 9,
               "windDirection": 273,
               "windGust": 14,
-              "cloudCover": 4
+              "cloudCover": 11
             },
             {
               "hour": 1,
@@ -8583,10 +8583,10 @@
           "windDirection": 107,
           "windGust": 3,
           "temperature": 76,
-          "dewPoint": 34,
+          "dewPoint": 35,
           "tcon": 85,
           "thermalStrength": 3,
-          "topOfLift": 4554,
+          "topOfLift": 4624,
           "flyability": "poor",
           "conditions": "Wind direction unfavorable for W-NW site",
           "soaringFlyability": "poor",
@@ -8652,11 +8652,11 @@
             {
               "hour": 6,
               "temperature": 56,
-              "tcon": 64,
+              "tcon": 62,
               "windSpeed": 6,
               "windDirection": 211,
               "windGust": 6,
-              "cloudCover": 100
+              "cloudCover": 97
             },
             {
               "hour": 7,
@@ -8670,7 +8670,7 @@
             {
               "hour": 8,
               "temperature": 58,
-              "tcon": 67,
+              "tcon": 66,
               "windSpeed": 4,
               "windDirection": 162,
               "windGust": 14,
@@ -8679,7 +8679,7 @@
             {
               "hour": 9,
               "temperature": 62,
-              "tcon": 71,
+              "tcon": 70,
               "windSpeed": 4,
               "windDirection": 114,
               "windGust": 20,
@@ -8688,7 +8688,7 @@
             {
               "hour": 10,
               "temperature": 68,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 6,
               "windDirection": 75,
               "windGust": 14,
@@ -8724,20 +8724,20 @@
             {
               "hour": 14,
               "temperature": 77,
-              "tcon": 86,
+              "tcon": 85,
               "windSpeed": 8,
               "windDirection": 301,
               "windGust": 9,
-              "cloudCover": 46
+              "cloudCover": 100
             },
             {
               "hour": 15,
               "temperature": 76,
-              "tcon": 85,
+              "tcon": 83,
               "windSpeed": 7,
               "windDirection": 310,
               "windGust": 9,
-              "cloudCover": 1
+              "cloudCover": 55
             },
             {
               "hour": 16,
@@ -8746,12 +8746,12 @@
               "windSpeed": 6,
               "windDirection": 309,
               "windGust": 8,
-              "cloudCover": 0
+              "cloudCover": 5
             },
             {
               "hour": 17,
               "temperature": 74,
-              "tcon": 80,
+              "tcon": 81,
               "windSpeed": 6,
               "windDirection": 309,
               "windGust": 8,
@@ -8778,11 +8778,11 @@
             {
               "hour": 20,
               "temperature": 60,
-              "tcon": 66,
+              "tcon": 65,
               "windSpeed": 2,
               "windDirection": 297,
               "windGust": 2,
-              "cloudCover": 26
+              "cloudCover": 33
             },
             {
               "hour": 21,
@@ -8791,32 +8791,32 @@
               "windSpeed": 3,
               "windDirection": 275,
               "windGust": 3,
-              "cloudCover": 25
+              "cloudCover": 51
             },
             {
               "hour": 22,
               "temperature": 61,
               "tcon": 68,
               "windSpeed": 2,
-              "windDirection": 274,
+              "windDirection": 277,
               "windGust": 2,
-              "cloudCover": 60
+              "cloudCover": 44
             },
             {
               "hour": 23,
-              "temperature": 61,
-              "tcon": 69,
+              "temperature": 60,
+              "tcon": 68,
               "windSpeed": 2,
-              "windDirection": 170,
+              "windDirection": 172,
               "windGust": 2,
-              "cloudCover": 25
+              "cloudCover": 30
             }
           ],
-          "blDepth": 665,
+          "blDepth": 690,
           "cape": 0,
-          "liftedIndex": 6.5,
+          "liftedIndex": 6.1,
           "convergence": 0,
-          "relativeHumidity": 22,
+          "relativeHumidity": 23,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -8841,11 +8841,11 @@
             {
               "hour": 0,
               "temperature": 59,
-              "tcon": 66,
+              "tcon": 65,
               "windSpeed": 5,
-              "windDirection": 160,
-              "windGust": 5,
-              "cloudCover": 7
+              "windDirection": 155,
+              "windGust": 6,
+              "cloudCover": 57
             },
             {
               "hour": 1,
@@ -10029,8 +10029,7 @@
           "convergence": 0,
           "relativeHumidity": 56,
           "cloudCover": 0,
-          "windDirectionMatch": true,
-          "rainInfo": "Rain expected in afternoon and evening"
+          "windDirectionMatch": true
         },
         {
           "date": "2026-04-02",
@@ -10295,7 +10294,7 @@
           "windDirection": 45,
           "windGust": 9,
           "temperature": 63,
-          "dewPoint": 24,
+          "dewPoint": 27,
           "tcon": 72,
           "thermalStrength": 3.3,
           "topOfLift": 4349,
@@ -10303,7 +10302,7 @@
           "conditions": "Wind direction unfavorable for W-SW site",
           "soaringFlyability": "poor",
           "thermalFlyability": "poor",
-          "launchTime": "5:00 PM",
+          "launchTime": "6:00 PM",
           "xcPotential": "low",
           "xcReason": "Low ceiling",
           "hourlyData": [
@@ -10364,16 +10363,16 @@
             {
               "hour": 6,
               "temperature": 51,
-              "tcon": 59,
+              "tcon": 58,
               "windSpeed": 16,
               "windDirection": 36,
               "windGust": 24,
-              "cloudCover": 100
+              "cloudCover": 99
             },
             {
               "hour": 7,
               "temperature": 51,
-              "tcon": 60,
+              "tcon": 59,
               "windSpeed": 17,
               "windDirection": 35,
               "windGust": 24,
@@ -10382,7 +10381,7 @@
             {
               "hour": 8,
               "temperature": 52,
-              "tcon": 60,
+              "tcon": 59,
               "windSpeed": 15,
               "windDirection": 32,
               "windGust": 21,
@@ -10427,7 +10426,7 @@
             {
               "hour": 13,
               "temperature": 66,
-              "tcon": 75,
+              "tcon": 74,
               "windSpeed": 4,
               "windDirection": 56,
               "windGust": 7,
@@ -10436,7 +10435,7 @@
             {
               "hour": 14,
               "temperature": 67,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 3,
               "windDirection": 66,
               "windGust": 7,
@@ -10445,7 +10444,7 @@
             {
               "hour": 15,
               "temperature": 68,
-              "tcon": 77,
+              "tcon": 76,
               "windSpeed": 2,
               "windDirection": 27,
               "windGust": 6,
@@ -10454,11 +10453,11 @@
             {
               "hour": 16,
               "temperature": 67,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 4,
               "windDirection": 348,
               "windGust": 6,
-              "cloudCover": 7
+              "cloudCover": 100
             },
             {
               "hour": 17,
@@ -10467,25 +10466,25 @@
               "windSpeed": 5,
               "windDirection": 330,
               "windGust": 6,
-              "cloudCover": 5
+              "cloudCover": 2
             },
             {
               "hour": 18,
               "temperature": 65,
-              "tcon": 73,
+              "tcon": 72,
               "windSpeed": 7,
               "windDirection": 332,
               "windGust": 7,
-              "cloudCover": 3
+              "cloudCover": 33
             },
             {
               "hour": 19,
               "temperature": 61,
-              "tcon": 67,
+              "tcon": 68,
               "windSpeed": 8,
               "windDirection": 328,
               "windGust": 11,
-              "cloudCover": 5
+              "cloudCover": 30
             },
             {
               "hour": 20,
@@ -10494,7 +10493,7 @@
               "windSpeed": 6,
               "windDirection": 325,
               "windGust": 7,
-              "cloudCover": 6
+              "cloudCover": 0
             },
             {
               "hour": 21,
@@ -10503,32 +10502,32 @@
               "windSpeed": 5,
               "windDirection": 337,
               "windGust": 6,
-              "cloudCover": 13
+              "cloudCover": 28
             },
             {
               "hour": 22,
               "temperature": 56,
-              "tcon": 65,
-              "windSpeed": 6,
-              "windDirection": 309,
+              "tcon": 64,
+              "windSpeed": 7,
+              "windDirection": 311,
               "windGust": 7,
-              "cloudCover": 100
+              "cloudCover": 3
             },
             {
               "hour": 23,
               "temperature": 55,
               "tcon": 64,
               "windSpeed": 8,
-              "windDirection": 292,
+              "windDirection": 293,
               "windGust": 11,
-              "cloudCover": 48
+              "cloudCover": 100
             }
           ],
-          "blDepth": 325,
+          "blDepth": 355,
           "cape": 0,
-          "liftedIndex": 8.8,
+          "liftedIndex": 7.7,
           "convergence": 0,
-          "relativeHumidity": 22,
+          "relativeHumidity": 25,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -10553,11 +10552,11 @@
             {
               "hour": 0,
               "temperature": 55,
-              "tcon": 65,
-              "windSpeed": 8,
-              "windDirection": 295,
+              "tcon": 64,
+              "windSpeed": 9,
+              "windDirection": 291,
               "windGust": 13,
-              "cloudCover": 90
+              "cloudCover": 96
             },
             {
               "hour": 1,
@@ -12005,15 +12004,15 @@
           "windDirection": 17,
           "windGust": 5,
           "temperature": 70,
-          "dewPoint": 30,
-          "tcon": 79,
+          "dewPoint": 32,
+          "tcon": 78,
           "thermalStrength": 2.8,
-          "topOfLift": 3132,
+          "topOfLift": 3202,
           "flyability": "poor",
           "conditions": "Wind direction unfavorable for W-NW site",
           "soaringFlyability": "poor",
           "thermalFlyability": "poor",
-          "launchTime": "3:00 PM",
+          "launchTime": "4:00 PM",
           "xcPotential": "low",
           "xcReason": "Low ceiling",
           "hourlyData": [
@@ -12074,16 +12073,16 @@
             {
               "hour": 6,
               "temperature": 49,
-              "tcon": 56,
+              "tcon": 54,
               "windSpeed": 8,
               "windDirection": 35,
               "windGust": 22,
-              "cloudCover": 100
+              "cloudCover": 99
             },
             {
               "hour": 7,
               "temperature": 51,
-              "tcon": 58,
+              "tcon": 56,
               "windSpeed": 9,
               "windDirection": 29,
               "windGust": 21,
@@ -12092,7 +12091,7 @@
             {
               "hour": 8,
               "temperature": 52,
-              "tcon": 59,
+              "tcon": 58,
               "windSpeed": 7,
               "windDirection": 17,
               "windGust": 21,
@@ -12101,7 +12100,7 @@
             {
               "hour": 9,
               "temperature": 59,
-              "tcon": 66,
+              "tcon": 65,
               "windSpeed": 10,
               "windDirection": 29,
               "windGust": 17,
@@ -12128,7 +12127,7 @@
             {
               "hour": 12,
               "temperature": 70,
-              "tcon": 79,
+              "tcon": 78,
               "windSpeed": 5,
               "windDirection": 17,
               "windGust": 5,
@@ -12146,7 +12145,7 @@
             {
               "hour": 14,
               "temperature": 73,
-              "tcon": 82,
+              "tcon": 81,
               "windSpeed": 5,
               "windDirection": 10,
               "windGust": 6,
@@ -12159,7 +12158,7 @@
               "windSpeed": 5,
               "windDirection": 336,
               "windGust": 5,
-              "cloudCover": 27
+              "cloudCover": 85
             },
             {
               "hour": 16,
@@ -12177,7 +12176,7 @@
               "windSpeed": 6,
               "windDirection": 301,
               "windGust": 6,
-              "cloudCover": 0
+              "cloudCover": 2
             },
             {
               "hour": 18,
@@ -12195,16 +12194,16 @@
               "windSpeed": 6,
               "windDirection": 306,
               "windGust": 8,
-              "cloudCover": 51
+              "cloudCover": 0
             },
             {
               "hour": 20,
               "temperature": 62,
-              "tcon": 70,
+              "tcon": 69,
               "windSpeed": 9,
               "windDirection": 313,
               "windGust": 12,
-              "cloudCover": 13
+              "cloudCover": 0
             },
             {
               "hour": 21,
@@ -12213,32 +12212,32 @@
               "windSpeed": 8,
               "windDirection": 315,
               "windGust": 9,
-              "cloudCover": 10
+              "cloudCover": 9
             },
             {
               "hour": 22,
               "temperature": 60,
-              "tcon": 69,
+              "tcon": 68,
               "windSpeed": 4,
               "windDirection": 315,
               "windGust": 5,
-              "cloudCover": 27
+              "cloudCover": 69
             },
             {
               "hour": 23,
               "temperature": 59,
-              "tcon": 67,
+              "tcon": 66,
               "windSpeed": 3,
-              "windDirection": 331,
+              "windDirection": 330,
               "windGust": 3,
-              "cloudCover": 42
+              "cloudCover": 36
             }
           ],
-          "blDepth": 400,
+          "blDepth": 425,
           "cape": 0,
-          "liftedIndex": 7.9,
+          "liftedIndex": 7,
           "convergence": 0,
-          "relativeHumidity": 23,
+          "relativeHumidity": 25,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -12262,12 +12261,12 @@
           "hourlyData": [
             {
               "hour": 0,
-              "temperature": 60,
-              "tcon": 68,
-              "windSpeed": 3,
-              "windDirection": 295,
-              "windGust": 3,
-              "cloudCover": 78
+              "temperature": 59,
+              "tcon": 66,
+              "windSpeed": 1,
+              "windDirection": 315,
+              "windGust": 2,
+              "cloudCover": 100
             },
             {
               "hour": 1,
@@ -13718,15 +13717,15 @@
           "windDirection": 257,
           "windGust": 5,
           "temperature": 70,
-          "dewPoint": 37,
+          "dewPoint": 38,
           "tcon": 78,
           "thermalStrength": 2.8,
-          "topOfLift": 2700,
+          "topOfLift": 2704,
           "flyability": "marginal",
           "conditions": "Overcast may limit thermals: 100% cloud cover",
           "soaringFlyability": "poor",
           "thermalFlyability": "poor",
-          "launchTime": "3:00 PM",
+          "launchTime": "4:00 PM",
           "xcPotential": "low",
           "xcReason": "Low ceiling",
           "hourlyData": [
@@ -13787,11 +13786,11 @@
             {
               "hour": 6,
               "temperature": 54,
-              "tcon": 64,
+              "tcon": 62,
               "windSpeed": 9,
               "windDirection": 77,
               "windGust": 9,
-              "cloudCover": 100
+              "cloudCover": 99
             },
             {
               "hour": 7,
@@ -13805,7 +13804,7 @@
             {
               "hour": 8,
               "temperature": 56,
-              "tcon": 66,
+              "tcon": 65,
               "windSpeed": 7,
               "windDirection": 58,
               "windGust": 7,
@@ -13814,7 +13813,7 @@
             {
               "hour": 9,
               "temperature": 64,
-              "tcon": 73,
+              "tcon": 72,
               "windSpeed": 4,
               "windDirection": 69,
               "windGust": 6,
@@ -13832,7 +13831,7 @@
             {
               "hour": 11,
               "temperature": 68,
-              "tcon": 75,
+              "tcon": 74,
               "windSpeed": 4,
               "windDirection": 236,
               "windGust": 4,
@@ -13850,7 +13849,7 @@
             {
               "hour": 13,
               "temperature": 73,
-              "tcon": 80,
+              "tcon": 81,
               "windSpeed": 5,
               "windDirection": 267,
               "windGust": 6,
@@ -13859,7 +13858,7 @@
             {
               "hour": 14,
               "temperature": 74,
-              "tcon": 82,
+              "tcon": 83,
               "windSpeed": 6,
               "windDirection": 283,
               "windGust": 6,
@@ -13868,11 +13867,11 @@
             {
               "hour": 15,
               "temperature": 75,
-              "tcon": 82,
+              "tcon": 84,
               "windSpeed": 7,
               "windDirection": 284,
               "windGust": 7,
-              "cloudCover": 1
+              "cloudCover": 26
             },
             {
               "hour": 16,
@@ -13886,7 +13885,7 @@
             {
               "hour": 17,
               "temperature": 74,
-              "tcon": 82,
+              "tcon": 81,
               "windSpeed": 6,
               "windDirection": 297,
               "windGust": 7,
@@ -13895,7 +13894,7 @@
             {
               "hour": 18,
               "temperature": 72,
-              "tcon": 80,
+              "tcon": 79,
               "windSpeed": 6,
               "windDirection": 302,
               "windGust": 7,
@@ -13908,7 +13907,7 @@
               "windSpeed": 4,
               "windDirection": 335,
               "windGust": 7,
-              "cloudCover": 100
+              "cloudCover": 80
             },
             {
               "hour": 20,
@@ -13917,7 +13916,7 @@
               "windSpeed": 3,
               "windDirection": 349,
               "windGust": 6,
-              "cloudCover": 100
+              "cloudCover": 95
             },
             {
               "hour": 21,
@@ -13926,7 +13925,7 @@
               "windSpeed": 3,
               "windDirection": 23,
               "windGust": 3,
-              "cloudCover": 22
+              "cloudCover": 4
             },
             {
               "hour": 22,
@@ -13935,23 +13934,23 @@
               "windSpeed": 4,
               "windDirection": 9,
               "windGust": 4,
-              "cloudCover": 0
+              "cloudCover": 69
             },
             {
               "hour": 23,
               "temperature": 60,
-              "tcon": 69,
-              "windSpeed": 2,
-              "windDirection": 17,
+              "tcon": 68,
+              "windSpeed": 3,
+              "windDirection": 14,
               "windGust": 3,
               "cloudCover": 0
             }
           ],
-          "blDepth": 335,
+          "blDepth": 360,
           "cape": 0,
-          "liftedIndex": 6.7,
+          "liftedIndex": 5.9,
           "convergence": 0,
-          "relativeHumidity": 30,
+          "relativeHumidity": 31,
           "cloudCover": 100,
           "windDirectionMatch": true
         },
@@ -13977,10 +13976,10 @@
               "hour": 0,
               "temperature": 61,
               "tcon": 69,
-              "windSpeed": 2,
-              "windDirection": 43,
-              "windGust": 2,
-              "cloudCover": 0
+              "windSpeed": 3,
+              "windDirection": 30,
+              "windGust": 3,
+              "cloudCover": 67
             },
             {
               "hour": 1,
@@ -15430,10 +15429,10 @@
           "windDirection": 46,
           "windGust": 14,
           "temperature": 67,
-          "dewPoint": 23,
-          "tcon": 77,
+          "dewPoint": 28,
+          "tcon": 76,
           "thermalStrength": 3,
-          "topOfLift": 3162,
+          "topOfLift": 3148,
           "flyability": "poor",
           "conditions": "Wind direction unfavorable for W-SW site",
           "soaringFlyability": "poor",
@@ -15499,16 +15498,16 @@
             {
               "hour": 6,
               "temperature": 57,
-              "tcon": 65,
+              "tcon": 64,
               "windSpeed": 8,
               "windDirection": 65,
               "windGust": 9,
-              "cloudCover": 100
+              "cloudCover": 99
             },
             {
               "hour": 7,
               "temperature": 57,
-              "tcon": 65,
+              "tcon": 66,
               "windSpeed": 9,
               "windDirection": 77,
               "windGust": 12,
@@ -15535,7 +15534,7 @@
             {
               "hour": 10,
               "temperature": 65,
-              "tcon": 75,
+              "tcon": 74,
               "windSpeed": 10,
               "windDirection": 56,
               "windGust": 14,
@@ -15544,7 +15543,7 @@
             {
               "hour": 11,
               "temperature": 66,
-              "tcon": 77,
+              "tcon": 76,
               "windSpeed": 8,
               "windDirection": 40,
               "windGust": 13,
@@ -15553,7 +15552,7 @@
             {
               "hour": 12,
               "temperature": 67,
-              "tcon": 77,
+              "tcon": 76,
               "windSpeed": 8,
               "windDirection": 46,
               "windGust": 14,
@@ -15580,7 +15579,7 @@
             {
               "hour": 15,
               "temperature": 72,
-              "tcon": 80,
+              "tcon": 81,
               "windSpeed": 6,
               "windDirection": 23,
               "windGust": 9,
@@ -15598,16 +15597,16 @@
             {
               "hour": 17,
               "temperature": 69,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 6,
               "windDirection": 334,
               "windGust": 8,
-              "cloudCover": 63
+              "cloudCover": 100
             },
             {
               "hour": 18,
               "temperature": 67,
-              "tcon": 75,
+              "tcon": 74,
               "windSpeed": 7,
               "windDirection": 313,
               "windGust": 9,
@@ -15616,7 +15615,7 @@
             {
               "hour": 19,
               "temperature": 63,
-              "tcon": 73,
+              "tcon": 72,
               "windSpeed": 6,
               "windDirection": 307,
               "windGust": 11,
@@ -15625,7 +15624,7 @@
             {
               "hour": 20,
               "temperature": 60,
-              "tcon": 70,
+              "tcon": 71,
               "windSpeed": 6,
               "windDirection": 323,
               "windGust": 10,
@@ -15638,7 +15637,7 @@
               "windSpeed": 7,
               "windDirection": 329,
               "windGust": 11,
-              "cloudCover": 86
+              "cloudCover": 100
             },
             {
               "hour": 22,
@@ -15647,23 +15646,23 @@
               "windSpeed": 8,
               "windDirection": 330,
               "windGust": 13,
-              "cloudCover": 83
+              "cloudCover": 89
             },
             {
               "hour": 23,
               "temperature": 62,
-              "tcon": 75,
+              "tcon": 74,
               "windSpeed": 8,
-              "windDirection": 325,
-              "windGust": 11,
-              "cloudCover": 19
+              "windDirection": 327,
+              "windGust": 12,
+              "cloudCover": 76
             }
           ],
-          "blDepth": 390,
+          "blDepth": 385,
           "cape": 0,
-          "liftedIndex": 9.3,
+          "liftedIndex": 8.5,
           "convergence": 0,
-          "relativeHumidity": 19,
+          "relativeHumidity": 23,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -15688,11 +15687,11 @@
             {
               "hour": 0,
               "temperature": 63,
-              "tcon": 76,
+              "tcon": 78,
               "windSpeed": 7,
-              "windDirection": 318,
+              "windDirection": 324,
               "windGust": 9,
-              "cloudCover": 41
+              "cloudCover": 100
             },
             {
               "hour": 1,
@@ -17142,14 +17141,14 @@
           "windDirection": 263,
           "windGust": 4,
           "temperature": 74,
-          "dewPoint": 58,
+          "dewPoint": 60,
           "tcon": 78,
-          "thermalStrength": 4.5,
+          "thermalStrength": 5,
           "topOfLift": 3732,
-          "flyability": "marginal",
-          "conditions": "Moderate: 4.5/10 thermals, top 3.7k",
+          "flyability": "good",
+          "conditions": "Good: 5/10 thermals, top 3.7k",
           "soaringFlyability": "poor",
-          "thermalFlyability": "marginal",
+          "thermalFlyability": "good",
           "launchTime": "10:00 AM",
           "xcPotential": "low",
           "xcReason": "Low ceiling",
@@ -17211,29 +17210,29 @@
             {
               "hour": 6,
               "temperature": 56,
-              "tcon": 60,
+              "tcon": 59,
               "windSpeed": 1,
               "windDirection": 360,
               "windGust": 1,
-              "cloudCover": 13
+              "cloudCover": 6
             },
             {
               "hour": 7,
               "temperature": 58,
-              "tcon": 62,
+              "tcon": 61,
               "windSpeed": 1,
               "windDirection": 297,
               "windGust": 0,
-              "cloudCover": 38
+              "cloudCover": 6
             },
             {
               "hour": 8,
               "temperature": 59,
-              "tcon": 62,
+              "tcon": 61,
               "windSpeed": 2,
               "windDirection": 326,
               "windGust": 2,
-              "cloudCover": 93
+              "cloudCover": 85
             },
             {
               "hour": 9,
@@ -17242,25 +17241,25 @@
               "windSpeed": 1,
               "windDirection": 297,
               "windGust": 1,
-              "cloudCover": 94
+              "cloudCover": 90
             },
             {
               "hour": 10,
               "temperature": 67,
-              "tcon": 70,
+              "tcon": 69,
               "windSpeed": 3,
               "windDirection": 265,
               "windGust": 3,
-              "cloudCover": 99
+              "cloudCover": 50
             },
             {
               "hour": 11,
               "temperature": 71,
-              "tcon": 74,
+              "tcon": 73,
               "windSpeed": 3,
               "windDirection": 262,
               "windGust": 3,
-              "cloudCover": 100
+              "cloudCover": 68
             },
             {
               "hour": 12,
@@ -17269,12 +17268,12 @@
               "windSpeed": 4,
               "windDirection": 263,
               "windGust": 4,
-              "cloudCover": 100
+              "cloudCover": 99
             },
             {
               "hour": 13,
               "temperature": 77,
-              "tcon": 82,
+              "tcon": 81,
               "windSpeed": 6,
               "windDirection": 272,
               "windGust": 6,
@@ -17301,7 +17300,7 @@
             {
               "hour": 16,
               "temperature": 80,
-              "tcon": 86,
+              "tcon": 85,
               "windSpeed": 8,
               "windDirection": 293,
               "windGust": 8,
@@ -17310,7 +17309,7 @@
             {
               "hour": 17,
               "temperature": 78,
-              "tcon": 84,
+              "tcon": 83,
               "windSpeed": 8,
               "windDirection": 300,
               "windGust": 9,
@@ -17350,33 +17349,33 @@
               "windSpeed": 1,
               "windDirection": 180,
               "windGust": 1,
-              "cloudCover": 100
+              "cloudCover": 72
             },
             {
               "hour": 22,
               "temperature": 68,
               "tcon": 74,
-              "windSpeed": 2,
+              "windSpeed": 3,
               "windDirection": 110,
-              "windGust": 2,
-              "cloudCover": 79
+              "windGust": 3,
+              "cloudCover": 0
             },
             {
               "hour": 23,
               "temperature": 68,
               "tcon": 74,
               "windSpeed": 2,
-              "windDirection": 121,
+              "windDirection": 120,
               "windGust": 2,
               "cloudCover": 0
             }
           ],
           "blDepth": 370,
-          "cape": 680,
-          "liftedIndex": -3.7,
+          "cape": 820,
+          "liftedIndex": -4.2,
           "convergence": 0,
-          "relativeHumidity": 56,
-          "cloudCover": 100,
+          "relativeHumidity": 60,
+          "cloudCover": 99,
           "windDirectionMatch": true
         },
         {
@@ -17402,7 +17401,7 @@
               "temperature": 67,
               "tcon": 73,
               "windSpeed": 2,
-              "windDirection": 113,
+              "windDirection": 117,
               "windGust": 2,
               "cloudCover": 0
             },
@@ -18347,7 +18346,7 @@
           "relativeHumidity": 42,
           "cloudCover": 14,
           "windDirectionMatch": true,
-          "rainInfo": "Rain expected all day"
+          "rainInfo": "Rain expected 0am-6pm"
         },
         {
           "date": "2026-04-01",
@@ -18857,7 +18856,7 @@
           "dewPoint": 23,
           "tcon": 60,
           "thermalStrength": 3,
-          "topOfLift": 12044,
+          "topOfLift": 11751,
           "flyability": "poor",
           "conditions": "Wind direction unfavorable for E-SE site",
           "soaringFlyability": "poor",
@@ -18927,16 +18926,16 @@
               "windSpeed": 10,
               "windDirection": 225,
               "windGust": 12,
-              "cloudCover": 100
+              "cloudCover": 93
             },
             {
               "hour": 7,
               "temperature": 37,
-              "tcon": 43,
+              "tcon": 42,
               "windSpeed": 12,
               "windDirection": 223,
               "windGust": 16,
-              "cloudCover": 100
+              "cloudCover": 99
             },
             {
               "hour": 8,
@@ -18945,7 +18944,7 @@
               "windSpeed": 10,
               "windDirection": 226,
               "windGust": 15,
-              "cloudCover": 100
+              "cloudCover": 75
             },
             {
               "hour": 9,
@@ -18959,7 +18958,7 @@
             {
               "hour": 10,
               "temperature": 50,
-              "tcon": 57,
+              "tcon": 56,
               "windSpeed": 5,
               "windDirection": 239,
               "windGust": 18,
@@ -18968,7 +18967,7 @@
             {
               "hour": 11,
               "temperature": 51,
-              "tcon": 58,
+              "tcon": 57,
               "windSpeed": 2,
               "windDirection": 236,
               "windGust": 13,
@@ -18986,7 +18985,7 @@
             {
               "hour": 13,
               "temperature": 55,
-              "tcon": 61,
+              "tcon": 62,
               "windSpeed": 9,
               "windDirection": 235,
               "windGust": 14,
@@ -19069,7 +19068,7 @@
               "temperature": 42,
               "tcon": 47,
               "windSpeed": 18,
-              "windDirection": 220,
+              "windDirection": 219,
               "windGust": 24,
               "cloudCover": 100
             },
@@ -19077,15 +19076,15 @@
               "hour": 23,
               "temperature": 41,
               "tcon": 46,
-              "windSpeed": 18,
+              "windSpeed": 19,
               "windDirection": 224,
               "windGust": 25,
-              "cloudCover": 100
+              "cloudCover": 0
             }
           ],
-          "blDepth": 1450,
+          "blDepth": 1345,
           "cape": 0,
-          "liftedIndex": 0.4,
+          "liftedIndex": 0.7,
           "convergence": 0,
           "relativeHumidity": 30,
           "cloudCover": 100,
@@ -19113,10 +19112,10 @@
               "hour": 0,
               "temperature": 40,
               "tcon": 45,
-              "windSpeed": 18,
+              "windSpeed": 19,
               "windDirection": 227,
               "windGust": 25,
-              "cloudCover": 100
+              "cloudCover": 83
             },
             {
               "hour": 1,
@@ -20566,10 +20565,10 @@
           "windDirection": 82,
           "windGust": 10,
           "temperature": 73,
-          "dewPoint": 35,
-          "tcon": 82,
+          "dewPoint": 37,
+          "tcon": 81,
           "thermalStrength": 3.8,
-          "topOfLift": 943,
+          "topOfLift": 915,
           "flyability": "poor",
           "conditions": "Wind direction unfavorable for W-NW site",
           "soaringFlyability": "poor",
@@ -20635,16 +20634,16 @@
             {
               "hour": 6,
               "temperature": 50,
-              "tcon": 54,
+              "tcon": 52,
               "windSpeed": 5,
               "windDirection": 147,
               "windGust": 5,
-              "cloudCover": 100
+              "cloudCover": 98
             },
             {
               "hour": 7,
               "temperature": 52,
-              "tcon": 56,
+              "tcon": 55,
               "windSpeed": 9,
               "windDirection": 123,
               "windGust": 12,
@@ -20653,7 +20652,7 @@
             {
               "hour": 8,
               "temperature": 56,
-              "tcon": 62,
+              "tcon": 61,
               "windSpeed": 7,
               "windDirection": 121,
               "windGust": 11,
@@ -20689,7 +20688,7 @@
             {
               "hour": 12,
               "temperature": 73,
-              "tcon": 82,
+              "tcon": 81,
               "windSpeed": 8,
               "windDirection": 82,
               "windGust": 10,
@@ -20707,7 +20706,7 @@
             {
               "hour": 14,
               "temperature": 76,
-              "tcon": 82,
+              "tcon": 83,
               "windSpeed": 6,
               "windDirection": 2,
               "windGust": 7,
@@ -20729,16 +20728,16 @@
               "windSpeed": 7,
               "windDirection": 319,
               "windGust": 10,
-              "cloudCover": 19
+              "cloudCover": 100
             },
             {
               "hour": 17,
               "temperature": 62,
-              "tcon": 64,
+              "tcon": 65,
               "windSpeed": 7,
               "windDirection": 298,
               "windGust": 12,
-              "cloudCover": 70
+              "cloudCover": 100
             },
             {
               "hour": 18,
@@ -20756,7 +20755,7 @@
               "windSpeed": 6,
               "windDirection": 270,
               "windGust": 8,
-              "cloudCover": 79
+              "cloudCover": 100
             },
             {
               "hour": 20,
@@ -20765,7 +20764,7 @@
               "windSpeed": 4,
               "windDirection": 257,
               "windGust": 7,
-              "cloudCover": 21
+              "cloudCover": 99
             },
             {
               "hour": 21,
@@ -20774,32 +20773,32 @@
               "windSpeed": 6,
               "windDirection": 248,
               "windGust": 7,
-              "cloudCover": 100
+              "cloudCover": 80
             },
             {
               "hour": 22,
               "temperature": 53,
-              "tcon": 56,
+              "tcon": 55,
               "windSpeed": 7,
-              "windDirection": 250,
-              "windGust": 8,
-              "cloudCover": 90
+              "windDirection": 252,
+              "windGust": 9,
+              "cloudCover": 91
             },
             {
               "hour": 23,
-              "temperature": 52,
-              "tcon": 53,
+              "temperature": 51,
+              "tcon": 52,
               "windSpeed": 7,
-              "windDirection": 258,
+              "windDirection": 256,
               "windGust": 10,
-              "cloudCover": 91
+              "cloudCover": 24
             }
           ],
-          "blDepth": 460,
+          "blDepth": 450,
           "cape": 0,
-          "liftedIndex": 9.1,
+          "liftedIndex": 8.7,
           "convergence": 0,
-          "relativeHumidity": 25,
+          "relativeHumidity": 27,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -20823,12 +20822,12 @@
           "hourlyData": [
             {
               "hour": 0,
-              "temperature": 50,
-              "tcon": 50,
-              "windSpeed": 8,
-              "windDirection": 263,
-              "windGust": 12,
-              "cloudCover": 82
+              "temperature": 49,
+              "tcon": 49,
+              "windSpeed": 7,
+              "windDirection": 260,
+              "windGust": 11,
+              "cloudCover": 100
             },
             {
               "hour": 1,
@@ -22278,8 +22277,8 @@
           "windDirection": 126,
           "windGust": 6,
           "temperature": 63,
-          "dewPoint": 62,
-          "tcon": 63,
+          "dewPoint": 61,
+          "tcon": 64,
           "thermalStrength": 0,
           "topOfLift": 750,
           "flyability": "poor",
@@ -22351,7 +22350,7 @@
               "windSpeed": 9,
               "windDirection": 98,
               "windGust": 15,
-              "cloudCover": 21
+              "cloudCover": 69
             },
             {
               "hour": 7,
@@ -22378,7 +22377,7 @@
               "windSpeed": 8,
               "windDirection": 119,
               "windGust": 12,
-              "cloudCover": 100
+              "cloudCover": 88
             },
             {
               "hour": 10,
@@ -22401,7 +22400,7 @@
             {
               "hour": 12,
               "temperature": 63,
-              "tcon": 63,
+              "tcon": 64,
               "windSpeed": 5,
               "windDirection": 126,
               "windGust": 6,
@@ -22459,7 +22458,7 @@
               "windSpeed": 7,
               "windDirection": 262,
               "windGust": 7,
-              "cloudCover": 100
+              "cloudCover": 78
             },
             {
               "hour": 19,
@@ -22468,7 +22467,7 @@
               "windSpeed": 6,
               "windDirection": 268,
               "windGust": 7,
-              "cloudCover": 100
+              "cloudCover": 98
             },
             {
               "hour": 20,
@@ -22493,7 +22492,7 @@
               "temperature": 58,
               "tcon": 58,
               "windSpeed": 4,
-              "windDirection": 285,
+              "windDirection": 284,
               "windGust": 5,
               "cloudCover": 100
             },
@@ -22502,16 +22501,16 @@
               "temperature": 58,
               "tcon": 58,
               "windSpeed": 3,
-              "windDirection": 276,
+              "windDirection": 270,
               "windGust": 4,
               "cloudCover": 100
             }
           ],
-          "blDepth": 345,
-          "cape": 10,
-          "liftedIndex": 4.6,
+          "blDepth": 355,
+          "cape": 0,
+          "liftedIndex": 4.7,
           "convergence": 0,
-          "relativeHumidity": 98,
+          "relativeHumidity": 92,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -22535,9 +22534,9 @@
           "hourlyData": [
             {
               "hour": 0,
-              "temperature": 58,
-              "tcon": 58,
-              "windSpeed": 4,
+              "temperature": 57,
+              "tcon": 57,
+              "windSpeed": 3,
               "windDirection": 270,
               "windGust": 4,
               "cloudCover": 100
@@ -23988,10 +23987,10 @@
           "windDirection": 144,
           "windGust": 4,
           "temperature": 71,
-          "dewPoint": 39,
-          "tcon": 78,
+          "dewPoint": 34,
+          "tcon": 79,
           "thermalStrength": 3.5,
-          "topOfLift": 4232,
+          "topOfLift": 4120,
           "flyability": "poor",
           "conditions": "Wind direction unfavorable for W-NW site",
           "soaringFlyability": "poor",
@@ -24061,12 +24060,12 @@
               "windSpeed": 9,
               "windDirection": 75,
               "windGust": 11,
-              "cloudCover": 100
+              "cloudCover": 99
             },
             {
               "hour": 7,
               "temperature": 57,
-              "tcon": 65,
+              "tcon": 64,
               "windSpeed": 8,
               "windDirection": 85,
               "windGust": 11,
@@ -24111,7 +24110,7 @@
             {
               "hour": 12,
               "temperature": 71,
-              "tcon": 78,
+              "tcon": 79,
               "windSpeed": 3,
               "windDirection": 144,
               "windGust": 4,
@@ -24120,11 +24119,11 @@
             {
               "hour": 13,
               "temperature": 72,
-              "tcon": 78,
+              "tcon": 79,
               "windSpeed": 2,
               "windDirection": 249,
               "windGust": 3,
-              "cloudCover": 100
+              "cloudCover": 98
             },
             {
               "hour": 14,
@@ -24133,7 +24132,7 @@
               "windSpeed": 4,
               "windDirection": 285,
               "windGust": 6,
-              "cloudCover": 4
+              "cloudCover": 0
             },
             {
               "hour": 15,
@@ -24169,12 +24168,12 @@
               "windSpeed": 5,
               "windDirection": 261,
               "windGust": 6,
-              "cloudCover": 0
+              "cloudCover": 1
             },
             {
               "hour": 19,
               "temperature": 63,
-              "tcon": 69,
+              "tcon": 70,
               "windSpeed": 6,
               "windDirection": 278,
               "windGust": 9,
@@ -24183,11 +24182,11 @@
             {
               "hour": 20,
               "temperature": 62,
-              "tcon": 68,
+              "tcon": 69,
               "windSpeed": 6,
               "windDirection": 295,
               "windGust": 9,
-              "cloudCover": 3
+              "cloudCover": 0
             },
             {
               "hour": 21,
@@ -24196,32 +24195,32 @@
               "windSpeed": 5,
               "windDirection": 30,
               "windGust": 5,
-              "cloudCover": 1
+              "cloudCover": 0
             },
             {
               "hour": 22,
               "temperature": 59,
-              "tcon": 64,
+              "tcon": 65,
               "windSpeed": 9,
-              "windDirection": 106,
+              "windDirection": 105,
               "windGust": 12,
               "cloudCover": 0
             },
             {
               "hour": 23,
               "temperature": 59,
-              "tcon": 64,
-              "windSpeed": 9,
-              "windDirection": 123,
-              "windGust": 13,
+              "tcon": 65,
+              "windSpeed": 8,
+              "windDirection": 124,
+              "windGust": 12,
               "cloudCover": 0
             }
           ],
-          "blDepth": 535,
+          "blDepth": 495,
           "cape": 0,
-          "liftedIndex": 2.6,
+          "liftedIndex": 4.1,
           "convergence": 0,
-          "relativeHumidity": 31,
+          "relativeHumidity": 26,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -24245,10 +24244,10 @@
           "hourlyData": [
             {
               "hour": 0,
-              "temperature": 58,
-              "tcon": 64,
+              "temperature": 59,
+              "tcon": 65,
               "windSpeed": 9,
-              "windDirection": 122,
+              "windDirection": 117,
               "windGust": 12,
               "cloudCover": 0
             },
@@ -25698,10 +25697,10 @@
           "windDirection": 357,
           "windGust": 4,
           "temperature": 77,
-          "dewPoint": 47,
-          "tcon": 84,
-          "thermalStrength": 2.8,
-          "topOfLift": 735,
+          "dewPoint": 49,
+          "tcon": 83,
+          "thermalStrength": 3.3,
+          "topOfLift": 693,
           "flyability": "poor",
           "conditions": "Wind direction unfavorable for W-NW site",
           "soaringFlyability": "poor",
@@ -25771,7 +25770,7 @@
               "windSpeed": 5,
               "windDirection": 123,
               "windGust": 6,
-              "cloudCover": 100
+              "cloudCover": 60
             },
             {
               "hour": 7,
@@ -25780,7 +25779,7 @@
               "windSpeed": 3,
               "windDirection": 111,
               "windGust": 6,
-              "cloudCover": 99
+              "cloudCover": 100
             },
             {
               "hour": 8,
@@ -25821,7 +25820,7 @@
             {
               "hour": 12,
               "temperature": 77,
-              "tcon": 84,
+              "tcon": 83,
               "windSpeed": 4,
               "windDirection": 357,
               "windGust": 4,
@@ -25834,12 +25833,12 @@
               "windSpeed": 5,
               "windDirection": 327,
               "windGust": 6,
-              "cloudCover": 80
+              "cloudCover": 71
             },
             {
               "hour": 14,
               "temperature": 77,
-              "tcon": 82,
+              "tcon": 83,
               "windSpeed": 8,
               "windDirection": 326,
               "windGust": 9,
@@ -25857,7 +25856,7 @@
             {
               "hour": 16,
               "temperature": 76,
-              "tcon": 82,
+              "tcon": 83,
               "windSpeed": 8,
               "windDirection": 283,
               "windGust": 11,
@@ -25870,7 +25869,7 @@
               "windSpeed": 8,
               "windDirection": 287,
               "windGust": 11,
-              "cloudCover": 5
+              "cloudCover": 2
             },
             {
               "hour": 18,
@@ -25879,16 +25878,16 @@
               "windSpeed": 7,
               "windDirection": 290,
               "windGust": 11,
-              "cloudCover": 0
+              "cloudCover": 4
             },
             {
               "hour": 19,
               "temperature": 64,
-              "tcon": 67,
+              "tcon": 68,
               "windSpeed": 6,
               "windDirection": 305,
               "windGust": 10,
-              "cloudCover": 80
+              "cloudCover": 100
             },
             {
               "hour": 20,
@@ -25912,26 +25911,26 @@
               "hour": 22,
               "temperature": 58,
               "tcon": 60,
-              "windSpeed": 1,
-              "windDirection": 223,
+              "windSpeed": 2,
+              "windDirection": 207,
               "windGust": 6,
-              "cloudCover": 55
+              "cloudCover": 50
             },
             {
               "hour": 23,
               "temperature": 55,
-              "tcon": 56,
+              "tcon": 57,
               "windSpeed": 4,
-              "windDirection": 12,
+              "windDirection": 13,
               "windGust": 5,
-              "cloudCover": 1
+              "cloudCover": 0
             }
           ],
-          "blDepth": 425,
+          "blDepth": 410,
           "cape": 0,
-          "liftedIndex": 4.2,
+          "liftedIndex": 3.7,
           "convergence": 0,
-          "relativeHumidity": 35,
+          "relativeHumidity": 37,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -25957,10 +25956,10 @@
               "hour": 0,
               "temperature": 53,
               "tcon": 54,
-              "windSpeed": 2,
-              "windDirection": 26,
-              "windGust": 6,
-              "cloudCover": 5
+              "windSpeed": 3,
+              "windDirection": 18,
+              "windGust": 5,
+              "cloudCover": 3
             },
             {
               "hour": 1,
@@ -27410,8 +27409,8 @@
           "windDirection": 274,
           "windGust": 3,
           "temperature": 67,
-          "dewPoint": 42,
-          "tcon": 72,
+          "dewPoint": 48,
+          "tcon": 71,
           "thermalStrength": 1.3,
           "topOfLift": 660,
           "flyability": "marginal",
@@ -27479,11 +27478,11 @@
             {
               "hour": 6,
               "temperature": 59,
-              "tcon": 66,
+              "tcon": 69,
               "windSpeed": 3,
               "windDirection": 42,
               "windGust": 3,
-              "cloudCover": 4
+              "cloudCover": 21
             },
             {
               "hour": 7,
@@ -27492,7 +27491,7 @@
               "windSpeed": 4,
               "windDirection": 125,
               "windGust": 4,
-              "cloudCover": 83
+              "cloudCover": 40
             },
             {
               "hour": 8,
@@ -27506,7 +27505,7 @@
             {
               "hour": 9,
               "temperature": 61,
-              "tcon": 66,
+              "tcon": 67,
               "windSpeed": 2,
               "windDirection": 96,
               "windGust": 4,
@@ -27515,7 +27514,7 @@
             {
               "hour": 10,
               "temperature": 60,
-              "tcon": 63,
+              "tcon": 62,
               "windSpeed": 2,
               "windDirection": 234,
               "windGust": 3,
@@ -27524,7 +27523,7 @@
             {
               "hour": 11,
               "temperature": 64,
-              "tcon": 68,
+              "tcon": 67,
               "windSpeed": 3,
               "windDirection": 255,
               "windGust": 3,
@@ -27533,7 +27532,7 @@
             {
               "hour": 12,
               "temperature": 67,
-              "tcon": 72,
+              "tcon": 71,
               "windSpeed": 3,
               "windDirection": 274,
               "windGust": 3,
@@ -27542,7 +27541,7 @@
             {
               "hour": 13,
               "temperature": 67,
-              "tcon": 73,
+              "tcon": 71,
               "windSpeed": 5,
               "windDirection": 281,
               "windGust": 5,
@@ -27551,7 +27550,7 @@
             {
               "hour": 14,
               "temperature": 68,
-              "tcon": 74,
+              "tcon": 73,
               "windSpeed": 5,
               "windDirection": 283,
               "windGust": 8,
@@ -27587,7 +27586,7 @@
             {
               "hour": 18,
               "temperature": 61,
-              "tcon": 65,
+              "tcon": 64,
               "windSpeed": 5,
               "windDirection": 288,
               "windGust": 9,
@@ -27618,32 +27617,32 @@
               "windSpeed": 2,
               "windDirection": 186,
               "windGust": 2,
-              "cloudCover": 50
+              "cloudCover": 97
             },
             {
               "hour": 22,
               "temperature": 51,
               "tcon": 52,
               "windSpeed": 2,
-              "windDirection": 175,
+              "windDirection": 174,
               "windGust": 2,
-              "cloudCover": 19
+              "cloudCover": 62
             },
             {
               "hour": 23,
               "temperature": 51,
-              "tcon": 51,
+              "tcon": 52,
               "windSpeed": 1,
-              "windDirection": 221,
+              "windDirection": 233,
               "windGust": 1,
-              "cloudCover": 21
+              "cloudCover": 52
             }
           ],
-          "blDepth": 210,
+          "blDepth": 220,
           "cape": 0,
-          "liftedIndex": 9.5,
+          "liftedIndex": 8.1,
           "convergence": 0,
-          "relativeHumidity": 41,
+          "relativeHumidity": 50,
           "cloudCover": 100,
           "windDirectionMatch": true
         },
@@ -27668,11 +27667,11 @@
             {
               "hour": 0,
               "temperature": 50,
-              "tcon": 50,
+              "tcon": 52,
               "windSpeed": 1,
-              "windDirection": 239,
+              "windDirection": 225,
               "windGust": 1,
-              "cloudCover": 7
+              "cloudCover": 11
             },
             {
               "hour": 1,
@@ -28857,7 +28856,7 @@
           "relativeHumidity": 61,
           "cloudCover": 57,
           "windDirectionMatch": false,
-          "rainInfo": "Rain expected all day"
+          "rainInfo": "Rain expected in afternoon and evening"
         },
         {
           "date": "2026-04-02",
@@ -29122,15 +29121,15 @@
           "windDirection": 90,
           "windGust": 13,
           "temperature": 74,
-          "dewPoint": 39,
-          "tcon": 82,
+          "dewPoint": 36,
+          "tcon": 83,
           "thermalStrength": 3.8,
-          "topOfLift": 1080,
+          "topOfLift": 1122,
           "flyability": "marginal",
-          "conditions": "Overcast may limit thermals: 100% cloud cover",
+          "conditions": "Cool: needs 83°F for good thermals, 74°F forecast",
           "soaringFlyability": "poor",
-          "thermalFlyability": "marginal",
-          "launchTime": "6:00 PM",
+          "thermalFlyability": "poor",
+          "launchTime": "10:00 AM",
           "xcPotential": "low",
           "xcReason": "Low ceiling",
           "hourlyData": [
@@ -29191,16 +29190,16 @@
             {
               "hour": 6,
               "temperature": 52,
-              "tcon": 56,
+              "tcon": 54,
               "windSpeed": 1,
               "windDirection": 342,
               "windGust": 2,
-              "cloudCover": 100
+              "cloudCover": 99
             },
             {
               "hour": 7,
               "temperature": 53,
-              "tcon": 57,
+              "tcon": 56,
               "windSpeed": 2,
               "windDirection": 82,
               "windGust": 3,
@@ -29218,7 +29217,7 @@
             {
               "hour": 9,
               "temperature": 60,
-              "tcon": 65,
+              "tcon": 64,
               "windSpeed": 4,
               "windDirection": 126,
               "windGust": 7,
@@ -29227,7 +29226,7 @@
             {
               "hour": 10,
               "temperature": 64,
-              "tcon": 69,
+              "tcon": 68,
               "windSpeed": 6,
               "windDirection": 118,
               "windGust": 8,
@@ -29236,7 +29235,7 @@
             {
               "hour": 11,
               "temperature": 70,
-              "tcon": 76,
+              "tcon": 77,
               "windSpeed": 6,
               "windDirection": 98,
               "windGust": 9,
@@ -29245,7 +29244,7 @@
             {
               "hour": 12,
               "temperature": 74,
-              "tcon": 82,
+              "tcon": 83,
               "windSpeed": 8,
               "windDirection": 90,
               "windGust": 13,
@@ -29285,16 +29284,16 @@
               "windSpeed": 5,
               "windDirection": 284,
               "windGust": 5,
-              "cloudCover": 96
+              "cloudCover": 100
             },
             {
               "hour": 17,
               "temperature": 80,
-              "tcon": 89,
+              "tcon": 88,
               "windSpeed": 6,
               "windDirection": 295,
               "windGust": 8,
-              "cloudCover": 9
+              "cloudCover": 97
             },
             {
               "hour": 18,
@@ -29303,7 +29302,7 @@
               "windSpeed": 9,
               "windDirection": 297,
               "windGust": 12,
-              "cloudCover": 15
+              "cloudCover": 85
             },
             {
               "hour": 19,
@@ -29312,7 +29311,7 @@
               "windSpeed": 10,
               "windDirection": 304,
               "windGust": 17,
-              "cloudCover": 60
+              "cloudCover": 100
             },
             {
               "hour": 20,
@@ -29326,11 +29325,11 @@
             {
               "hour": 21,
               "temperature": 64,
-              "tcon": 70,
+              "tcon": 71,
               "windSpeed": 8,
               "windDirection": 311,
               "windGust": 12,
-              "cloudCover": 78
+              "cloudCover": 100
             },
             {
               "hour": 22,
@@ -29339,23 +29338,23 @@
               "windSpeed": 8,
               "windDirection": 313,
               "windGust": 11,
-              "cloudCover": 93
+              "cloudCover": 91
             },
             {
               "hour": 23,
               "temperature": 62,
-              "tcon": 68,
+              "tcon": 67,
               "windSpeed": 8,
               "windDirection": 307,
               "windGust": 11,
-              "cloudCover": 84
+              "cloudCover": 98
             }
           ],
-          "blDepth": 495,
+          "blDepth": 510,
           "cape": 0,
-          "liftedIndex": 8.4,
+          "liftedIndex": 8.9,
           "convergence": 0,
-          "relativeHumidity": 28,
+          "relativeHumidity": 25,
           "cloudCover": 100,
           "windDirectionMatch": true
         },
@@ -29379,12 +29378,12 @@
           "hourlyData": [
             {
               "hour": 0,
-              "temperature": 61,
-              "tcon": 67,
-              "windSpeed": 8,
-              "windDirection": 312,
-              "windGust": 11,
-              "cloudCover": 68
+              "temperature": 60,
+              "tcon": 66,
+              "windSpeed": 7,
+              "windDirection": 314,
+              "windGust": 10,
+              "cloudCover": 33
             },
             {
               "hour": 1,
@@ -30811,7 +30810,7 @@
           "relativeHumidity": 54,
           "cloudCover": 35,
           "windDirectionMatch": false,
-          "rainInfo": "Rain expected 4am-7am"
+          "rainInfo": "Rain expected 3am-7am"
         }
       ]
     },
@@ -30833,10 +30832,10 @@
           "windDirection": 281,
           "windGust": 10,
           "temperature": 66,
-          "dewPoint": 23,
+          "dewPoint": 24,
           "tcon": 76,
           "thermalStrength": 4.3,
-          "topOfLift": 9034,
+          "topOfLift": 9020,
           "flyability": "marginal",
           "conditions": "Cool: needs 76°F for good thermals, 66°F forecast",
           "soaringFlyability": "poor",
@@ -30906,7 +30905,7 @@
               "windSpeed": 1,
               "windDirection": 162,
               "windGust": 2,
-              "cloudCover": 26
+              "cloudCover": 7
             },
             {
               "hour": 7,
@@ -30915,7 +30914,7 @@
               "windSpeed": 1,
               "windDirection": 259,
               "windGust": 2,
-              "cloudCover": 87
+              "cloudCover": 74
             },
             {
               "hour": 8,
@@ -30924,7 +30923,7 @@
               "windSpeed": 4,
               "windDirection": 322,
               "windGust": 4,
-              "cloudCover": 37
+              "cloudCover": 59
             },
             {
               "hour": 9,
@@ -30933,7 +30932,7 @@
               "windSpeed": 3,
               "windDirection": 312,
               "windGust": 3,
-              "cloudCover": 80
+              "cloudCover": 87
             },
             {
               "hour": 10,
@@ -30942,7 +30941,7 @@
               "windSpeed": 4,
               "windDirection": 305,
               "windGust": 10,
-              "cloudCover": 100
+              "cloudCover": 97
             },
             {
               "hour": 11,
@@ -30951,7 +30950,7 @@
               "windSpeed": 6,
               "windDirection": 295,
               "windGust": 9,
-              "cloudCover": 98
+              "cloudCover": 97
             },
             {
               "hour": 12,
@@ -30965,7 +30964,7 @@
             {
               "hour": 13,
               "temperature": 69,
-              "tcon": 80,
+              "tcon": 79,
               "windSpeed": 7,
               "windDirection": 245,
               "windGust": 9,
@@ -31032,7 +31031,7 @@
               "windSpeed": 14,
               "windDirection": 167,
               "windGust": 26,
-              "cloudCover": 91
+              "cloudCover": 70
             },
             {
               "hour": 21,
@@ -31041,32 +31040,32 @@
               "windSpeed": 10,
               "windDirection": 141,
               "windGust": 16,
-              "cloudCover": 100
+              "cloudCover": 92
             },
             {
               "hour": 22,
               "temperature": 61,
-              "tcon": 72,
+              "tcon": 71,
               "windSpeed": 10,
-              "windDirection": 124,
+              "windDirection": 123,
               "windGust": 14,
               "cloudCover": 100
             },
             {
               "hour": 23,
-              "temperature": 59,
-              "tcon": 69,
+              "temperature": 58,
+              "tcon": 68,
               "windSpeed": 8,
-              "windDirection": 112,
-              "windGust": 10,
+              "windDirection": 113,
+              "windGust": 9,
               "cloudCover": 100
             }
           ],
-          "blDepth": 550,
+          "blDepth": 545,
           "cape": 0,
-          "liftedIndex": 3.6,
+          "liftedIndex": 3.5,
           "convergence": 0,
-          "relativeHumidity": 19,
+          "relativeHumidity": 20,
           "cloudCover": 100,
           "windDirectionMatch": true
         },
@@ -31091,10 +31090,10 @@
             {
               "hour": 0,
               "temperature": 57,
-              "tcon": 67,
-              "windSpeed": 8,
-              "windDirection": 112,
-              "windGust": 8,
+              "tcon": 66,
+              "windSpeed": 9,
+              "windDirection": 113,
+              "windGust": 9,
               "cloudCover": 100
             },
             {
@@ -32548,7 +32547,7 @@
           "dewPoint": 23,
           "tcon": 79,
           "thermalStrength": 4.3,
-          "topOfLift": 6536,
+          "topOfLift": 6522,
           "flyability": "marginal",
           "conditions": "Cool: needs 79°F for good thermals, 68°F forecast",
           "soaringFlyability": "poor",
@@ -32614,38 +32613,38 @@
             {
               "hour": 6,
               "temperature": 48,
-              "tcon": 56,
+              "tcon": 55,
               "windSpeed": 5,
               "windDirection": 28,
               "windGust": 5,
-              "cloudCover": 18
+              "cloudCover": 5
             },
             {
               "hour": 7,
               "temperature": 50,
-              "tcon": 58,
+              "tcon": 57,
               "windSpeed": 5,
               "windDirection": 25,
               "windGust": 7,
-              "cloudCover": 69
+              "cloudCover": 56
             },
             {
               "hour": 8,
               "temperature": 51,
-              "tcon": 59,
+              "tcon": 58,
               "windSpeed": 6,
               "windDirection": 11,
               "windGust": 8,
-              "cloudCover": 16
+              "cloudCover": 52
             },
             {
               "hour": 9,
               "temperature": 57,
-              "tcon": 65,
+              "tcon": 64,
               "windSpeed": 6,
               "windDirection": 353,
               "windGust": 8,
-              "cloudCover": 79
+              "cloudCover": 90
             },
             {
               "hour": 10,
@@ -32654,7 +32653,7 @@
               "windSpeed": 7,
               "windDirection": 324,
               "windGust": 7,
-              "cloudCover": 100
+              "cloudCover": 98
             },
             {
               "hour": 11,
@@ -32663,7 +32662,7 @@
               "windSpeed": 6,
               "windDirection": 305,
               "windGust": 9,
-              "cloudCover": 98
+              "cloudCover": 96
             },
             {
               "hour": 12,
@@ -32744,7 +32743,7 @@
               "windSpeed": 19,
               "windDirection": 163,
               "windGust": 27,
-              "cloudCover": 99
+              "cloudCover": 82
             },
             {
               "hour": 21,
@@ -32758,25 +32757,25 @@
             {
               "hour": 22,
               "temperature": 66,
-              "tcon": 77,
+              "tcon": 78,
               "windSpeed": 12,
-              "windDirection": 131,
-              "windGust": 16,
+              "windDirection": 130,
+              "windGust": 15,
               "cloudCover": 100
             },
             {
               "hour": 23,
               "temperature": 64,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 11,
-              "windDirection": 120,
-              "windGust": 13,
+              "windDirection": 118,
+              "windGust": 12,
               "cloudCover": 100
             }
           ],
-          "blDepth": 515,
+          "blDepth": 510,
           "cape": 0,
-          "liftedIndex": 4.6,
+          "liftedIndex": 4.5,
           "convergence": 0,
           "relativeHumidity": 18,
           "cloudCover": 100,
@@ -32804,10 +32803,10 @@
               "hour": 0,
               "temperature": 63,
               "tcon": 74,
-              "windSpeed": 10,
+              "windSpeed": 11,
               "windDirection": 118,
               "windGust": 12,
-              "cloudCover": 100
+              "cloudCover": 99
             },
             {
               "hour": 1,
@@ -34255,15 +34254,15 @@
           "windDirection": 67,
           "windGust": 20,
           "temperature": 67,
-          "dewPoint": 31,
-          "tcon": 76,
+          "dewPoint": 32,
+          "tcon": 75,
           "thermalStrength": 3.3,
           "topOfLift": 2405,
           "flyability": "marginal",
-          "conditions": "Cool: needs 76°F for good thermals, 67°F forecast",
+          "conditions": "Overcast may limit thermals: 100% cloud cover",
           "soaringFlyability": "poor",
-          "thermalFlyability": "poor",
-          "launchTime": "6:00 PM",
+          "thermalFlyability": "marginal",
+          "launchTime": "5:00 PM",
           "xcPotential": "low",
           "xcReason": "Low ceiling",
           "hourlyData": [
@@ -34328,12 +34327,12 @@
               "windSpeed": 3,
               "windDirection": 72,
               "windGust": 3,
-              "cloudCover": 100
+              "cloudCover": 99
             },
             {
               "hour": 7,
               "temperature": 56,
-              "tcon": 63,
+              "tcon": 62,
               "windSpeed": 3,
               "windDirection": 153,
               "windGust": 3,
@@ -34342,7 +34341,7 @@
             {
               "hour": 8,
               "temperature": 55,
-              "tcon": 62,
+              "tcon": 61,
               "windSpeed": 6,
               "windDirection": 104,
               "windGust": 6,
@@ -34351,7 +34350,7 @@
             {
               "hour": 9,
               "temperature": 57,
-              "tcon": 65,
+              "tcon": 64,
               "windSpeed": 8,
               "windDirection": 81,
               "windGust": 15,
@@ -34360,7 +34359,7 @@
             {
               "hour": 10,
               "temperature": 62,
-              "tcon": 71,
+              "tcon": 70,
               "windSpeed": 12,
               "windDirection": 66,
               "windGust": 19,
@@ -34369,7 +34368,7 @@
             {
               "hour": 11,
               "temperature": 64,
-              "tcon": 73,
+              "tcon": 72,
               "windSpeed": 13,
               "windDirection": 64,
               "windGust": 23,
@@ -34378,7 +34377,7 @@
             {
               "hour": 12,
               "temperature": 67,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 13,
               "windDirection": 67,
               "windGust": 20,
@@ -34418,16 +34417,16 @@
               "windSpeed": 3,
               "windDirection": 318,
               "windGust": 5,
-              "cloudCover": 46
+              "cloudCover": 100
             },
             {
               "hour": 17,
               "temperature": 70,
-              "tcon": 77,
+              "tcon": 76,
               "windSpeed": 6,
               "windDirection": 270,
               "windGust": 6,
-              "cloudCover": 5
+              "cloudCover": 46
             },
             {
               "hour": 18,
@@ -34436,7 +34435,7 @@
               "windSpeed": 6,
               "windDirection": 258,
               "windGust": 6,
-              "cloudCover": 28
+              "cloudCover": 100
             },
             {
               "hour": 19,
@@ -34454,7 +34453,7 @@
               "windSpeed": 4,
               "windDirection": 317,
               "windGust": 6,
-              "cloudCover": 40
+              "cloudCover": 100
             },
             {
               "hour": 21,
@@ -34463,7 +34462,7 @@
               "windSpeed": 4,
               "windDirection": 327,
               "windGust": 5,
-              "cloudCover": 100
+              "cloudCover": 68
             },
             {
               "hour": 22,
@@ -34472,23 +34471,23 @@
               "windSpeed": 3,
               "windDirection": 293,
               "windGust": 5,
-              "cloudCover": 89
+              "cloudCover": 57
             },
             {
               "hour": 23,
               "temperature": 59,
               "tcon": 68,
               "windSpeed": 5,
-              "windDirection": 273,
+              "windDirection": 275,
               "windGust": 5,
-              "cloudCover": 95
+              "cloudCover": 100
             }
           ],
-          "blDepth": 365,
+          "blDepth": 390,
           "cape": 0,
           "liftedIndex": 9,
           "convergence": 0,
-          "relativeHumidity": 26,
+          "relativeHumidity": 27,
           "cloudCover": 100,
           "windDirectionMatch": true
         },
@@ -34512,12 +34511,12 @@
           "hourlyData": [
             {
               "hour": 0,
-              "temperature": 55,
-              "tcon": 62,
-              "windSpeed": 8,
-              "windDirection": 240,
-              "windGust": 8,
-              "cloudCover": 22
+              "temperature": 57,
+              "tcon": 64,
+              "windSpeed": 7,
+              "windDirection": 244,
+              "windGust": 7,
+              "cloudCover": 100
             },
             {
               "hour": 1,
@@ -35944,7 +35943,7 @@
           "relativeHumidity": 54,
           "cloudCover": 35,
           "windDirectionMatch": false,
-          "rainInfo": "Rain expected 4am-7am"
+          "rainInfo": "Rain expected 3am-7am"
         }
       ]
     },
@@ -35966,10 +35965,10 @@
           "windDirection": 40,
           "windGust": 11,
           "temperature": 66,
-          "dewPoint": 23,
+          "dewPoint": 25,
           "tcon": 75,
           "thermalStrength": 3.5,
-          "topOfLift": 4555,
+          "topOfLift": 4527,
           "flyability": "poor",
           "conditions": "Wind direction unfavorable for NW-SW site",
           "soaringFlyability": "poor",
@@ -36039,7 +36038,7 @@
               "windSpeed": 11,
               "windDirection": 25,
               "windGust": 17,
-              "cloudCover": 76
+              "cloudCover": 56
             },
             {
               "hour": 7,
@@ -36048,12 +36047,12 @@
               "windSpeed": 11,
               "windDirection": 30,
               "windGust": 17,
-              "cloudCover": 82
+              "cloudCover": 16
             },
             {
               "hour": 8,
               "temperature": 54,
-              "tcon": 63,
+              "tcon": 62,
               "windSpeed": 11,
               "windDirection": 30,
               "windGust": 15,
@@ -36071,7 +36070,7 @@
             {
               "hour": 10,
               "temperature": 60,
-              "tcon": 69,
+              "tcon": 68,
               "windSpeed": 11,
               "windDirection": 34,
               "windGust": 15,
@@ -36080,7 +36079,7 @@
             {
               "hour": 11,
               "temperature": 62,
-              "tcon": 72,
+              "tcon": 71,
               "windSpeed": 11,
               "windDirection": 37,
               "windGust": 15,
@@ -36107,7 +36106,7 @@
             {
               "hour": 14,
               "temperature": 69,
-              "tcon": 79,
+              "tcon": 78,
               "windSpeed": 4,
               "windDirection": 16,
               "windGust": 6,
@@ -36134,7 +36133,7 @@
             {
               "hour": 17,
               "temperature": 66,
-              "tcon": 73,
+              "tcon": 72,
               "windSpeed": 7,
               "windDirection": 273,
               "windGust": 9,
@@ -36143,7 +36142,7 @@
             {
               "hour": 18,
               "temperature": 63,
-              "tcon": 70,
+              "tcon": 69,
               "windSpeed": 7,
               "windDirection": 277,
               "windGust": 10,
@@ -36152,7 +36151,7 @@
             {
               "hour": 19,
               "temperature": 60,
-              "tcon": 66,
+              "tcon": 65,
               "windSpeed": 7,
               "windDirection": 287,
               "windGust": 13,
@@ -36181,9 +36180,9 @@
               "temperature": 59,
               "tcon": 67,
               "windSpeed": 5,
-              "windDirection": 339,
+              "windDirection": 341,
               "windGust": 5,
-              "cloudCover": 61
+              "cloudCover": 100
             },
             {
               "hour": 23,
@@ -36192,14 +36191,14 @@
               "windSpeed": 5,
               "windDirection": 332,
               "windGust": 6,
-              "cloudCover": 14
+              "cloudCover": 28
             }
           ],
-          "blDepth": 450,
+          "blDepth": 440,
           "cape": 0,
-          "liftedIndex": 7.5,
+          "liftedIndex": 7.2,
           "convergence": 0,
-          "relativeHumidity": 20,
+          "relativeHumidity": 21,
           "cloudCover": 100,
           "windDirectionMatch": false
         },
@@ -36224,11 +36223,11 @@
             {
               "hour": 0,
               "temperature": 60,
-              "tcon": 69,
-              "windSpeed": 5,
-              "windDirection": 326,
-              "windGust": 6,
-              "cloudCover": 5
+              "tcon": 68,
+              "windSpeed": 6,
+              "windDirection": 320,
+              "windGust": 7,
+              "cloudCover": 15
             },
             {
               "hour": 1,
@@ -37678,12 +37677,12 @@
           "windDirection": 63,
           "windGust": 5,
           "temperature": 74,
-          "dewPoint": 32,
-          "tcon": 84,
+          "dewPoint": 34,
+          "tcon": 83,
           "thermalStrength": 3.6,
           "topOfLift": 2790,
           "flyability": "marginal",
-          "conditions": "Cool: needs 84°F for good thermals, 74°F forecast",
+          "conditions": "Cool: needs 83°F for good thermals, 74°F forecast",
           "soaringFlyability": "poor",
           "thermalFlyability": "poor",
           "launchTime": "11:00 AM",
@@ -37747,11 +37746,11 @@
             {
               "hour": 6,
               "temperature": 59,
-              "tcon": 67,
+              "tcon": 66,
               "windSpeed": 6,
               "windDirection": 151,
               "windGust": 6,
-              "cloudCover": 100
+              "cloudCover": 98
             },
             {
               "hour": 7,
@@ -37765,7 +37764,7 @@
             {
               "hour": 8,
               "temperature": 59,
-              "tcon": 67,
+              "tcon": 66,
               "windSpeed": 6,
               "windDirection": 162,
               "windGust": 6,
@@ -37774,7 +37773,7 @@
             {
               "hour": 9,
               "temperature": 65,
-              "tcon": 74,
+              "tcon": 73,
               "windSpeed": 6,
               "windDirection": 161,
               "windGust": 7,
@@ -37783,7 +37782,7 @@
             {
               "hour": 10,
               "temperature": 68,
-              "tcon": 78,
+              "tcon": 77,
               "windSpeed": 3,
               "windDirection": 110,
               "windGust": 8,
@@ -37792,7 +37791,7 @@
             {
               "hour": 11,
               "temperature": 71,
-              "tcon": 81,
+              "tcon": 80,
               "windSpeed": 4,
               "windDirection": 69,
               "windGust": 8,
@@ -37801,7 +37800,7 @@
             {
               "hour": 12,
               "temperature": 74,
-              "tcon": 84,
+              "tcon": 83,
               "windSpeed": 5,
               "windDirection": 63,
               "windGust": 5,
@@ -37823,7 +37822,7 @@
               "windSpeed": 4,
               "windDirection": 28,
               "windGust": 5,
-              "cloudCover": 95
+              "cloudCover": 100
             },
             {
               "hour": 15,
@@ -37832,25 +37831,25 @@
               "windSpeed": 5,
               "windDirection": 2,
               "windGust": 5,
-              "cloudCover": 5
+              "cloudCover": 100
             },
             {
               "hour": 16,
               "temperature": 81,
-              "tcon": 92,
+              "tcon": 91,
               "windSpeed": 5,
               "windDirection": 347,
               "windGust": 6,
-              "cloudCover": 0
+              "cloudCover": 1
             },
             {
               "hour": 17,
               "temperature": 80,
-              "tcon": 88,
+              "tcon": 89,
               "windSpeed": 5,
               "windDirection": 306,
               "windGust": 6,
-              "cloudCover": 0
+              "cloudCover": 3
             },
             {
               "hour": 18,
@@ -37873,45 +37872,45 @@
             {
               "hour": 20,
               "temperature": 68,
-              "tcon": 77,
+              "tcon": 76,
               "windSpeed": 7,
               "windDirection": 254,
               "windGust": 7,
-              "cloudCover": 1
+              "cloudCover": 26
             },
             {
               "hour": 21,
               "temperature": 66,
-              "tcon": 75,
+              "tcon": 74,
               "windSpeed": 2,
               "windDirection": 270,
               "windGust": 2,
-              "cloudCover": 42
+              "cloudCover": 45
             },
             {
               "hour": 22,
               "temperature": 65,
-              "tcon": 75,
+              "tcon": 74,
               "windSpeed": 3,
-              "windDirection": 221,
+              "windDirection": 219,
               "windGust": 3,
-              "cloudCover": 100
+              "cloudCover": 26
             },
             {
               "hour": 23,
-              "temperature": 67,
-              "tcon": 76,
-              "windSpeed": 4,
-              "windDirection": 241,
-              "windGust": 4,
-              "cloudCover": 9
+              "temperature": 66,
+              "tcon": 75,
+              "windSpeed": 5,
+              "windDirection": 237,
+              "windGust": 5,
+              "cloudCover": 100
             }
           ],
           "blDepth": 495,
           "cape": 0,
-          "liftedIndex": 9.4,
+          "liftedIndex": 8.7,
           "convergence": 0,
-          "relativeHumidity": 21,
+          "relativeHumidity": 23,
           "cloudCover": 100,
           "windDirectionMatch": true
         },
@@ -37936,11 +37935,11 @@
             {
               "hour": 0,
               "temperature": 66,
-              "tcon": 76,
+              "tcon": 75,
               "windSpeed": 5,
-              "windDirection": 248,
+              "windDirection": 249,
               "windGust": 5,
-              "cloudCover": 50
+              "cloudCover": 90
             },
             {
               "hour": 1,
@@ -39124,8 +39123,7 @@
           "convergence": 0,
           "relativeHumidity": 56,
           "cloudCover": 0,
-          "windDirectionMatch": false,
-          "rainInfo": "Rain expected in afternoon and evening"
+          "windDirectionMatch": false
         },
         {
           "date": "2026-04-02",
