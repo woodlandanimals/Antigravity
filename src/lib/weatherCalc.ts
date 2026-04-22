@@ -204,7 +204,9 @@ export const checkWindDirectionMatch = (windDir: number, siteOrientation: string
     'W-SW': [[225, 285]],
     'E-SE': [[75, 165]],
     'NE-SE': [[30, 165]],
-    'NW-N': [[315, 360], [0, 15]]
+    'NW-N': [[315, 360], [0, 15]],
+    'NNW-SSW': [[202, 337]],
+    'ALL': [[0, 360]]
   };
 
   const ranges = orientationRanges[siteOrientation];
@@ -219,6 +221,7 @@ export const determineSoaringFlyability = (
   windGust: number,
   windDirectionMatch: boolean
 ): 'good' | 'marginal' | 'poor' => {
+  if (site.siteType === 'thermal') return 'poor';
   if (!windDirectionMatch) return 'poor';
   if (windSpeed < 8) return 'poor';
   if (windSpeed > site.maxWind) return 'poor';

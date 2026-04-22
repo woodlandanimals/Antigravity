@@ -27,9 +27,9 @@ export const launchSites: LaunchSite[] = [
     elevation: 2800,
     latitude: 38.3700,
     longitude: -122.0200,
-    orientation: 'SW-W',
-    maxWind: 22,
-    siteType: 'mixed'  // Both ridge and thermal
+    orientation: 'ALL',
+    maxWind: 7,
+    siteType: 'thermal'  // No real LZ - thermal only. Light wind any direction; 5mph east cross is ideal
   },
   {
     id: 'slide',
@@ -57,9 +57,9 @@ export const launchSites: LaunchSite[] = [
     elevation: 3200,
     latitude: 37.2500,
     longitude: -122.1800,
-    orientation: 'W-NW',
-    maxWind: 18,
-    siteType: 'mixed'  // Ridge + thermal
+    orientation: 'NNW-SSW',
+    maxWind: 20,
+    siteType: 'mixed'  // Ridge + thermal; launchable NNW through W to SSW, 8-20mph
   },
   {
     id: 'mt-diablo',
