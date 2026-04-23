@@ -231,6 +231,21 @@ export const determineSoaringFlyability = (
   return 'poor';
 };
 
+// Effective temp deficit: high-elevation thermal sites get a credit because the
+// thermal column reaches well above launch and surface temp is naturally cooler.
+// Flynns at 5600ft with 12°F raw deficit becomes ~5°F effective.
+const effectiveTempDeficit = (tcon: number, temperature: number, elevationFt: number): number => {
+  const altitudeBonus = Math.max(0, (elevationFt - 4000) / 1000) * 3;
+  return (tcon - temperature) - altitudeBonus;
+};
+
+// Light wind (<5mph) at thermal/mixed sites: thermal column sets the launch
+// direction, not synoptic wind. Skip the hard direction gate.
+const effectiveDirectionOk = (windDirectionMatch: boolean, windSpeed: number, site: LaunchSite): boolean => {
+  if (windDirectionMatch) return true;
+  return windSpeed <= 5 && site.siteType !== 'soaring';
+};
+
 export const determineThermalFlyability = (
   site: LaunchSite,
   temperature: number,
@@ -240,8 +255,8 @@ export const determineThermalFlyability = (
   windDirectionMatch: boolean,
   cloudCover: number
 ): 'good' | 'marginal' | 'poor' => {
-  if (!windDirectionMatch) return 'poor';
-  const tempDeficit = tcon - temperature;
+  if (!effectiveDirectionOk(windDirectionMatch, windSpeed, site)) return 'poor';
+  const tempDeficit = effectiveTempDeficit(tcon, temperature, site.elevation);
   if (tempDeficit > 15) return 'poor';
   if (windSpeed > site.maxWind) return 'poor';
   if (windSpeed < 3) return thermalStrength > 6 ? 'marginal' : 'poor';
@@ -265,11 +280,25 @@ export const determineFlyability = (
   cape: number,
   liftedIndex: number
 ): { flyability: 'good' | 'marginal' | 'poor', conditions: string } => {
-  const tempDeficit = tcon - temperature;
+  const tempDeficit = effectiveTempDeficit(tcon, temperature, site.elevation);
+  const ceilingAGL = topOfLift - site.elevation;
+  const dirOk = effectiveDirectionOk(windDirectionMatch, windSpeed, site);
+  const dirRelaxed = !windDirectionMatch && dirOk;
+  const topK = Math.round(topOfLift / 1000 * 10) / 10;
   let flyability: 'good' | 'marginal' | 'poor' = 'poor';
   let conditions = '';
 
-  if (!windDirectionMatch) {
+  // Post-frontal breakout: cool, unstable airmass with tall column. Bypasses
+  // the TCON deficit gate because the cool air mass IS the flight signal.
+  const postFrontal = dirOk && site.siteType !== 'soaring'
+    && liftedIndex <= -3 && cape >= 250
+    && ceilingAGL >= 4000 && windSpeed <= 12 && windSpeed >= 2
+    && windGust <= site.maxWind * 1.5;
+
+  if (postFrontal) {
+    flyability = 'good';
+    conditions = `Post-frontal breakout: top ${topK}k, LI ${liftedIndex.toFixed(1)}, CAPE ${Math.round(cape)}`;
+  } else if (!dirOk) {
     flyability = 'poor';
     conditions = `Wind direction unfavorable for ${site.orientation} site`;
   } else if (tempDeficit > 15) {
@@ -295,13 +324,22 @@ export const determineFlyability = (
     conditions = `Excellent post-frontal: ${thermalStrength}/10 thermals, CAPE ${Math.round(cape)}`;
   } else if (thermalStrength >= 7 && windSpeed <= site.maxWind * 0.7 && tempDeficit <= 3) {
     flyability = 'good';
-    conditions = `Excellent: ${thermalStrength}/10 thermals, top ${Math.round(topOfLift/1000*10)/10}k`;
+    conditions = `Excellent: ${thermalStrength}/10 thermals, top ${topK}k`;
   } else if (thermalStrength >= 5 && windSpeed <= site.maxWind * 0.8 && tempDeficit <= 5) {
     flyability = 'good';
-    conditions = `Good: ${thermalStrength}/10 thermals, top ${Math.round(topOfLift/1000*10)/10}k`;
+    conditions = `Good: ${thermalStrength}/10 thermals, top ${topK}k`;
+  } else if (ceilingAGL >= 5000 && thermalStrength >= 3.5 && windSpeed <= 12) {
+    // Tall-column day: ceiling alone carries it even with modest thermal strength
+    flyability = 'good';
+    conditions = `Tall column: top ${topK}k, ${thermalStrength}/10${dirRelaxed ? ' (light wind)' : ''}`;
+  } else if (site.siteType !== 'soaring' && windSpeed <= 5 && ceilingAGL >= 4000 && tempDeficit <= 8) {
+    // Light-wind thermal-defined launch: surface metrics underrate cool/calm days
+    // where the column still builds above launch (Mt Diablo Apr 18 pattern).
+    flyability = 'marginal';
+    conditions = `Light wind, top ${topK}k — thermal-defined launch`;
   } else if (thermalStrength >= 3 && windSpeed <= site.maxWind * 0.9 && tempDeficit <= 8) {
     flyability = 'marginal';
-    conditions = `Moderate: ${thermalStrength}/10 thermals, top ${Math.round(topOfLift/1000*10)/10}k`;
+    conditions = `Moderate: ${thermalStrength}/10 thermals, top ${topK}k`;
   } else {
     flyability = 'poor';
     conditions = `Stable conditions: ${thermalStrength}/10 thermals`;
@@ -323,8 +361,15 @@ export const calculateXCPotential = (
   if (thermalStrength >= 7 && ceilingAGL >= 4000 && windSpeed <= 15) {
     return { xcPotential: 'high', xcReason: `${Math.round(ceilingAGL/1000)}k+ AGL, ${thermalStrength}/10` };
   }
+  // Tall-column path: tall ceiling + decent thermals + light wind = big XC even without strong thermal rating
+  if (ceilingAGL >= 5000 && thermalStrength >= 4 && windSpeed <= 12) {
+    return { xcPotential: 'high', xcReason: `Tall column ${Math.round(ceilingAGL/1000)}k AGL, light wind` };
+  }
   if ((thermalStrength >= 5 && ceilingAGL >= 3000) || (thermalStrength >= 6 && windSpeed <= 12)) {
     return { xcPotential: 'moderate', xcReason: 'Good for local XC' };
+  }
+  if (ceilingAGL >= 4000 && thermalStrength >= 3.5 && windSpeed <= 14) {
+    return { xcPotential: 'moderate', xcReason: `${Math.round(ceilingAGL/1000)}k AGL despite modest thermals` };
   }
   return { xcPotential: 'low', xcReason: ceilingAGL < 2000 ? 'Low ceiling' : 'Weak thermals' };
 };
