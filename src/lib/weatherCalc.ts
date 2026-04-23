@@ -206,6 +206,8 @@ export const checkWindDirectionMatch = (windDir: number, siteOrientation: string
     'NE-SE': [[30, 165]],
     'NW-N': [[315, 360], [0, 15]],
     'NNW-SSW': [[202, 337]],
+    // Mt Diablo combined: Juniper SW-W, Moses Rock Ridge W-NE, South ESE-S, Tower NW-NE
+    'ESE-ENE': [[105, 360], [0, 75]],
     'ALL': [[0, 360]]
   };
 

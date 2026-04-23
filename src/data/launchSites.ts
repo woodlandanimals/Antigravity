@@ -64,12 +64,14 @@ export const launchSites: LaunchSite[] = [
   {
     id: 'mt-diablo',
     name: 'Mt Diablo',
-    elevation: 3849,
-    latitude: 37.8814,
-    longitude: -121.9142,
-    orientation: 'W-SW',
+    elevation: 3140,
+    latitude: 37.8825,
+    longitude: -121.9478,
+    orientation: 'ESE-ENE',
     maxWind: 20,
-    siteType: 'thermal'  // Strong thermal generator
+    siteType: 'thermal'  // Default launch: Moses Rock Ridge (W-NE). Combined wind acceptance
+    // covers all four Mt Diablo launches: Juniper (SW-W), Moses Rock Ridge (W-NE),
+    // South (ESE-S), Tower (NW-NE). Gap is ~75-105° (E). See wingsofrogallo.org/mt-diablo.
   },
   {
     id: 'mission-peak',
