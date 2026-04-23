@@ -25,8 +25,8 @@ export const launchSites: LaunchSite[] = [
     id: 'mt-vaca',
     name: 'Mt Vaca',
     elevation: 2800,
-    latitude: 38.3700,
-    longitude: -122.0200,
+    latitude: 38.4000,
+    longitude: -122.1060,
     orientation: 'ALL',
     maxWind: 7,
     siteType: 'thermal'  // No real LZ - thermal only. Light wind any direction; 5mph east cross is ideal
@@ -55,8 +55,8 @@ export const launchSites: LaunchSite[] = [
     id: 'blue-rock',
     name: 'Blue Rock',
     elevation: 3200,
-    latitude: 37.2500,
-    longitude: -122.1800,
+    latitude: 38.1380,
+    longitude: -122.1950,
     orientation: 'NNW-SSW',
     maxWind: 20,
     siteType: 'mixed'  // Ridge + thermal; launchable NNW through W to SSW, 8-20mph
@@ -135,8 +135,8 @@ export const launchSites: LaunchSite[] = [
     id: 'ej-bowl',
     name: 'EJ Bowl',
     elevation: 250,
-    latitude: 34.4042,
-    longitude: -119.7465,
+    latitude: 34.4940,
+    longitude: -119.7030,
     orientation: 'W-NW',
     maxWind: 22,
     siteType: 'soaring'  // Coastal ridge soaring
