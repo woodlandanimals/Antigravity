@@ -47,15 +47,170 @@ export const estimateLiftedIndex = (cape: number, tempF: number, dewPointF: numb
   return 2;  // Default moderately stable (typical zero-CAPE day)
 };
 
-export const calculateLCL = (tempF: number, dewPointF: number, elevationFt: number): { lclMSL: number, tcon: number } => {
+// LCL height in feet MSL using Espy's approximation (used for cloud-base ceiling, not Tc).
+export const calculateLCL = (tempF: number, dewPointF: number, elevationFt: number): { lclMSL: number } => {
   const tempC = (tempF - 32) * 5/9;
   const dewPointC = (dewPointF - 32) * 5/9;
   const lclAGL_m = 125 * (tempC - dewPointC);
   const lclAGL_ft = lclAGL_m * 3.28084;
   let lclMSL_ft = elevationFt + lclAGL_ft;
   lclMSL_ft = Math.max(elevationFt + 500, lclMSL_ft);
-  const tcon = dewPointF + (lclAGL_ft / 1000) * 5.4;
-  return { lclMSL: lclMSL_ft, tcon: Math.round(tcon) };
+  return { lclMSL: lclMSL_ft };
+};
+
+// --- Convective temperature (Tc) from model sounding ---
+// Tc = surface temperature required for a parcel lifted from the ground (with current
+// surface dewpoint) to reach the convective condensation level (CCL) defined by the
+// environmental T(p) profile. Standard Skew-T construction: from surface Td, follow
+// constant mixing ratio up to the CCL, then descend a dry adiabat back to surface
+// pressure. The temperature at surface on that adiabat is Tc.
+
+export type SoundingLevel = { p: number; T_C: number };
+
+const RD_CP = 0.286;  // R_d / c_p for air
+
+// Magnus formula for saturation vapor pressure over water (hPa)
+const saturationVaporPressure = (T_C: number): number => {
+  return 6.112 * Math.exp((17.67 * T_C) / (T_C + 243.5));
+};
+
+// Mixing ratio (kg/kg). Treats input T as the dewpoint when computing actual w from Td.
+const mixingRatio = (T_C: number, p_hPa: number): number => {
+  const e = saturationVaporPressure(T_C);
+  return 0.622 * e / (p_hPa - e);
+};
+
+// Standard atmosphere pressure from elevation (hPa)
+export const pressureFromElevation = (elevationFt: number): number => {
+  const h_m = elevationFt * 0.3048;
+  return 1013.25 * Math.pow(1 - (0.0065 * h_m) / 288.15, 5.2559);
+};
+
+/**
+ * Legacy Tc estimate via Espy's LCL formula (Tc ≈ Td + DALR×LCL_height).
+ * This is the OLD formula. It is mathematically circular (collapses to
+ * Tc ≈ T + 0.23·spread) and does NOT reflect inversion caps from a real
+ * sounding. Use only as a fallback when sounding data is unavailable
+ * (e.g. Open-Meteo historical archive, which is surface-only).
+ */
+export const legacyTcEspy = (tempF: number, dewPointF: number): number => {
+  const tempC = (tempF - 32) * 5/9;
+  const dewPointC = (dewPointF - 32) * 5/9;
+  const lclAGL_m = 125 * (tempC - dewPointC);
+  const lclAGL_ft = lclAGL_m * 3.28084;
+  return Math.round(dewPointF + (lclAGL_ft / 1000) * 5.4);
+};
+
+/**
+ * Compute convective temperature Tc (°F) from a model sounding.
+ * Returns null when:
+ *  - fewer than 3 sounding levels above surface
+ *  - no CCL bracket found (column never saturates → very dry, strong cap)
+ *  - any input NaN
+ *  - result is non-physical (Tc below current surface T)
+ */
+export const calculateConvectiveTemp = (
+  dewPointF: number,
+  surfacePressure_hPa: number | null,
+  elevationFt: number,
+  sounding: SoundingLevel[],
+  currentSurfaceTempF?: number
+): number | null => {
+  if (!Number.isFinite(dewPointF)) return null;
+
+  const p_sfc = surfacePressure_hPa && Number.isFinite(surfacePressure_hPa) && surfacePressure_hPa > 0
+    ? surfacePressure_hPa
+    : pressureFromElevation(elevationFt);
+
+  const Td_C = (dewPointF - 32) * 5/9;
+  const w_sfc = mixingRatio(Td_C, p_sfc);
+  if (!Number.isFinite(w_sfc) || w_sfc <= 0) return null;
+
+  // Keep only levels above ground (lower pressure than surface) with valid T.
+  const above = sounding
+    .filter(s => Number.isFinite(s.p) && Number.isFinite(s.T_C) && s.p < p_sfc)
+    .sort((a, b) => b.p - a.p);  // pressure descending = altitude ascending
+
+  if (above.length < 3) return null;
+
+  // Walk adjacent pairs looking for first level whose saturation mixing ratio
+  // (at the environmental T) drops to/below the surface mixing ratio. That's where
+  // a surface parcel raised dry-adiabatically would saturate → CCL.
+  let p_CCL: number | null = null;
+  let T_CCL_C: number | null = null;
+
+  // Bracket against the surface itself first (between p_sfc and above[0]).
+  // Use a virtual "surface" point with the environmental T at the lowest level
+  // extrapolated dry-adiabatically down to p_sfc — but for the saturation test
+  // we just need ws at each level vs w_sfc. At the surface, by definition,
+  // ws_surface_at_dewpoint = w_sfc (the parcel is at its dewpoint exactly when
+  // saturated), but we're asking whether the env T at each level can hold the
+  // surface w. So scan from the lowest sounding level upward.
+  for (let i = 0; i < above.length - 1; i++) {
+    const lo = above[i];
+    const hi = above[i + 1];
+    const ws_lo = mixingRatio(lo.T_C, lo.p);
+    const ws_hi = mixingRatio(hi.T_C, hi.p);
+    const d_lo = ws_lo - w_sfc;
+    const d_hi = ws_hi - w_sfc;
+
+    // CCL is where env saturation ws crosses below w_sfc going up.
+    if (d_lo >= 0 && d_hi <= 0 && (d_lo - d_hi) !== 0) {
+      const f = d_lo / (d_lo - d_hi);
+      const logP = Math.log(lo.p) + f * (Math.log(hi.p) - Math.log(lo.p));
+      p_CCL = Math.exp(logP);
+      T_CCL_C = lo.T_C + f * (hi.T_C - lo.T_C);
+      break;
+    }
+  }
+
+  // Special-case: even the lowest above-surface level is already drier than w_sfc.
+  // That means the CCL lies *between* the surface and above[0]. The parcel saturates
+  // very close to the ground — Tc ≈ current T. Treat as no meaningful cap.
+  if (p_CCL === null && above.length >= 1) {
+    const ws0 = mixingRatio(above[0].T_C, above[0].p);
+    if (ws0 < w_sfc) {
+      // Use above[0] as the CCL (slight conservative bias upward).
+      p_CCL = above[0].p;
+      T_CCL_C = above[0].T_C;
+    }
+  }
+
+  // Fallback for dry-blue-thermal days (no saturation possible in the column).
+  // The classic Skew-T Tc requires a CCL, but pilots regularly fly capless dry days.
+  // Compute Tc as max over levels of T_env(p) × (p_sfc/p)^(R/cp): the surface T
+  // needed for a dry-adiabat-lifted parcel to remain non-negatively-buoyant against
+  // the warmest layer aloft. This is the "dry convective temperature".
+  if (p_CCL === null || T_CCL_C === null) {
+    let TcDry_K = -Infinity;
+    for (const lvl of above) {
+      const T_lvl_K = lvl.T_C + 273.15;
+      const Tc_candidate = T_lvl_K * Math.pow(p_sfc / lvl.p, RD_CP);
+      if (Tc_candidate > TcDry_K) TcDry_K = Tc_candidate;
+    }
+    if (!Number.isFinite(TcDry_K)) return null;
+    const Tc_F_dry = (TcDry_K - 273.15) * 9 / 5 + 32;
+    if (currentSurfaceTempF !== undefined && Tc_F_dry < currentSurfaceTempF - 2) {
+      return Math.round(currentSurfaceTempF);
+    }
+    return Math.round(Tc_F_dry);
+  }
+
+  // Dry adiabat back down to surface pressure.
+  const T_CCL_K = T_CCL_C + 273.15;
+  const Tc_K = T_CCL_K * Math.pow(p_sfc / p_CCL, RD_CP);
+  const Tc_C = Tc_K - 273.15;
+  const Tc_F = Tc_C * 9/5 + 32;
+
+  if (!Number.isFinite(Tc_F)) return null;
+
+  // Sanity: Tc must be at or above current surface T (otherwise it would already be
+  // triggering). Numerical pathology near the surface can produce small negatives.
+  if (currentSurfaceTempF !== undefined && Tc_F < currentSurfaceTempF - 2) {
+    return Math.round(currentSurfaceTempF);
+  }
+
+  return Math.round(Tc_F);
 };
 
 // Estimate environmental lapse rate from atmospheric stability indicators
@@ -236,8 +391,12 @@ export const determineSoaringFlyability = (
 // Effective temp deficit: high-elevation thermal sites get a credit because the
 // thermal column reaches well above launch and surface temp is naturally cooler.
 // Flynns at 5600ft with 12°F raw deficit becomes ~5°F effective.
-const effectiveTempDeficit = (tcon: number, temperature: number, elevationFt: number): number => {
-  const altitudeBonus = Math.max(0, (elevationFt - 4000) / 1000) * 3;
+// Null tcon → 99 (sentinel "very capped / sounding unavailable").
+const effectiveTempDeficit = (tcon: number | null, temperature: number, elevationFt: number): number => {
+  if (tcon === null) return 99;
+  // Reduced altitude bonus (was 3°F/1000ft) because real Tc already accounts for
+  // the cooler temps aloft via the dry-adiabat descent — old bonus was double-counting.
+  const altitudeBonus = Math.min(6, Math.max(0, (elevationFt - 4000) / 1000) * 1.5);
   return (tcon - temperature) - altitudeBonus;
 };
 
@@ -251,7 +410,7 @@ const effectiveDirectionOk = (windDirectionMatch: boolean, windSpeed: number, si
 export const determineThermalFlyability = (
   site: LaunchSite,
   temperature: number,
-  tcon: number,
+  tcon: number | null,
   thermalStrength: number,
   windSpeed: number,
   windDirectionMatch: boolean,
@@ -259,12 +418,13 @@ export const determineThermalFlyability = (
 ): 'good' | 'marginal' | 'poor' => {
   if (!effectiveDirectionOk(windDirectionMatch, windSpeed, site)) return 'poor';
   const tempDeficit = effectiveTempDeficit(tcon, temperature, site.elevation);
-  if (tempDeficit > 15) return 'poor';
+  // Recalibrated for real convective temperature (was >15 poor / ≤5 good / ≤8 marginal).
+  if (tempDeficit > 25) return 'poor';
   if (windSpeed > site.maxWind) return 'poor';
   if (windSpeed < 3) return thermalStrength > 6 ? 'marginal' : 'poor';
-  if (thermalStrength >= 7 && tempDeficit <= 3 && windSpeed <= site.maxWind * 0.7) return 'good';
-  if (thermalStrength >= 5 && tempDeficit <= 5) return 'good';
-  if (thermalStrength >= 3 && tempDeficit <= 8) return 'marginal';
+  if (thermalStrength >= 7 && tempDeficit <= 5 && windSpeed <= site.maxWind * 0.7) return 'good';
+  if (thermalStrength >= 5 && tempDeficit <= 10) return 'good';
+  if (thermalStrength >= 3 && tempDeficit <= 15) return 'marginal';
   if (cloudCover > 75 && thermalStrength < 5) return 'poor';
   return 'poor';
 };
@@ -272,7 +432,7 @@ export const determineThermalFlyability = (
 export const determineFlyability = (
   site: LaunchSite,
   temperature: number,
-  tcon: number,
+  tcon: number | null,
   windSpeed: number,
   windGust: number,
   thermalStrength: number,
@@ -283,6 +443,7 @@ export const determineFlyability = (
   liftedIndex: number
 ): { flyability: 'good' | 'marginal' | 'poor', conditions: string } => {
   const tempDeficit = effectiveTempDeficit(tcon, temperature, site.elevation);
+  const tconLabel = tcon === null ? 'n/a' : `${tcon}°F`;
   const ceilingAGL = topOfLift - site.elevation;
   const dirOk = effectiveDirectionOk(windDirectionMatch, windSpeed, site);
   const dirRelaxed = !windDirectionMatch && dirOk;
@@ -303,12 +464,15 @@ export const determineFlyability = (
   } else if (!dirOk) {
     flyability = 'poor';
     conditions = `Wind direction unfavorable for ${site.orientation} site`;
-  } else if (tempDeficit > 15) {
+  } else if (tcon === null && site.siteType !== 'soaring') {
     flyability = 'poor';
-    conditions = `Too cool: needs ${tcon}°F for thermals, only ${Math.round(temperature)}°F forecast`;
-  } else if (tempDeficit > 8) {
-    flyability = tempDeficit > 12 ? 'poor' : 'marginal';
-    conditions = `Cool: needs ${tcon}°F for good thermals, ${Math.round(temperature)}°F forecast`;
+    conditions = `Strong cap: thermals unlikely to trigger`;
+  } else if (tempDeficit > 25) {
+    flyability = 'poor';
+    conditions = `Capped: needs ${tconLabel} for thermals, only ${Math.round(temperature)}°F forecast`;
+  } else if (tempDeficit > 15) {
+    flyability = tempDeficit > 20 ? 'poor' : 'marginal';
+    conditions = `Cool: needs ${tconLabel} for good thermals, ${Math.round(temperature)}°F forecast`;
   } else if (windSpeed > site.maxWind) {
     flyability = 'poor';
     conditions = `Too strong: ${windSpeed}mph exceeds ${site.maxWind}mph limit`;
@@ -321,25 +485,25 @@ export const determineFlyability = (
   } else if (cloudCover > 75 && liftedIndex > 2) {
     flyability = 'marginal';
     conditions = `Overcast may limit thermals: ${Math.round(cloudCover)}% cloud cover`;
-  } else if (thermalStrength >= 8 && windSpeed <= site.maxWind * 0.6 && tempDeficit <= 2 && cape > 400) {
+  } else if (thermalStrength >= 8 && windSpeed <= site.maxWind * 0.6 && tempDeficit <= 5 && cape > 400) {
     flyability = 'good';
     conditions = `Excellent post-frontal: ${thermalStrength}/10 thermals, CAPE ${Math.round(cape)}`;
-  } else if (thermalStrength >= 7 && windSpeed <= site.maxWind * 0.7 && tempDeficit <= 3) {
+  } else if (thermalStrength >= 7 && windSpeed <= site.maxWind * 0.7 && tempDeficit <= 7) {
     flyability = 'good';
     conditions = `Excellent: ${thermalStrength}/10 thermals, top ${topK}k`;
-  } else if (thermalStrength >= 5 && windSpeed <= site.maxWind * 0.8 && tempDeficit <= 5) {
+  } else if (thermalStrength >= 5 && windSpeed <= site.maxWind * 0.8 && tempDeficit <= 10) {
     flyability = 'good';
     conditions = `Good: ${thermalStrength}/10 thermals, top ${topK}k`;
   } else if (ceilingAGL >= 5000 && thermalStrength >= 3.5 && windSpeed <= 12) {
     // Tall-column day: ceiling alone carries it even with modest thermal strength
     flyability = 'good';
     conditions = `Tall column: top ${topK}k, ${thermalStrength}/10${dirRelaxed ? ' (light wind)' : ''}`;
-  } else if (site.siteType !== 'soaring' && windSpeed <= 5 && ceilingAGL >= 4000 && tempDeficit <= 8) {
+  } else if (site.siteType !== 'soaring' && windSpeed <= 5 && ceilingAGL >= 4000 && tempDeficit <= 15) {
     // Light-wind thermal-defined launch: surface metrics underrate cool/calm days
     // where the column still builds above launch (Mt Diablo Apr 18 pattern).
     flyability = 'marginal';
     conditions = `Light wind, top ${topK}k — thermal-defined launch`;
-  } else if (thermalStrength >= 3 && windSpeed <= site.maxWind * 0.9 && tempDeficit <= 8) {
+  } else if (thermalStrength >= 3 && windSpeed <= site.maxWind * 0.9 && tempDeficit <= 15) {
     flyability = 'marginal';
     conditions = `Moderate: ${thermalStrength}/10 thermals, top ${topK}k`;
   } else {
@@ -422,16 +586,21 @@ export const analyzeRain = (hourly: any, targetDate: string): string | undefined
 export const extractHourlyData = (
   site: LaunchSite,
   hourly: any,
-  targetDate: string
-): { hour: number; temperature: number; tcon: number; windSpeed: number; windDirection: number; windGust: number; cloudCover: number }[] => {
-  const result: { hour: number; temperature: number; tcon: number; windSpeed: number; windDirection: number; windGust: number; cloudCover: number }[] = [];
+  targetDate: string,
+  buildSounding?: (idx: number) => SoundingLevel[]
+): { hour: number; temperature: number; tcon: number | null; windSpeed: number; windDirection: number; windGust: number; cloudCover: number }[] => {
+  const result: { hour: number; temperature: number; tcon: number | null; windSpeed: number; windDirection: number; windGust: number; cloudCover: number }[] = [];
 
   hourly.time.forEach((time: string, index: number) => {
     const { dateStr, hour } = parseApiTime(time);
     if (dateStr === targetDate) {
       const temp = hourly.temperature_2m[index];
       const dewPoint = hourly.dew_point_2m[index];
-      const { tcon } = calculateLCL(temp, dewPoint, site.elevation);
+      const sfcPressure = hourly.surface_pressure?.[index] ?? null;
+      const sounding = buildSounding ? buildSounding(index) : [];
+      const tcon = sounding.length > 0
+        ? calculateConvectiveTemp(dewPoint, sfcPressure, site.elevation, sounding, temp)
+        : null;
 
       result.push({
         hour,
@@ -451,7 +620,7 @@ export const extractHourlyData = (
 // Score an hour for thermal flying potential
 const scoreThermalHour = (
   temp: number,
-  tcon: number,
+  tcon: number | null,
   windSpeed: number,
   windGust: number,
   cloudCover: number,
@@ -459,12 +628,16 @@ const scoreThermalHour = (
 ): number => {
   let score = 0;
 
-  // Temperature vs TCON (thermals triggered when temp >= tcon)
-  const tempDeficit = tcon - temp;
-  if (tempDeficit <= 0) score += 40;  // Thermals are triggering
-  else if (tempDeficit <= 3) score += 30;
-  else if (tempDeficit <= 5) score += 20;
-  else if (tempDeficit <= 8) score += 10;
+  // Temperature vs TCON (thermals triggered when temp >= tcon).
+  // null = sounding unavailable or strongly capped; award no thermal points.
+  // Brackets recalibrated for real convective temp (was ≤0/3/5/8 → 40/30/20/10).
+  if (tcon !== null) {
+    const tempDeficit = tcon - temp;
+    if (tempDeficit <= 0) score += 40;   // Thermals are triggering
+    else if (tempDeficit <= 5) score += 30;
+    else if (tempDeficit <= 10) score += 20;
+    else if (tempDeficit <= 15) score += 10;
+  }
 
   // Wind - moderate is best for thermals
   if (windSpeed >= 5 && windSpeed <= 12) score += 25;
@@ -512,7 +685,7 @@ const scoreSoaringHour = (
 };
 
 export const calculateLaunchTimeFromHourly = (
-  hourlyData: { hour: number; temperature: number; tcon: number; windSpeed: number; windDirection: number; windGust: number; cloudCover: number }[],
+  hourlyData: { hour: number; temperature: number; tcon: number | null; windSpeed: number; windDirection: number; windGust: number; cloudCover: number }[],
   site: LaunchSite,
   siteOrientation: string
 ): string => {

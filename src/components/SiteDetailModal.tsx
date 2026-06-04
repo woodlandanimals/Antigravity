@@ -205,7 +205,7 @@ const SiteDetailModal: React.FC<SiteDetailModalProps> = ({ siteForecast, onClose
                   <div className="data-label">Temp</div>
                   <div className="data-value">{day.temperature}°</div>
                   <div className="font-mono text-[10px] text-neutral-500">
-                    TCON {day.tcon}°
+                    TCON {day.tcon !== null ? `${day.tcon}°` : '—'}
                   </div>
                 </div>
 

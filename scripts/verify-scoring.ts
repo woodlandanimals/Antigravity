@@ -10,6 +10,8 @@ import { launchSites } from '../src/data/launchSites.js';
 import { LaunchSite } from '../src/types/weather.js';
 import {
   calculateLCL,
+  calculateConvectiveTemp,
+  legacyTcEspy,
   calculateThermalStrength,
   calculateTopOfUsableLift,
   checkWindDirectionMatch,
@@ -18,7 +20,21 @@ import {
   determineFlyability,
   calculateXCPotential,
   estimateLiftedIndex,
+  SoundingLevel,
 } from '../src/lib/weatherCalc.js';
+
+const PRESSURE_LEVELS = [1000, 925, 850, 700, 600, 500] as const;
+const PRESSURE_VARS = PRESSURE_LEVELS.flatMap(p => [`temperature_${p}hPa`, `dew_point_${p}hPa`]);
+
+function buildSounding(hourly: any, idx: number): SoundingLevel[] {
+  const levels: SoundingLevel[] = [];
+  for (const p of PRESSURE_LEVELS) {
+    const t_F = hourly[`temperature_${p}hPa`]?.[idx];
+    if (t_F == null || !Number.isFinite(t_F)) continue;
+    levels.push({ p, T_C: (t_F - 32) * 5 / 9 });
+  }
+  return levels;
+}
 
 interface Target {
   date: string;
@@ -56,8 +72,10 @@ async function fetchHistoricalWeather(site: LaunchSite, date: string): Promise<a
     end_date: date,
     hourly: [
       'temperature_2m', 'dew_point_2m', 'relative_humidity_2m',
+      'surface_pressure',
       'cloud_cover', 'wind_speed_10m', 'wind_direction_10m', 'wind_gusts_10m',
       'cape', 'precipitation', 'precipitation_probability',
+      ...PRESSURE_VARS,
     ].join(','),
     temperature_unit: 'fahrenheit',
     wind_speed_unit: 'mph',
@@ -87,7 +105,15 @@ function scoreNoon(site: LaunchSite, weather: any) {
   const cape = h.cape?.[noonIdx] ?? 0;
   const liftedIndex = estimateLiftedIndex(cape, temperature, dewPoint);
 
-  const { lclMSL, tcon } = calculateLCL(temperature, dewPoint, site.elevation);
+  const { lclMSL } = calculateLCL(temperature, dewPoint, site.elevation);
+  const sfcPressure = h.surface_pressure?.[noonIdx] ?? null;
+  const sounding = buildSounding(h, noonIdx);
+  // Open-Meteo historical archive is surface-only — fall back to legacy Espy Tc
+  // so historical scoring continues to work (with the same imperfect signal as before).
+  // Forward forecast (fetch-weather.ts) uses real soundings.
+  const tcon = sounding.length > 0
+    ? calculateConvectiveTemp(dewPoint, sfcPressure, site.elevation, sounding, temperature)
+    : legacyTcEspy(temperature, dewPoint);
   const thermalStrength = calculateThermalStrength(
     temperature, dewPoint, windSpeed, site.elevation, cape, liftedIndex
   );

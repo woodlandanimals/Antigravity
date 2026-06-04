@@ -29,7 +29,7 @@ export interface LaunchSite {
 export interface HourlyDataPoint {
   hour: number;           // 6-18
   temperature: number;
-  tcon: number;
+  tcon: number | null;
   windSpeed: number;
   windDirection: number;
   windGust: number;
@@ -43,7 +43,7 @@ export interface WeatherCondition {
   windGust: number;
   temperature: number;
   dewPoint: number;
-  tcon: number;
+  tcon: number | null;
   thermalStrength: number;
   topOfLift: number;
   flyability: 'good' | 'marginal' | 'poor';

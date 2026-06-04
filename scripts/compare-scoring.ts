@@ -15,9 +15,24 @@ import * as path from 'path';
 import { launchSites } from '../src/data/launchSites.js';
 import { LaunchSite } from '../src/types/weather.js';
 import {
-  calculateLCL, calculateThermalStrength, calculateTopOfUsableLift,
+  calculateLCL, calculateConvectiveTemp, legacyTcEspy,
+  calculateThermalStrength, calculateTopOfUsableLift,
   checkWindDirectionMatch, determineFlyability, calculateXCPotential, estimateLiftedIndex,
+  SoundingLevel,
 } from '../src/lib/weatherCalc.js';
+
+const PRESSURE_LEVELS = [1000, 925, 850, 700, 600, 500] as const;
+const PRESSURE_VARS = PRESSURE_LEVELS.flatMap(p => [`temperature_${p}hPa`, `dew_point_${p}hPa`]);
+
+function buildSounding(hourly: any, idx: number): SoundingLevel[] {
+  const levels: SoundingLevel[] = [];
+  for (const p of PRESSURE_LEVELS) {
+    const t_F = hourly[`temperature_${p}hPa`]?.[idx];
+    if (t_F == null || !Number.isFinite(t_F)) continue;
+    levels.push({ p, T_C: (t_F - 32) * 5 / 9 });
+  }
+  return levels;
+}
 
 const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 const rank = { poor: 0, marginal: 1, good: 2 } as const;
@@ -27,7 +42,7 @@ async function fetchWeather(site: LaunchSite, date: string) {
     latitude: site.latitude.toFixed(4),
     longitude: site.longitude.toFixed(4),
     start_date: date, end_date: date,
-    hourly: 'temperature_2m,dew_point_2m,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m,cape',
+    hourly: ['temperature_2m','dew_point_2m','surface_pressure','cloud_cover','wind_speed_10m','wind_direction_10m','wind_gusts_10m','cape', ...PRESSURE_VARS].join(','),
     temperature_unit: 'fahrenheit', wind_speed_unit: 'mph', timezone: 'America/Los_Angeles',
   });
   const r = await fetch(`https://archive-api.open-meteo.com/v1/archive?${params}`);
@@ -47,7 +62,12 @@ function score(site: LaunchSite, w: any) {
   const cc = h.cloud_cover[i];
   const cape = h.cape?.[i] ?? 0;
   const li = estimateLiftedIndex(cape, temp, dew);
-  const { lclMSL, tcon } = calculateLCL(temp, dew, site.elevation);
+  const { lclMSL } = calculateLCL(temp, dew, site.elevation);
+  const sfcPressure = h.surface_pressure?.[i] ?? null;
+  const sounding = buildSounding(h, i);
+  const tcon = sounding.length > 0
+    ? calculateConvectiveTemp(dew, sfcPressure, site.elevation, sounding, temp)
+    : legacyTcEspy(temp, dew);
   const ts = calculateThermalStrength(temp, dew, ws, site.elevation, cape, li);
   const tol = calculateTopOfUsableLift(lclMSL, ts, ws, site.elevation, cape, li, undefined, temp, dew);
   const wm = checkWindDirectionMatch(wd, site.orientation);

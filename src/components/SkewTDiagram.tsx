@@ -1,6 +1,7 @@
 import React from 'react';
 import { SoundingData } from '../types/weather';
 import { getWindDirection } from '../services/weatherService';
+import { calculateConvectiveTemp, pressureFromElevation, SoundingLevel } from '../lib/weatherCalc';
 
 interface SkewTDiagramProps {
   soundingData: SoundingData;
@@ -225,9 +226,9 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
   const altGridLevels = [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000];
   const tempGridValues = [-20, 0, 20, 40, 60, 80];
 
-  // Calculate TCON and LCL from surface data
+  // Calculate LCL height (Espy approximation) and Tc (real, from sounding).
   const surfaceLevel = visibleLevels[0];
-  let tconF = 0;
+  let tconF: number | null = null;
   let lclFt = 0;
   if (surfaceLevel) {
     const tempC = (surfaceLevel.temperature - 32) * 5 / 9;
@@ -235,7 +236,22 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
     const lclAGL_m = 125 * (tempC - dewC);
     const lclAGL_ft = lclAGL_m * 3.28084;
     lclFt = Math.round(getAltitude(surfaceLevel) + lclAGL_ft);
-    tconF = Math.round(surfaceLevel.dewPoint + (lclAGL_ft / 1000) * DALR);
+
+    // Build sounding for Tc: levels above surface only, converted to °C.
+    const sfcPressure = surfaceLevel.pressure;
+    const tcSounding: SoundingLevel[] = soundingData.levels
+      .filter(l => Number.isFinite(l.temperature) && Number.isFinite(l.pressure))
+      .map(l => ({
+        p: l.pressure,
+        T_C: (l.temperature - 32) * 5 / 9,
+      }));
+    tconF = calculateConvectiveTemp(
+      surfaceLevel.dewPoint,
+      sfcPressure ?? pressureFromElevation(siteElevation),
+      siteElevation,
+      tcSounding,
+      surfaceLevel.temperature
+    );
   }
 
   // === PARCEL TRAJECTORY (green line) ===
@@ -711,7 +727,7 @@ const SkewTDiagram: React.FC<SkewTDiagramProps> = ({ soundingData, siteElevation
           fill="rgba(255,255,255,0.5)"
           style={{ fontSize: '9px', fontFamily: 'monospace' }}
         >
-          tcon: {tconF}°F   lcl: {lclFt.toLocaleString()}ft
+          tcon: {tconF !== null ? `${tconF}°F` : '—'}   lcl: {lclFt.toLocaleString()}ft
           {thermalTopAlt ? `   top: ${(thermalTopAlt / 1000).toFixed(1)}k` : ''}   elev: {siteElevation.toLocaleString()}ft
         </text>
       </svg>

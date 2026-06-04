@@ -19,6 +19,7 @@ import {
   parseApiTime,
   estimateLiftedIndex,
   calculateLCL,
+  calculateConvectiveTemp,
   calculateThermalStrength,
   calculateTopOfUsableLift,
   checkWindDirectionMatch,
@@ -28,7 +29,8 @@ import {
   calculateXCPotential,
   analyzeRain,
   extractHourlyData,
-  calculateLaunchTimeFromHourly
+  calculateLaunchTimeFromHourly,
+  SoundingLevel
 } from '../src/lib/weatherCalc';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -36,12 +38,49 @@ const __dirname = path.dirname(__filename);
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Retry wrapper for Open-Meteo calls.
+// Retries on network errors and 5xx with exponential backoff (30s, 60s, 120s).
+// 4xx errors are not retried — they indicate a bad request.
+async function fetchWithRetry(url: string, label: string, attempts = 3): Promise<Response> {
+  const BACKOFF_MS = [30_000, 60_000, 120_000];
+  let lastError: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const r = await fetch(url);
+      if (r.ok) return r;
+      // Don't retry client errors — they won't fix themselves
+      if (r.status >= 400 && r.status < 500) {
+        throw new Error(`${label} ${r.status} ${r.statusText}`);
+      }
+      lastError = new Error(`${label} ${r.status} ${r.statusText}`);
+    } catch (e) {
+      lastError = e;
+    }
+    if (i < attempts - 1) {
+      const wait = BACKOFF_MS[i] ?? 120_000;
+      console.warn(`  ${label} attempt ${i + 1}/${attempts} failed: ${lastError instanceof Error ? lastError.message : lastError}. Retrying in ${wait / 1000}s...`);
+      await delay(wait);
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
+}
+
 // --- Batched site data fetching (all sites in 1 API call) ---
+
+// Pressure levels used for sounding-based convective-temperature calc.
+// Intersection of HRRR + ECMWF coverage on Open-Meteo. Spans ~110 ft to ~18,000 ft.
+const PRESSURE_LEVELS = [1000, 925, 850, 700, 600, 500] as const;
+
+const PRESSURE_VARS = PRESSURE_LEVELS.flatMap(p => [
+  `temperature_${p}hPa`,
+  `dew_point_${p}hPa`,
+]);
 
 const HRRR_HOURLY_VARS = [
   'temperature_2m',
   'dew_point_2m',
   'relative_humidity_2m',
+  'surface_pressure',
   'cloud_cover',
   'wind_speed_10m',
   'wind_direction_10m',
@@ -50,21 +89,37 @@ const HRRR_HOURLY_VARS = [
   'lifted_index',
   'boundary_layer_height',
   'precipitation',
-  'precipitation_probability'
+  'precipitation_probability',
+  ...PRESSURE_VARS,
 ];
 
 const ECMWF_HOURLY_VARS = [
   'temperature_2m',
   'dew_point_2m',
   'relative_humidity_2m',
+  'surface_pressure',
   'cloud_cover',
   'wind_speed_10m',
   'wind_direction_10m',
   'wind_gusts_10m',
   'cape',
   'precipitation',
-  'precipitation_probability'
+  'precipitation_probability',
+  ...PRESSURE_VARS,
 ];
+
+// Build a sounding (pressure-level T profile) at a given hour index from Open-Meteo response.
+// Returns levels above ground in °C with pressure in hPa. Temperature data is requested in °F
+// (via `temperature_unit=fahrenheit`) and converted to °C here.
+function buildSounding(hourly: any, idx: number): SoundingLevel[] {
+  const levels: SoundingLevel[] = [];
+  for (const p of PRESSURE_LEVELS) {
+    const t_F = hourly[`temperature_${p}hPa`]?.[idx];
+    if (t_F == null || !Number.isFinite(t_F)) continue;
+    levels.push({ p, T_C: (t_F - 32) * 5 / 9 });
+  }
+  return levels;
+}
 
 async function fetchBatchHRRR(sites: LaunchSite[]): Promise<any[]> {
   const params = new URLSearchParams({
@@ -78,8 +133,7 @@ async function fetchBatchHRRR(sites: LaunchSite[]): Promise<any[]> {
   });
 
   const url = `https://api.open-meteo.com/v1/forecast?${params}`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`HRRR batch API error: ${response.status}`);
+  const response = await fetchWithRetry(url, 'HRRR batch API error');
   const data = await response.json();
   return Array.isArray(data) ? data : [data];
 }
@@ -96,8 +150,7 @@ async function fetchBatchECMWF(sites: LaunchSite[]): Promise<any[]> {
   });
 
   const url = `https://api.open-meteo.com/v1/ecmwf?${params}`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`ECMWF batch API error: ${response.status}`);
+  const response = await fetchWithRetry(url, 'ECMWF batch API error');
   const data = await response.json();
   return Array.isArray(data) ? data : [data];
 }
@@ -133,7 +186,7 @@ function processDataForDay(
       return Math.abs(currentHour - 12) < Math.abs(closestHour - 12) ? current : closest;
     });
 
-    const hourlyData = extractHourlyData(site, hourly, targetDate);
+    const hourlyData = extractHourlyData(site, hourly, targetDate, (idx) => buildSounding(hourly, idx));
 
     const temperature = hourly.temperature_2m[noonIndex];
     const dewPoint = hourly.dew_point_2m[noonIndex];
@@ -149,7 +202,15 @@ function processDataForDay(
       : estimateLiftedIndex(cape, temperature, dewPoint);
     const boundaryLayerHeight = isHRRR ? (hourly.boundary_layer_height?.[noonIndex] || undefined) : undefined;
 
-    const { lclMSL, tcon } = calculateLCL(temperature, dewPoint, site.elevation);
+    const { lclMSL } = calculateLCL(temperature, dewPoint, site.elevation);
+    const sfcPressure = hourly.surface_pressure?.[noonIndex] ?? null;
+    const tcon = calculateConvectiveTemp(
+      dewPoint,
+      sfcPressure,
+      site.elevation,
+      buildSounding(hourly, noonIndex),
+      temperature
+    );
 
     const thermalStrength = calculateThermalStrength(
       temperature, dewPoint, windSpeed, site.elevation,
@@ -245,7 +306,7 @@ function processSiteForecasts(
           windGust: 0,
           temperature: 0,
           dewPoint: 0,
-          tcon: 0,
+          tcon: null,
           thermalStrength: 0,
           topOfLift: site.elevation,
           flyability: 'poor',
@@ -496,6 +557,20 @@ async function main() {
 
   const forecasts = processSiteForecasts(launchSites, hrrrResults, ecmwfResults, targetDates);
 
+  // Guard against silent partial-failure: if too many sites have no real day data,
+  // refuse to overwrite forecast.json. The workflow will fail, Netlify will keep
+  // the previous good build, and the dashboard stays accurate.
+  const MIN_SITES_WITH_REAL_DATA = Math.ceil(launchSites.length * 0.75);  // 18/23
+  const sitesWithReal = forecasts.filter(f =>
+    f.forecast.some(d => d.temperature !== 0 || d.windSpeed !== 0 || d.tcon !== null)
+  ).length;
+  if (sitesWithReal < MIN_SITES_WITH_REAL_DATA) {
+    throw new Error(
+      `Refusing to write forecast.json: only ${sitesWithReal}/${launchSites.length} sites returned real data ` +
+      `(threshold ${MIN_SITES_WITH_REAL_DATA}). Upstream Open-Meteo likely failing — keeping previous deploy intact.`
+    );
+  }
+
   const outputDir = path.join(__dirname, '../public/data');
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
@@ -508,7 +583,7 @@ async function main() {
     forecasts
   };
   fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
-  console.log(`\nSuccess! Written ${forecasts.length} site forecasts to ${outputPath}`);
+  console.log(`\nSuccess! Written ${forecasts.length} site forecasts to ${outputPath} (${sitesWithReal}/${launchSites.length} with real data)`);
 
   // Fetch and write grid data for map overlays
   try {
