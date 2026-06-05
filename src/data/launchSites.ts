@@ -54,9 +54,9 @@ export const launchSites: LaunchSite[] = [
   {
     id: 'blue-rock',
     name: 'Blue Rock',
-    elevation: 3200,
-    latitude: 38.1380,
-    longitude: -122.1950,
+    elevation: 660,
+    latitude: 38.1385,
+    longitude: -122.1955,
     orientation: 'NNW-SSW',
     maxWind: 20,
     siteType: 'mixed'  // Ridge + thermal; launchable NNW through W to SSW, 8-20mph
