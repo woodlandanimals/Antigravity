@@ -86,12 +86,12 @@ export const launchSites: LaunchSite[] = [
   {
     id: 'potato-hill',
     name: 'Potato Hill',
-    elevation: 2200,
-    latitude: 37.3500,
-    longitude: -121.7500,
-    orientation: 'W-NW',
+    elevation: 3400,
+    latitude: 39.3410,
+    longitude: -122.6850,
+    orientation: 'NE-E',
     maxWind: 18,
-    siteType: 'mixed'  // Training site, both modes
+    siteType: 'mixed'  // Training site, both modes; launch faces ENE, west winds are OTB hazard
   },
   {
     id: 'mt-tamalpais',
