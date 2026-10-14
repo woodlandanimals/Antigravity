@@ -446,6 +446,28 @@ const MapResizer: React.FC = () => {
   return null;
 };
 
+// Fit the map to the bounding box of the currently-visible sites. Runs whenever the
+// set of site coordinates changes — e.g. after a state switch — and does nothing on
+// subsequent re-renders with the same coords, so user pan/zoom is preserved.
+const MapFitter: React.FC<{ sites: Array<{ lat: number; lon: number }> }> = ({ sites }) => {
+  const map = useMap();
+  const coordKey = sites.map(s => `${s.lat.toFixed(3)},${s.lon.toFixed(3)}`).sort().join('|');
+  useEffect(() => {
+    if (sites.length === 0) return;
+    if (sites.length === 1) {
+      map.setView([sites[0].lat, sites[0].lon], 9);
+      return;
+    }
+    const bounds: [[number, number], [number, number]] = [
+      [Math.min(...sites.map(s => s.lat)), Math.min(...sites.map(s => s.lon))],
+      [Math.max(...sites.map(s => s.lat)), Math.max(...sites.map(s => s.lon))],
+    ];
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 9 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coordKey, map]);
+  return null;
+};
+
 // --- Site Popup ---
 
 const SitePopup: React.FC<{ sf: SiteForecast; fc: WeatherCondition; hourSnap: Partial<HourlyDataPoint> | null; onDetail: () => void }> = ({ sf, fc, hourSnap, onDetail }) => {
@@ -801,6 +823,7 @@ const MapView: React.FC<MapViewProps> = ({ forecasts, gridForecast, onSiteClick 
         ref={mapRef}
       >
         <MapResizer />
+        <MapFitter sites={forecasts.map(f => ({ lat: f.site.latitude, lon: f.site.longitude }))} />
 
         {/* Terrain tiles */}
         <TileLayer

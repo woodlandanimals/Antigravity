@@ -5,8 +5,19 @@ import Legend from './components/Legend';
 import SiteDetailModal from './components/SiteDetailModal';
 import WeeklyView from './components/WeeklyView';
 import MapView from './components/MapView';
-import { SiteForecast, GridForecast } from './types/weather';
+import { SiteForecast, GridForecast, SiteState } from './types/weather';
 import { getWeatherForecast, getGridForecast } from './services/weatherService';
+
+const STATE_STORAGE_KEY = 'xcforecast.selectedState';
+const VALID_STATES: SiteState[] = ['CA', 'PA', 'NY'];
+
+const loadInitialState = (): SiteState => {
+  try {
+    const stored = localStorage.getItem(STATE_STORAGE_KEY);
+    if (stored && (VALID_STATES as string[]).includes(stored)) return stored as SiteState;
+  } catch { /* localStorage blocked */ }
+  return 'CA';
+};
 
 function App() {
   const [forecasts, setForecasts] = useState<SiteForecast[]>([]);
@@ -16,6 +27,21 @@ function App() {
   const [selectedSite, setSelectedSite] = useState<SiteForecast | null>(null);
   const [view, setView] = useState<'today' | 'weekly' | 'map'>('today');
   const [gridForecast, setGridForecast] = useState<GridForecast | null>(null);
+  const [selectedState, setSelectedState] = useState<SiteState>(loadInitialState);
+
+  const changeState = (s: SiteState) => {
+    setSelectedState(s);
+    try { localStorage.setItem(STATE_STORAGE_KEY, s); } catch { /* localStorage blocked */ }
+    // Grid heatmap is CA-only; dismissing the modal and resetting state-specific UI
+    setSelectedSite(null);
+  };
+
+  // Filter forecasts by selected state. Older forecast.json records (pre-state-field
+  // deployment) have no site.state — treat them as CA so nothing disappears while the
+  // scheduled fetch catches up to the new site data.
+  const stateFiltered = useMemo(() => {
+    return forecasts.filter(f => (f.site.state ?? 'CA') === selectedState);
+  }, [forecasts, selectedState]);
 
   const fetchForecasts = async () => {
     try {
@@ -46,7 +72,7 @@ function App() {
 
   // Sort by best flying conditions first (considering both soaring and thermal)
   const sortedForecasts = useMemo(() => {
-    return [...forecasts].sort((a, b) => {
+    return [...stateFiltered].sort((a, b) => {
       const scoreMap: Record<string, number> = { good: 3, marginal: 2, poor: 1 };
       const getScore = (f: SiteForecast) => {
         const soaring = scoreMap[f.forecast[0].soaringFlyability];
@@ -55,11 +81,11 @@ function App() {
       };
       return getScore(b) - getScore(a);
     });
-  }, [forecasts]);
+  }, [stateFiltered]);
 
   // Sort by TOMORROW's conditions (not today's)
   const tomorrowsSorted = useMemo(() => {
-    return [...forecasts].sort((a, b) => {
+    return [...stateFiltered].sort((a, b) => {
       const scoreMap: Record<string, number> = { good: 3, marginal: 2, poor: 1 };
       const getScore = (f: SiteForecast) => {
         const day2 = f.forecast[1];
@@ -70,7 +96,7 @@ function App() {
       };
       return getScore(b) - getScore(a);
     });
-  }, [forecasts]);
+  }, [stateFiltered]);
 
   // Get the single best site for today
   const todaysBest = sortedForecasts.length > 0 ? [sortedForecasts[0]] : [];
@@ -92,6 +118,8 @@ function App() {
         isLoading={loading}
         view={view}
         onViewChange={setView}
+        selectedState={selectedState}
+        onStateChange={changeState}
       />
 
       <main className={view === 'map' ? '' : 'max-w-6xl mx-auto px-4 py-6'}>
@@ -103,11 +131,22 @@ function App() {
             </div>
           </div>
         )}
-        {forecasts.length > 0 && view === 'map' ? (
-          <MapView forecasts={sortedForecasts} gridForecast={gridForecast} onSiteClick={(sf) => setSelectedSite(sf)} />
-        ) : forecasts.length > 0 && view === 'weekly' ? (
+        {!loading && forecasts.length > 0 && stateFiltered.length === 0 && (
+          <div className="max-w-md mx-auto text-center py-20">
+            <p className="font-mono text-sm text-neutral-500">
+              No forecast data for this state yet. The next hourly fetch will populate it.
+            </p>
+          </div>
+        )}
+        {stateFiltered.length > 0 && view === 'map' ? (
+          <MapView
+            forecasts={sortedForecasts}
+            gridForecast={selectedState === 'CA' ? gridForecast : null}
+            onSiteClick={(sf) => setSelectedSite(sf)}
+          />
+        ) : stateFiltered.length > 0 && view === 'weekly' ? (
           <WeeklyView forecasts={sortedForecasts} />
-        ) : forecasts.length > 0 ? (
+        ) : stateFiltered.length > 0 ? (
           <div className="space-y-8">
             {/* Today's Best - most prominent */}
             {todaysBest.length > 0 && (

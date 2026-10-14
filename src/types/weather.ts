@@ -1,5 +1,8 @@
 export type SiteType = 'thermal' | 'soaring' | 'mixed';
 
+// Two-letter US state code. New sites must add their code to the UI state list in Header.
+export type SiteState = 'CA' | 'PA' | 'NY';
+
 export interface PressureLevelData {
   pressure: number;           // hPa
   temperature: number;        // °F
@@ -24,6 +27,7 @@ export interface LaunchSite {
   orientation: string;
   maxWind: number;
   siteType: SiteType;
+  state: SiteState;
 }
 
 export interface HourlyDataPoint {

@@ -9,7 +9,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -119.3372,
     orientation: 'SSE-WNW',
     maxWind: 17,
-    siteType: 'thermal'  // Central Valley thermal site - thermals come up the hill from wide range
+    siteType: 'thermal',  // Central Valley thermal site - thermals come up the hill from wide range
+    state: 'CA'
   },
   {
     id: 'ed-levin',
@@ -19,7 +20,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -121.8531,
     orientation: 'S-NW',
     maxWind: 20,
-    siteType: 'mixed'  // Training hill + thermals
+    siteType: 'mixed',  // Training hill + thermals
+    state: 'CA'
   },
   {
     id: 'mt-vaca',
@@ -29,7 +31,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -122.1060,
     orientation: 'ALL',
     maxWind: 7,
-    siteType: 'thermal'  // No real LZ - thermal only. Light wind any direction; 5mph east cross is ideal
+    siteType: 'thermal',  // No real LZ - thermal only. Light wind any direction; 5mph east cross is ideal
+    state: 'CA'
   },
   {
     id: 'slide',
@@ -39,7 +42,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -119.9400,
     orientation: 'W-NW',
     maxWind: 25,
-    siteType: 'thermal'  // High altitude thermal
+    siteType: 'thermal',  // High altitude thermal
+    state: 'CA'
   },
   {
     id: 'whaleback',
@@ -49,7 +53,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -122.1530,
     orientation: 'NW-SW',
     maxWind: 14,
-    siteType: 'thermal'  // High altitude thermal near Mt Shasta
+    siteType: 'thermal',  // High altitude thermal near Mt Shasta
+    state: 'CA'
   },
   {
     id: 'blue-rock',
@@ -59,7 +64,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -122.1955,
     orientation: 'NNW-SSW',
     maxWind: 20,
-    siteType: 'mixed'  // Ridge + thermal; launchable NNW through W to SSW, 8-20mph
+    siteType: 'mixed',  // Ridge + thermal; launchable NNW through W to SSW, 8-20mph
+    state: 'CA'
   },
   {
     id: 'mt-diablo',
@@ -69,9 +75,10 @@ export const launchSites: LaunchSite[] = [
     longitude: -121.9478,
     orientation: 'ESE-ENE',
     maxWind: 20,
-    siteType: 'thermal'  // Default launch: Moses Rock Ridge (W-NE). Combined wind acceptance
+    siteType: 'thermal',  // Default launch: Moses Rock Ridge (W-NE). Combined wind acceptance
     // covers all four Mt Diablo launches: Juniper (SW-W), Moses Rock Ridge (W-NE),
     // South (ESE-S), Tower (NW-NE). Gap is ~75-105° (E). See wingsofrogallo.org/mt-diablo.
+    state: 'CA'
   },
   {
     id: 'mission-peak',
@@ -81,7 +88,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -121.8808,
     orientation: 'W-NW',
     maxWind: 22,
-    siteType: 'mixed'  // Ridge + thermal
+    siteType: 'mixed',  // Ridge + thermal
+    state: 'CA'
   },
   {
     id: 'potato-hill',
@@ -91,7 +99,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -122.6850,
     orientation: 'NE-E',
     maxWind: 18,
-    siteType: 'mixed'  // Training site, both modes; launch faces ENE, west winds are OTB hazard
+    siteType: 'mixed',  // Training site, both modes; launch faces ENE, west winds are OTB hazard
+    state: 'CA'
   },
   {
     id: 'mt-tamalpais',
@@ -101,7 +110,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -122.5969,
     orientation: 'W-SW',
     maxWind: 25,
-    siteType: 'soaring'  // Coastal ridge soaring
+    siteType: 'soaring',  // Coastal ridge soaring
+    state: 'CA'
   },
   {
     id: 'dunlap',
@@ -111,7 +121,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -119.1000,
     orientation: 'SW-W',
     maxWind: 20,
-    siteType: 'thermal'  // Famous XC thermal site
+    siteType: 'thermal',  // Famous XC thermal site
+    state: 'CA'
   },
   {
     id: 'mcgee',
@@ -121,7 +132,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -118.8300,
     orientation: 'E-SE',
     maxWind: 22,
-    siteType: 'thermal'  // High Sierra thermal
+    siteType: 'thermal',  // High Sierra thermal
+    state: 'CA'
   },
   {
     id: 'mussel-rock',
@@ -131,7 +143,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -122.4900,
     orientation: 'W-NW',
     maxWind: 25,
-    siteType: 'soaring'  // Coastal ridge only
+    siteType: 'soaring',  // Coastal ridge only
+    state: 'CA'
   },
   {
     id: 'ej-bowl',
@@ -141,7 +154,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -119.7030,
     orientation: 'W-NW',
     maxWind: 22,
-    siteType: 'soaring'  // Coastal ridge soaring
+    siteType: 'soaring',  // Coastal ridge soaring
+    state: 'CA'
   },
   {
     id: 'big-sur',
@@ -151,7 +165,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -121.4511,
     orientation: 'W-NW',
     maxWind: 15,
-    siteType: 'soaring'  // Coastal ridge soaring
+    siteType: 'soaring',  // Coastal ridge soaring
+    state: 'CA'
   },
   {
     id: 'sand-city',
@@ -161,7 +176,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -121.8439,
     orientation: 'W-NW',
     maxWind: 18,
-    siteType: 'soaring'  // Coastal dune soaring
+    siteType: 'soaring',  // Coastal dune soaring
+    state: 'CA'
   },
   {
     id: 'goat-rock',
@@ -171,7 +187,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -123.1264,
     orientation: 'W-NW',
     maxWind: 18,
-    siteType: 'soaring'  // Coastal cliff soaring
+    siteType: 'soaring',  // Coastal cliff soaring
+    state: 'CA'
   },
   {
     id: 'channing-east',
@@ -181,7 +198,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -122.1472,
     orientation: 'NE-SE',
     maxWind: 12,
-    siteType: 'mixed'  // Ridge + thermal
+    siteType: 'mixed',  // Ridge + thermal
+    state: 'CA'
   },
   {
     id: 'paiute',
@@ -191,7 +209,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -118.2700,
     orientation: 'SW-NW',
     maxWind: 15,
-    siteType: 'thermal'  // White Mountains thermal
+    siteType: 'thermal',  // White Mountains thermal
+    state: 'CA'
   },
   {
     id: 'flynns',
@@ -201,7 +220,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -118.2950,
     orientation: 'W-NW',
     maxWind: 15,
-    siteType: 'thermal'  // Owens Valley thermal
+    siteType: 'thermal',  // Owens Valley thermal
+    state: 'CA'
   },
   {
     id: 'vollmer-peak',
@@ -211,7 +231,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -122.2204,
     orientation: 'NE-SE',
     maxWind: 18,
-    siteType: 'mixed'  // Berkeley Hills ridge + thermal
+    siteType: 'mixed',  // Berkeley Hills ridge + thermal
+    state: 'CA'
   },
   {
     id: 'mt-st-helena',
@@ -221,7 +242,8 @@ export const launchSites: LaunchSite[] = [
     longitude: -122.6361,
     orientation: 'NW-SW',
     maxWind: 14,
-    siteType: 'thermal'  // Mayacamas Mountains thermal, Napa Valley
+    siteType: 'thermal',  // Mayacamas Mountains thermal, Napa Valley
+    state: 'CA'
   },
   {
     id: 'windy-hill',
@@ -231,6 +253,44 @@ export const launchSites: LaunchSite[] = [
     longitude: -122.2228,
     orientation: 'NNE-ENE',
     maxWind: 20,
-    siteType: 'soaring'  // NE-facing ridge soaring, Portola Valley
+    siteType: 'soaring',  // NE-facing ridge soaring, Portola Valley
+    state: 'CA'
+  },
+
+  // --- Pennsylvania ---
+  {
+    id: 'little-gap',
+    name: 'Little Gap',
+    elevation: 1340,
+    latitude: 40.8075,
+    longitude: -75.5481,
+    orientation: 'NW-NE',  // paratrace: "Need NW -N- NE winds"
+    maxWind: 20,
+    siteType: 'mixed',  // Blue Mountain ridge; strong mid-day thermals, Allentown Class C airspace 2800-4400 msl behind ridge
+    state: 'PA'
+  },
+  {
+    id: 'hyner-view',
+    name: 'Hyner View',
+    elevation: 1940,
+    latitude: 41.3265,
+    longitude: -77.6240,
+    orientation: 'W-NW',  // Overlook ramp above West Branch Susquehanna
+    maxWind: 18,
+    siteType: 'thermal',  // State park ramp; DCNR authorization required (handled by Hyner Hang Gliding Club)
+    state: 'PA'
+  },
+
+  // --- New York ---
+  {
+    id: 'ellenville',
+    name: 'Ellenville',
+    elevation: 1380,
+    latitude: 41.6726,
+    longitude: -74.4032,
+    orientation: 'WNW-NW',  // flyappi/XContest: "launch faces WNW - NW"; Shawangunk Ridge
+    maxWind: 20,
+    siteType: 'mixed',  // Hudson Valley Free Flyers site; USHPA rating required, check in at LZ
+    state: 'NY'
   }
 ];

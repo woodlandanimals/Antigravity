@@ -1,5 +1,6 @@
-import React from 'react';
-import { RefreshCw } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { RefreshCw, ChevronDown } from 'lucide-react';
+import { SiteState } from '../types/weather';
 
 interface HeaderProps {
   lastUpdated: Date;
@@ -8,7 +9,17 @@ interface HeaderProps {
   isLoading: boolean;
   view: 'today' | 'weekly' | 'map';
   onViewChange: (view: 'today' | 'weekly' | 'map') => void;
+  selectedState: SiteState;
+  onStateChange: (s: SiteState) => void;
 }
+
+const STATE_LABELS: Record<SiteState, string> = {
+  CA: 'California',
+  PA: 'Pennsylvania',
+  NY: 'New York',
+};
+
+const STATE_ORDER: SiteState[] = ['CA', 'PA', 'NY'];
 
 const formatAge = (date: Date): string => {
   const ageMs = Date.now() - date.getTime();
@@ -22,7 +33,70 @@ const formatAge = (date: Date): string => {
   return remHours > 0 ? `${days}d ${remHours}h ago` : `${days}d ago`;
 };
 
-const Header: React.FC<HeaderProps> = ({ lastUpdated, dataSource, onRefresh, isLoading, view, onViewChange }) => {
+const StateDropdown: React.FC<{
+  selected: SiteState;
+  onChange: (s: SiteState) => void;
+  compact?: boolean;
+}> = ({ selected, onChange, compact }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const textCls = compact
+    ? 'font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-400'
+    : 'font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400';
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`${textCls} inline-flex items-center gap-1 hover:text-neutral-900 transition-colors`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span>{STATE_LABELS[selected]}</span>
+        <ChevronDown className={`w-2.5 h-2.5 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div
+          role="listbox"
+          className="absolute left-0 top-full mt-1 z-50 bg-white border border-neutral-300 shadow-sm min-w-[140px]"
+        >
+          {STATE_ORDER.map(s => (
+            <button
+              key={s}
+              role="option"
+              aria-selected={s === selected}
+              onClick={() => { onChange(s); setOpen(false); }}
+              className={`block w-full text-left px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] transition-colors ${
+                s === selected
+                  ? 'bg-neutral-900 text-white'
+                  : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'
+              }`}
+            >
+              {STATE_LABELS[s]}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Header: React.FC<HeaderProps> = ({ lastUpdated, dataSource, onRefresh, isLoading, view, onViewChange, selectedState, onStateChange }) => {
   const ageMs = Date.now() - lastUpdated.getTime();
   const isDelayed = dataSource === 'stale' || ageMs > 3 * 60 * 60 * 1000;
 
@@ -36,9 +110,7 @@ const Header: React.FC<HeaderProps> = ({ lastUpdated, dataSource, onRefresh, isL
             <h1 className="font-mono text-xl font-bold tracking-tight text-neutral-900">
               XC–FORECAST
             </h1>
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-400">
-              California
-            </span>
+            <StateDropdown selected={selectedState} onChange={onStateChange} />
           </div>
 
           {/* Center - View Toggle */}
@@ -113,9 +185,7 @@ const Header: React.FC<HeaderProps> = ({ lastUpdated, dataSource, onRefresh, isL
               <h1 className="font-mono text-lg font-bold tracking-tight text-neutral-900">
                 XC–FORECAST
               </h1>
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-neutral-400">
-                California
-              </span>
+              <StateDropdown selected={selectedState} onChange={onStateChange} compact />
             </div>
 
             <div className="flex items-center gap-3">
