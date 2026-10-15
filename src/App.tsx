@@ -9,7 +9,7 @@ import { SiteForecast, GridForecast, SiteState } from './types/weather';
 import { getWeatherForecast, getGridForecast } from './services/weatherService';
 
 const STATE_STORAGE_KEY = 'xcforecast.selectedState';
-const VALID_STATES: SiteState[] = ['CA', 'PA', 'NY'];
+const VALID_STATES: SiteState[] = ['CA', 'MA', 'NY', 'PA', 'VT'];
 
 const loadInitialState = (): SiteState => {
   try {

@@ -292,5 +292,75 @@ export const launchSites: LaunchSite[] = [
     maxWind: 20,
     siteType: 'mixed',  // Hudson Valley Free Flyers site; USHPA rating required, check in at LZ
     state: 'NY'
+  },
+  {
+    id: 'mt-brace',
+    name: 'Mt Brace',
+    elevation: 2300,
+    latitude: 42.0444,
+    longitude: -73.4927,
+    orientation: 'WSW-WNW',  // mtbraceclub.com: ideal 250-290° (west-facing)
+    maxWind: 20,
+    siteType: 'mixed',  // Taconic range; club observer required for P2 first 10 flights
+    state: 'NY'
+  },
+
+  // --- Vermont ---
+  {
+    id: 'mt-ascutney',
+    name: 'Mt Ascutney',
+    elevation: 3115,
+    latitude: 43.4434,
+    longitude: -72.4542,
+    orientation: 'SSW-SSE',  // South Peak primary launch (sunny S face); VHGA
+    maxWind: 18,
+    siteType: 'thermal',  // State park, toll road to launch; VHGA waiver + intro required
+    state: 'VT'
+  },
+  {
+    id: 'rutland',
+    name: 'Rutland (Birdseye)',
+    elevation: 2290,
+    latitude: 43.5578,
+    longitude: -73.1086,
+    orientation: 'S-W',  // VHGA: SW-facing ridge
+    maxWind: 18,
+    siteType: 'mixed',  // Birdseye Mountain; locked gate, 4x4 drive-up; VHGA waiver + observer for P2
+    state: 'VT'
+  },
+
+  // --- Massachusetts ---
+  {
+    id: 'mt-greylock',
+    name: 'Mt Greylock',
+    elevation: 3466,
+    latitude: 42.637,
+    longitude: -73.1674,
+    orientation: 'E-SE',  // flyappi: "launch is on the peak of the mountain facing southeast"
+    maxWind: 20,
+    siteType: 'mixed',  // MA highpoint; MassHGA waiver + lodge sign-in; no top landing; seasonal DCR blackouts
+    state: 'MA'
+  },
+  {
+    id: 'mt-tom',
+    name: 'Mt Tom',
+    elevation: 1190,
+    latitude: 42.2417,
+    longitude: -72.6481,
+    orientation: 'W-NW',  // Cliff launch facing Easthampton/Connecticut River valley
+    maxWind: 18,
+    siteType: 'mixed',  // Traprock cliff launch — "technical takeoff"; NEPHC waiver + site intro
+    state: 'MA'
+  },
+  {
+    id: 'cape-cod',
+    name: 'Cape Cod (White Crest)',
+    elevation: 70,
+    latitude: 41.9340,
+    longitude: -69.9790,
+    orientation: 'NE-E',  // ENE-facing coastal dunes at Wellfleet
+    maxWind: 18,
+    siteType: 'soaring',  // Dune soaring; Oct-mid-Apr only (plover nesting closes Apr-Oct); NEPHC waiver
+    state: 'MA'
   }
 ];

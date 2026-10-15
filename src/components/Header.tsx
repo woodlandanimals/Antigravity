@@ -15,11 +15,13 @@ interface HeaderProps {
 
 const STATE_LABELS: Record<SiteState, string> = {
   CA: 'California',
-  PA: 'Pennsylvania',
+  MA: 'Massachusetts',
   NY: 'New York',
+  PA: 'Pennsylvania',
+  VT: 'Vermont',
 };
 
-const STATE_ORDER: SiteState[] = ['CA', 'PA', 'NY'];
+const STATE_ORDER: SiteState[] = ['CA', 'MA', 'NY', 'PA', 'VT'];
 
 const formatAge = (date: Date): string => {
   const ageMs = Date.now() - date.getTime();
