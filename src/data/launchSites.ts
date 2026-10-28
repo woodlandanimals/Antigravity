@@ -362,5 +362,75 @@ export const launchSites: LaunchSite[] = [
     maxWind: 18,
     siteType: 'soaring',  // Dune soaring; Oct-mid-Apr only (plover nesting closes Apr-Oct); NEPHC waiver
     state: 'MA'
+  },
+
+  // --- Pennsylvania (CHGPA) ---
+  {
+    id: 'pulpit',
+    name: 'Pulpit',
+    elevation: 2170,
+    latitude: 39.9143,
+    longitude: -77.9583,
+    orientation: 'SW-NNW',  // Launch faces WNW; flyable SW through NNW
+    maxWind: 20,
+    siteType: 'mixed',  // CHGPA site above McConnellsburg PA; difficult in N cross, rocks below/left of takeoff
+    state: 'PA'
+  },
+  {
+    id: 'bills-hill',
+    name: "Bill's Hill",
+    elevation: 1740,
+    latitude: 40.10,
+    longitude: -78.09,
+    orientation: 'ENE-SE',  // East-facing ridge per CHGPA
+    maxWind: 18,
+    siteType: 'mixed',  // Buchanan State Forest, PA; contact forest office before each flight (CHGPA requirement)
+    state: 'PA'
+  },
+
+  // --- Virginia (CHGPA) ---
+  {
+    id: 'ediths-gap',
+    name: "Edith's Gap",
+    elevation: 1650,
+    latitude: 38.7253,
+    longitude: -78.5079,
+    orientation: 'E-SSE',  // USFS listing: faces SE, flyable E through SSE
+    maxWind: 20,
+    siteType: 'mixed',  // Massanutten SE slope near Luray VA; US Forest Service hang-gliding launch
+    state: 'VA'
+  },
+  {
+    id: 'woodstock',
+    name: 'Woodstock',
+    elevation: 1830,
+    latitude: 38.8706,
+    longitude: -78.4500,
+    orientation: 'W-NW',  // Perched high on W slope of Massanutten; CHGPA: not good in W cross due to spine
+    maxWind: 20,
+    siteType: 'mixed',  // Massanutten W slope; Holfuy weather station on observation tower above launch
+    state: 'VA'
+  },
+  {
+    id: 'dickey-ridge',
+    name: 'Dickey Ridge',
+    elevation: 2430,
+    latitude: 38.8547,
+    longitude: -78.205,
+    orientation: 'SW-W',  // SW-facing ridge inside Shenandoah NP
+    maxWind: 18,
+    siteType: 'mixed',  // Shenandoah NP; NPS permit required (P3+ with cliff-launch endorsement, yearly fee)
+    state: 'VA'
+  },
+  {
+    id: 'daniels',
+    name: 'Daniels',
+    elevation: 1620,
+    latitude: 38.3108,
+    longitude: -78.5117,
+    orientation: 'S-SW',  // CHGPA: faces SSW, not good in W cross
+    maxWind: 18,
+    siteType: 'mixed',  // Near Stanardsville, VA
+    state: 'VA'
   }
 ];

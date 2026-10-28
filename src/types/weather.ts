@@ -1,7 +1,7 @@
 export type SiteType = 'thermal' | 'soaring' | 'mixed';
 
 // Two-letter US state code. New sites must add their code to the UI state list in Header.
-export type SiteState = 'CA' | 'PA' | 'NY' | 'VT' | 'MA';
+export type SiteState = 'CA' | 'PA' | 'NY' | 'VT' | 'MA' | 'VA';
 
 export interface PressureLevelData {
   pressure: number;           // hPa

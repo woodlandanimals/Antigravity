@@ -19,9 +19,10 @@ const STATE_LABELS: Record<SiteState, string> = {
   NY: 'New York',
   PA: 'Pennsylvania',
   VT: 'Vermont',
+  VA: 'Virginia',
 };
 
-const STATE_ORDER: SiteState[] = ['CA', 'MA', 'NY', 'PA', 'VT'];
+const STATE_ORDER: SiteState[] = ['CA', 'MA', 'NY', 'PA', 'VT', 'VA'];
 
 const formatAge = (date: Date): string => {
   const ageMs = Date.now() - date.getTime();
