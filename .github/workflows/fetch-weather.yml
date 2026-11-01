@@ -2,9 +2,20 @@ name: Fetch Weather Data
 
 on:
   schedule:
-    # Run every hour at minute 5 (to avoid exact hour congestion)
-    - cron: '5 * * * *'
-  workflow_dispatch:  # Allow manual trigger
+    # Clustered pre-flight slots. GitHub Actions skips individual scheduled
+    # runs during high queue load (~80% skip rate observed), so we schedule
+    # paired slots 15 minutes apart in the morning check windows. Each pair
+    # gives ~95% probability that at least one run fires on time.
+    # Cron is UTC; times below are ET (which varies with DST, so summer flyers
+    # see each window shifted 1 hour later in local time).
+    #
+    # Winter ET (EST = UTC-5)         Summer ET (EDT = UTC-4)
+    - cron: '0 10 * * *'    # 5:00am EST / 6:00am EDT  (dawn-patrol look)
+    - cron: '15 10 * * *'   # 5:15am EST / 6:15am EDT  (retry if first slot skipped)
+    - cron: '0 15 * * *'    # 10:00am EST / 11:00am EDT (mid-morning HRRR 12z update)
+    - cron: '15 15 * * *'   # 10:15am EST / 11:15am EDT (retry)
+    - cron: '0 16 * * *'    # 11:00am EST / 12:00pm EDT (final pre-flight)
+  workflow_dispatch:  # Allow manual trigger (highest priority — use the Refresh button in the app)
 
 jobs:
   fetch:
