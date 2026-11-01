@@ -304,6 +304,28 @@ export const launchSites: LaunchSite[] = [
     siteType: 'mixed',  // Taconic range; club observer required for P2 first 10 flights
     state: 'NY'
   },
+  {
+    id: 'harris-hill',
+    name: 'Harris Hill',
+    elevation: 1712,
+    latitude: 42.1209,
+    longitude: -76.9011,
+    orientation: 'W-NW',  // Per 2010 trip reports; WNW winds flew ridge+thermal
+    maxWind: 18,
+    siteType: 'mixed',  // Harris Hill Soaring Corp gliderport; sailplane club operation — coordinate with club before free-flight launch
+    state: 'NY'
+  },
+  {
+    id: 'indian-cliffs',
+    name: 'Indian Cliffs',
+    elevation: 1535,
+    latitude: 42.113,
+    longitude: -76.937,
+    orientation: 'N-NE',  // N-facing escarpment of Steege Hill over Chemung River; pilot reports fly NW/NE
+    maxWind: 18,
+    siteType: 'mixed',  // Steege Hill north escarpment near Big Flats; GPS ref Tag's Restaurant per Upstate NY Free Flyers
+    state: 'NY'
+  },
 
   // --- Vermont ---
   {
