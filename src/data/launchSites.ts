@@ -321,9 +321,9 @@ export const launchSites: LaunchSite[] = [
     elevation: 1680,
     latitude: 42.0897,
     longitude: -76.9188,
-    orientation: 'N-E',  // NE-facing corner — USGS terrain drops N and E of launch; pilot reports fly NW/NE
+    orientation: 'N-E',  // NE-facing corner — USGS terrain drops N and E of launch
     maxWind: 18,
-    siteType: 'mixed',  // Chemung Valley escarpment near Big Flats; GPS ref Tag's Restaurant per Upstate NY Free Flyers
+    siteType: 'mixed',  // Free Spirit Flight club; CLOSED Oct 11 - Mar 2 (pheasant hunting); May: no flights before 12:30 PM (turkey season)
     state: 'NY'
   },
 
