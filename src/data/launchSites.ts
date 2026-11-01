@@ -288,7 +288,7 @@ export const launchSites: LaunchSite[] = [
     elevation: 1380,
     latitude: 41.6726,
     longitude: -74.4032,
-    orientation: 'WNW-NW',  // flyappi/XContest: "launch faces WNW - NW"; Shawangunk Ridge
+    orientation: 'W-NW',  // Shawangunk Ridge; Flying Mag + Flight Park fundraiser: "W- and NW-facing launches"; pilots routinely fly pure W
     maxWind: 20,
     siteType: 'mixed',  // Hudson Valley Free Flyers site; USHPA rating required, check in at LZ
     state: 'NY'
@@ -299,7 +299,7 @@ export const launchSites: LaunchSite[] = [
     elevation: 2300,
     latitude: 42.0444,
     longitude: -73.4927,
-    orientation: 'WSW-WNW',  // mtbraceclub.com: ideal 250-290° (west-facing)
+    orientation: 'SW-NW',  // mtbraceclub.com: 250-290° ideal, 230-310° usable (west-facing)
     maxWind: 20,
     siteType: 'mixed',  // Taconic range; club observer required for P2 first 10 flights
     state: 'NY'
@@ -393,8 +393,8 @@ export const launchSites: LaunchSite[] = [
     elevation: 2170,
     latitude: 39.9143,
     longitude: -77.9583,
-    orientation: 'SW-NNW',  // Launch faces WNW; flyable SW through NNW
-    maxWind: 20,
+    orientation: 'SW-W',  // CHGPA: NW ridge, launch faces W; N is a bad cross — NNW/N removed
+    maxWind: 7,  // CHGPA: paragliders typically don't fly if forecast winds exceed 7 mph
     siteType: 'mixed',  // CHGPA site above McConnellsburg PA; difficult in N cross, rocks below/left of takeoff
     state: 'PA'
   },
@@ -428,7 +428,7 @@ export const launchSites: LaunchSite[] = [
     elevation: 1830,
     latitude: 38.8706,
     longitude: -78.4500,
-    orientation: 'W-NW',  // Perched high on W slope of Massanutten; CHGPA: not good in W cross due to spine
+    orientation: 'WNW-NNW',  // NW-facing per CHGPA; W is cross and specifically called out as not-good due to spine
     maxWind: 20,
     siteType: 'mixed',  // Massanutten W slope; Holfuy weather station on observation tower above launch
     state: 'VA'
@@ -450,7 +450,7 @@ export const launchSites: LaunchSite[] = [
     elevation: 1620,
     latitude: 38.3108,
     longitude: -78.5117,
-    orientation: 'S-SW',  // CHGPA: faces SSW, not good in W cross
+    orientation: 'S-SSW',  // CHGPA: faces SSW, W cross is bad — tightened to not include SW
     maxWind: 18,
     siteType: 'mixed',  // Near Stanardsville, VA
     state: 'VA'
