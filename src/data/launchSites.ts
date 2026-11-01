@@ -318,12 +318,12 @@ export const launchSites: LaunchSite[] = [
   {
     id: 'indian-cliffs',
     name: 'Indian Cliffs',
-    elevation: 1535,
-    latitude: 42.113,
-    longitude: -76.937,
-    orientation: 'N-NE',  // N-facing escarpment of Steege Hill over Chemung River; pilot reports fly NW/NE
+    elevation: 1680,
+    latitude: 42.0897,
+    longitude: -76.9188,
+    orientation: 'N-E',  // NE-facing corner — USGS terrain drops N and E of launch; pilot reports fly NW/NE
     maxWind: 18,
-    siteType: 'mixed',  // Steege Hill north escarpment near Big Flats; GPS ref Tag's Restaurant per Upstate NY Free Flyers
+    siteType: 'mixed',  // Chemung Valley escarpment near Big Flats; GPS ref Tag's Restaurant per Upstate NY Free Flyers
     state: 'NY'
   },
 
