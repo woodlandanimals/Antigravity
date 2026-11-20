@@ -338,37 +338,77 @@ export const calculateThermalStrength = (
   return Math.max(0, Math.min(10, Math.round(strength * 10) / 10));
 };
 
+// Explicit overrides preserve historical range definitions. Any orientation NOT
+// listed here falls through to the compass-letter parser below.
+const ORIENTATION_OVERRIDES: { [key: string]: [number, number][] } = {
+  'N': [[345, 360], [0, 15]],
+  'NE': [[15, 75]],
+  'NNE-ENE': [[10, 75]],
+  'E': [[75, 105]],
+  'SE': [[105, 165]],
+  'S': [[165, 195]],
+  'SSW': [[180, 225]],
+  'SW': [[195, 255]],
+  'W': [[255, 285]],
+  'NW': [[285, 345]],
+  'NW-SW': [[285, 360], [0, 15], [195, 255]],  // NW through N to NE + SW
+  'SW-W': [[195, 285]],
+  'W-NW': [[245, 345]],
+  'SW-NW': [[195, 345]],
+  'S-NW': [[165, 345]],
+  'SSE-WNW': [[150, 300]],
+  'W-SW': [[225, 285]],
+  'E-SE': [[75, 165]],
+  'NE-SE': [[30, 165]],
+  'NW-N': [[315, 360], [0, 15]],
+  'NNW-SSW': [[202, 337]],  // Blue Rock: measured launchable range
+  // Mt Diablo combined: Juniper SW-W, Moses Rock Ridge W-NE, South ESE-S, Tower NW-NE
+  'ESE-ENE': [[105, 360], [0, 75]],
+  'ALL': [[0, 360]]
+};
+
+const COMPASS_DEG: Record<string, number> = {
+  N: 0, NNE: 22.5, NE: 45, ENE: 67.5,
+  E: 90, ESE: 112.5, SE: 135, SSE: 157.5,
+  S: 180, SSW: 202.5, SW: 225, WSW: 247.5,
+  W: 270, WNW: 292.5, NW: 315, NNW: 337.5,
+};
+const ORIENTATION_BUFFER_DEG = 15;
+
+const wrapRange = (start: number, end: number): [number, number][] => {
+  const s = ((start % 360) + 360) % 360;
+  const e = ((end % 360) + 360) % 360;
+  if (s <= e) return [[s, e]];
+  return [[s, 360], [0, e]];
+};
+
+// Parse "A" or "A-B" where A,B are 16-point compass letters. A-B takes the
+// SHORTER arc from A to B, extended by ±ORIENTATION_BUFFER_DEG at each end.
+const parseOrientationRange = (orientation: string): [number, number][] | null => {
+  const parts = orientation.split('-');
+  if (parts.length === 1) {
+    const d = COMPASS_DEG[parts[0]];
+    if (d === undefined) return null;
+    return wrapRange(d - ORIENTATION_BUFFER_DEG, d + ORIENTATION_BUFFER_DEG);
+  }
+  if (parts.length === 2) {
+    const da = COMPASS_DEG[parts[0]];
+    const db = COMPASS_DEG[parts[1]];
+    if (da === undefined || db === undefined) return null;
+    const cw = ((db - da) + 360) % 360;
+    const ccw = ((da - db) + 360) % 360;
+    if (cw <= ccw) {
+      return wrapRange(da - ORIENTATION_BUFFER_DEG, db + ORIENTATION_BUFFER_DEG);
+    }
+    return wrapRange(db - ORIENTATION_BUFFER_DEG, da + ORIENTATION_BUFFER_DEG);
+  }
+  return null;
+};
+
 export const checkWindDirectionMatch = (windDir: number, siteOrientation: string): boolean => {
-  const orientationRanges: { [key: string]: [number, number][] } = {
-    'N': [[345, 360], [0, 15]],
-    'NE': [[15, 75]],
-    'NNE-ENE': [[10, 75]],
-    'E': [[75, 105]],
-    'SE': [[105, 165]],
-    'S': [[165, 195]],
-    'SSW': [[180, 225]],
-    'SW': [[195, 255]],
-    'W': [[255, 285]],
-    'NW': [[285, 345]],
-    'NW-SW': [[285, 360], [0, 15], [195, 255]],  // NW through N to NE + SW
-    'SW-W': [[195, 285]],
-    'W-NW': [[245, 345]],
-    'SW-NW': [[195, 345]],
-    'S-NW': [[165, 345]],
-    'SSE-WNW': [[150, 300]],
-    'W-SW': [[225, 285]],
-    'E-SE': [[75, 165]],
-    'NE-SE': [[30, 165]],
-    'NW-N': [[315, 360], [0, 15]],
-    'NNW-SSW': [[202, 337]],
-    // Mt Diablo combined: Juniper SW-W, Moses Rock Ridge W-NE, South ESE-S, Tower NW-NE
-    'ESE-ENE': [[105, 360], [0, 75]],
-    'ALL': [[0, 360]]
-  };
-
-  const ranges = orientationRanges[siteOrientation];
+  const explicit = ORIENTATION_OVERRIDES[siteOrientation];
+  const ranges = explicit ?? parseOrientationRange(siteOrientation);
   if (!ranges) return false;
-
   return ranges.some(([min, max]) => windDir >= min && windDir <= max);
 };
 
